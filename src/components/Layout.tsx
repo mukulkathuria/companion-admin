@@ -1,7 +1,7 @@
 import { Bell, LogOut, Menu, User, List, PlusSquare, RotateCw, Calendar, Ticket, BarChart, MoreVertical , Trash } from 'lucide-react';
 import type { Tab } from '../App';
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import image from '../asset/featureimage.jpg'
 import {
   DropdownMenu,
@@ -16,7 +16,7 @@ import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 
 interface LayoutProps {
-  children: React.ReactNode;
+  // children: React.ReactNode;
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
 }
@@ -34,7 +34,7 @@ interface Notification {
   updateId?: number;
 }
 
-export function Layout({ children, activeTab, onTabChange }: LayoutProps) {
+export function Layout({ activeTab, onTabChange }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -309,7 +309,7 @@ export function Layout({ children, activeTab, onTabChange }: LayoutProps) {
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>

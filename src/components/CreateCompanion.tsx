@@ -207,6 +207,7 @@ import { useState } from 'react';
       const getChangedFields = (initial: CompanionForm, current: CompanionForm) => {
         const changes: { [key: string]: boolean } = {};
         for (const key in current) {
+          // eslint-disable-next-line no-prototype-builtins
           if (current.hasOwnProperty(key) && initial[key as keyof CompanionForm] !== current[key as keyof CompanionForm]) {
             changes[key] = true;
           }
@@ -226,6 +227,7 @@ import { useState } from 'react';
               const workbook = XLSX.read(binaryStr, { type: 'binary' });
               const sheetName = workbook.SheetNames[0];
               const worksheet = workbook.Sheets[sheetName];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const data = XLSX.utils.sheet_to_json(worksheet) as any[];
               console.log('Parsed Data:', data);
       
@@ -254,6 +256,7 @@ import { useState } from 'react';
               ];
       
               const missingColumns = requiredColumns.filter(
+                // eslint-disable-next-line no-prototype-builtins
                 (column) => !data[0].hasOwnProperty(column)
               );
       
