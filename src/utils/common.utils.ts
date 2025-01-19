@@ -47,3 +47,27 @@ export const convertFile = async (basestr: string, fileName: string) => {
   const blob = await res.blob();
   return new File([blob], fileName, { type: 'image/png' });
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getRandomElements(n: number, arr: any[]) {
+  if (!Number.isInteger(n) || n <= 0 || !Array.isArray(arr)) {
+    throw new TypeError("Invalid Data");
+  }
+
+  if (n > arr.length) {
+    n = arr.length;
+  }
+
+  const shuffled = arr.slice();
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled.slice(0, n);
+}
+
+export function getRandomValue(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

@@ -7,13 +7,14 @@ import {
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { LoginParamsDto } from "@/services/auth/dto/login.dto";
+import { toast } from "sonner";
 
 const Login: FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({ email: "", password: "" });
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,8 +23,8 @@ const Login: FC = () => {
 
   const validateForm = () => {
     const validationErrors: LoginParamsDto = {
-      email: '',
-      password: ''
+      email: "",
+      password: "",
     };
 
     if (!email) {
@@ -38,28 +39,37 @@ const Login: FC = () => {
       validationErrors.password = "Password is not valid";
     }
     setErrors(validationErrors);
-    return Object.values(validationErrors).length === 0;
+    const value = Object.values(validationErrors).every((l) => l);
+    return value;
   };
 
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (
+    e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLDivElement>
+  ) => {
     e.preventDefault();
     const { datafetched } = await import("../../Redux/auth/auth.reducer");
     const { decodeAccessToken } = await import("../../utils/common.utils");
-    const { loginUserService } = await import("../../services/auth/login.service");
+    const { loginUserService } = await import(
+      "../../services/auth/login.service"
+    );
     const {
       default: { set },
     } = await import("js-cookie");
-    if (validateForm()) {
+    if (!validateForm()) {
       // Submit the form data (for example, send to an API)
-      const logindata =  await loginUserService({ email, password });
-      console.log(logindata?.data, logindata?.error);
+      const logindata = await loginUserService({ email, password });
       if (logindata?.data) {
-        dispatch(datafetched(decodeAccessToken(logindata.data.access_token).decodedToken));
+        dispatch(
+          datafetched(
+            decodeAccessToken(logindata.data.access_token).decodedToken
+          )
+        );
         set(ACCESS_TOKEN_LOC, logindata.data.access_token);
         set(REFRESH_TOKEN_LOC, logindata.data.refresh_token);
         navigate("/requests");
       } else {
         console.log("Error handling");
+        toast.error("Some error occur. Please try again after sometime");
       }
     }
   };
@@ -72,40 +82,40 @@ const Login: FC = () => {
         <div className="rightbox">
           <h1 className="zestful zestnone">zestful amigos</h1>
           <div className="logindetail">
-            <div>
+            <div onKeyUp={(e) => e.key === "Enter" && handleSubmit(e)}>
               <h5>Welcome</h5>
               <p>PLEASE LOGIN TO ADMIN DASHBOARD</p>
-                <div className="lginputbox">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="Email"
-                    className="lginputfield"
-                  />
-                  <br />
-                  {errors.email && (
-                    <span style={{ color: "red" }}>{errors.email}</span>
-                  )}
-                </div>
-                <div className="lginputbox">
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="Password"
-                    className="lginputfield"
-                  />
-                  <br />
-                  {errors.password && (
-                    <span style={{ color: "red" }}>{errors.password}</span>
-                  )}
-                </div>
-                <button type="submit" className="lgbtn" onClick={handleSubmit}>
-                  Login
-                </button>
+              <div className="lginputbox">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Email"
+                  className="lginputfield"
+                />
+                <br />
+                {errors.email && (
+                  <span style={{ color: "red" }}>{errors.email}</span>
+                )}
+              </div>
+              <div className="lginputbox">
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Password"
+                  className="lginputfield"
+                />
+                <br />
+                {errors.password && (
+                  <span style={{ color: "red" }}>{errors.password}</span>
+                )}
+              </div>
+              <button type="submit" className="lgbtn" onClick={handleSubmit}>
+                Login
+              </button>
               <p className="forgotpass">forgot password ?</p>
             </div>
           </div>{" "}

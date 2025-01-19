@@ -64,7 +64,7 @@ const refreshAccessToken = async (refreshToken: string) => {
   } catch (error) {
     console.error('Error refreshing token:', error);
     await removeUserData();
-    window.location = '/login' as unknown as Location;
+    window.location = '/' as unknown as Location;
     processQueue(error, null);
     throw error;
   } finally {
@@ -81,6 +81,7 @@ axios.interceptors.response.use(
 
     // Ignore token handling if there's no token and it's not a path that needs the token
     if (!err.response?.config?.url?.includes(ignoretokenpaths) && !token) {
+      window.location = '/' as unknown as Location;
       return Promise.reject(err);
     }
 

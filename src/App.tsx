@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layout } from "./components/Layout";
+import Layout  from "./components/Layout";
 import { Requests } from "./components/Requests";
 import { CreateCompanion } from "./components/CreateCompanion";
 import { UpdateCompanion } from "./components/UpdateCompanion";
