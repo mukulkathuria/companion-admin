@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { faker } from "@faker-js/faker";
+
 import {
   skinToneData,
   BookingRateData,
@@ -36,6 +37,18 @@ import {
 } from "@/data/dto/companion.data.dto";
 import { toast } from "sonner";
 
+
+interface Image {
+  url: string;
+  file: File;
+  isMain: boolean;
+}
+
+interface ImageUploaderProps {
+  images: Image[]; // Array of images with a specific structure
+  onUpload: (updatedImages: Image[]) => void; // Callback to handle image updates
+}
+
 const initialForm: CompanionForm = {
   firstName: "",
   lastName: "",
@@ -51,6 +64,7 @@ const initialForm: CompanionForm = {
   description: [],
   bookingRate: 0,
   height: 160,
+  
 };
 
 export function CreateCompanion({
@@ -60,7 +74,15 @@ export function CreateCompanion({
   const [form, setForm] = useState<CompanionForm>(
     initialValues ? { ...initialForm, ...initialValues } : initialForm
   );
+// image uploader start
+  const [formData, setFormData] = useState<{ images: Image[] }>({
+    images: [],
+  });
 
+  const handleImageUpload = (images: Image[]) => {
+    setFormData({ ...formData, images });
+  };
+// image uploader end
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -393,6 +415,7 @@ export function CreateCompanion({
     ? getChangedFields(initialForm, form)
     : {};
 
+
   return (
     <div className="max-w-4xl mx-auto">
       <Card>
@@ -413,6 +436,10 @@ export function CreateCompanion({
             <h3 className="text-lg font-medium text-gray-700">
               Personal Details
             </h3>
+            <div>
+              <h1>profile picture</h1>
+              <ImageUploader images={formData.images} onUpload={handleImageUpload} />  
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="firstName">First Name</Label>
@@ -700,3 +727,80 @@ export function CreateCompanion({
     </div>
   );
 }
+
+
+
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onUpload }) => {
+  const [localImages, setLocalImages] = useState<Image[]>(images);
+  const maxImages = 5;
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (localImages.length + files.length > maxImages) {
+      alert(`You can only upload up to ${maxImages} images.`);
+      return;
+    }
+
+    const newImages: Image[] = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+      isMain: localImages.length === 0 && files.length === 1,
+    }));
+
+    const updatedImages = [...localImages, ...newImages];
+    setLocalImages(updatedImages);
+    onUpload(updatedImages);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const updatedImages = localImages.filter((_, i) => i !== index);
+    setLocalImages(updatedImages);
+    onUpload(updatedImages);
+  };
+
+  const setMainImage = (index: number) => {
+    const updatedImages = localImages.map((img, i) => ({
+      ...img,
+      isMain: i === index,
+    }));
+    setLocalImages(updatedImages);
+    onUpload(updatedImages);
+  };
+
+  return (
+    <div className="image-uploader">
+      {localImages.map((img, index) => (
+        <div key={index} className="image-container">
+          <img
+            src={img.url}
+            alt={`Uploaded ${index + 1}`}
+            className="uploaded-image"
+          />
+          {img.isMain ? (
+            <span className="main-label">Main</span>
+          ) : (
+            <span className="index-label" onClick={() => setMainImage(index)}>
+              {index + 1}
+            </span>
+          )}
+          <button
+            className="remove-button"
+            onClick={() => handleRemoveImage(index)}
+          >
+            &times;
+          </button>
+        </div>
+      ))}
+      {localImages.length < maxImages && (
+        <label className="add-image">
+          <input
+            type="file"
+            onChange={handleImageUpload}
+            style={{ display: "none" }}
+          />
+          <span>+</span>
+        </label>
+      )}
+    </div>
+  );
+};

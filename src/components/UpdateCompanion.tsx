@@ -9,6 +9,7 @@ import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandItem } f
 import { SearchIcon } from 'lucide-react';
 import { CompanionForm } from './CompanionForm';
 
+
 interface Companion {
   id: number;
   firstName: string;
@@ -119,6 +120,8 @@ export function UpdateCompanion() {
     };
   }, [handleKeyDown]);
 
+
+
   return (
     <div className="space-y-6 p-6">
 <CommandDialog open={open} onOpenChange={setOpen}>
@@ -166,6 +169,9 @@ export function UpdateCompanion() {
                 <CardTitle className="text-xl font-semibold text-gray-900">Original Profile</CardTitle>
                 <CardDescription className="text-gray-500">Current profile data</CardDescription>
               </CardHeader>
+              <div>
+               
+              </div>
               <CardContent className="space-y-4">
                 <div className="flex items-center">
                   <Avatar />
