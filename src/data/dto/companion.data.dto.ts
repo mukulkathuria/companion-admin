@@ -1,4 +1,11 @@
+export interface ImageDto {
+  url: string;
+  file: File;
+  isMain: boolean;
+}
+
 export interface CompanionForm {
+  images: ImageDto[] | null,
     firstName: string;
     lastName: string;
     age: number;

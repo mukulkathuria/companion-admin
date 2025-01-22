@@ -1,3 +1,5 @@
+import { ImageDto } from "@/data/dto/companion.data.dto";
+
 export const dummySlotRequests = [
   {
     id: 1,
@@ -123,6 +125,7 @@ export const dummyCompanionCancellations = [
 ];
 
 interface Companion {
+  images: ImageDto[] | null,
   id: number;
   firstName: string;
   lastName: string;
@@ -155,6 +158,7 @@ export const dummyUpdateRequests: UpdateRequest[] = [
     companionId: 1,
     oldProfile: {
       id: 1,
+      images: null,
       firstName: 'Sarah',
       lastName: 'Wilson',
       age: 24,
@@ -181,6 +185,7 @@ export const dummyUpdateRequests: UpdateRequest[] = [
     id: 2,
     companionId: 2,
     oldProfile: {
+      images: null,
       id: 2,
       firstName: 'James',
       lastName: 'Brown',

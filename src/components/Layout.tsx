@@ -32,7 +32,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "./ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import withAuth from "@/hoc/wihAuth";
+//import withAuth from "@/hoc/wihAuth";
 
 interface LayoutProps {
   // children: React.ReactNode;
@@ -429,4 +429,4 @@ function Layout({ activeTab, onTabChange }: LayoutProps) {
   );
 }
 
-export default withAuth(Layout);
+export default Layout;

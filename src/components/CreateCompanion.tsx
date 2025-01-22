@@ -35,8 +35,10 @@ import {
   OtherCompanionBodyTypeEnum,
 } from "@/data/dto/companion.data.dto";
 import { toast } from "sonner";
+import ImageUploader from "./ui/ImageUploader";
 
 const initialForm: CompanionForm = {
+  images: null,
   firstName: "",
   lastName: "",
   age: 18,
@@ -60,7 +62,6 @@ export function CreateCompanion({
   const [form, setForm] = useState<CompanionForm>(
     initialValues ? { ...initialForm, ...initialValues } : initialForm
   );
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -122,7 +123,9 @@ export function CreateCompanion({
     userData.append("lng", String(faker.number.float({ min: 60, max: 70 })));
     // If all validations pass, proceed with form submission
     try {
-      const { registerUserService } = await import("../services/auth/register.service");
+      const { registerUserService } = await import(
+        "../services/auth/register.service"
+      );
       await registerUserService(userData);
       toast.success("Companion Created Successfully!!!");
     } catch (error) {
@@ -413,6 +416,15 @@ export function CreateCompanion({
             <h3 className="text-lg font-medium text-gray-700">
               Personal Details
             </h3>
+            <div>
+              <h1>profile picture</h1>
+              <ImageUploader
+                images={form.images}
+                onUpload={() => {
+                  console.log("For Uploading Images");
+                }}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="firstName">First Name</Label>
