@@ -21,33 +21,14 @@ import {
 } from "./ui/command";
 import { SearchIcon } from "lucide-react";
 import { CompanionForm } from "./CompanionForm";
-import { ImageDto } from "@/data/dto/companion.data.dto";
+import { CompanionFormDto } from "@/data/dto/companion.data.dto";
 
-interface Companion {
-  images: ImageDto[] | null;
-  id: number;
-  firstName: string;
-  lastName: string;
-  age: number;
-  gender: "Male" | "Female" | "OTHER";
-  skinTone: "Fair" | "Brown" | "Dark";
-  bodyType: string;
-  eatingHabits: string;
-  smokingHabit: string;
-  drinkingHabit: string;
-  location: string;
-  email: string;
-  bookingRate: number;
-  description: string[]; // Updated to string array
-  password?: string;
-  height: number;
-}
 
 interface UpdateRequest {
   id: number;
   companionId: number;
-  oldProfile: Companion;
-  newProfile: Partial<Companion>;
+  oldProfile: CompanionFormDto;
+  newProfile: Partial<CompanionFormDto>;
   status: "pending" | "approved" | "rejected";
 }
 
@@ -62,7 +43,7 @@ export function UpdateCompanion() {
   const [open, setOpen] = useState(false);
   const [filteredRequests, setFilteredRequests] =
     useState<UpdateRequest[]>(dummyUpdateRequests);
-  const [selectedCompanion, setSelectedCompanion] = useState<Companion | null>(
+  const [selectedCompanion, setSelectedCompanion] = useState<CompanionFormDto | null>(
     null
   );
 
@@ -81,7 +62,7 @@ export function UpdateCompanion() {
     setSelectedRequest({ ...request, status: "approved" });
     toast({
       title: "Approved",
-      description: `Update request for ${request.oldProfile.firstName} approved`,
+      description: `Update request for ${request.oldProfile.firstname} approved`,
     });
   };
 
@@ -89,11 +70,11 @@ export function UpdateCompanion() {
     setSelectedRequest({ ...request, status: "rejected" });
     toast({
       title: "Rejected",
-      description: `Update request for ${request.oldProfile.firstName} rejected`,
+      description: `Update request for ${request.oldProfile.firstname} rejected`,
     });
   };
 
-  const handleDelete = (companionId: number) => {
+  const handleDelete = (companionId: number | undefined) => {
     // Implement delete logic here
     toast({
       title: "Deleted",
@@ -112,8 +93,8 @@ export function UpdateCompanion() {
     const filtered = dummyUpdateRequests.filter((request) => {
       const idMatch = String(request.id).includes(value);
       const nameMatch =
-        request.oldProfile.firstName.toLowerCase().includes(searchTerm) ||
-        request.oldProfile.lastName.toLowerCase().includes(searchTerm);
+        request.oldProfile.firstname.toLowerCase().includes(searchTerm) ||
+        request.oldProfile.lastname.toLowerCase().includes(searchTerm);
       return idMatch || nameMatch;
     });
     setFilteredRequests(filtered);
@@ -121,7 +102,7 @@ export function UpdateCompanion() {
     setOpen(false);
   };
 
-  const handleSelectCompanion = (companion: Companion) => {
+  const handleSelectCompanion = (companion: CompanionFormDto) => {
     setSelectedCompanion(companion);
     setSelectedRequest(null);
     setOpen(false);
@@ -162,8 +143,8 @@ export function UpdateCompanion() {
                 className="text-gray-900 hover:bg-gray-100 p-4 cursor-pointer flex items-center"
               >
                 <SearchIcon className="mr-2 h-4 w-4 text-gray-500" />
-                {request.id} - {request.oldProfile.firstName}{" "}
-                {request.oldProfile.lastName}
+                {request.id} - {request.oldProfile.firstname}{" "}
+                {request.oldProfile.lastname}
               </CommandItem>
             ))}
             {dummyUpdateRequests.map((request) => (
@@ -174,7 +155,7 @@ export function UpdateCompanion() {
                 className="text-gray-900 hover:bg-gray-100 p-4 cursor-pointer flex items-center"
               >
                 <SearchIcon className="mr-2 h-4 w-4 text-gray-500" />
-                {request.oldProfile.firstName} {request.oldProfile.lastName}
+                {request.oldProfile.firstname} {request.oldProfile.lastname}
               </CommandItem>
             ))}
           </CommandList>
@@ -203,8 +184,8 @@ export function UpdateCompanion() {
                   <Avatar />
                   <div className="ml-4">
                     <p className="font-medium text-gray-900">
-                      {selectedRequest.oldProfile.firstName}{" "}
-                      {selectedRequest.oldProfile.lastName}
+                      {selectedRequest.oldProfile.firstname}{" "}
+                      {selectedRequest.oldProfile.lastname}
                     </p>
                     <p className="text-sm text-gray-500">
                       {selectedRequest.oldProfile.email}
@@ -213,11 +194,11 @@ export function UpdateCompanion() {
                 </div>
                 <p>
                   <strong className="text-gray-700">Location:</strong>{" "}
-                  {selectedRequest.oldProfile.location}
+                  {selectedRequest.oldProfile.city}
                 </p>
                 <p>
                   <strong className="text-gray-700">Booking Rate:</strong>{" "}
-                  {selectedRequest.oldProfile.bookingRate}
+                  {selectedRequest.oldProfile.bookingrate}
                 </p>
                 <p>
                   <strong className="text-gray-700">Description:</strong>{" "}
@@ -234,23 +215,23 @@ export function UpdateCompanion() {
                 </p>
                 <p>
                   <strong className="text-gray-700">Skin Tone:</strong>{" "}
-                  {selectedRequest.oldProfile.skinTone}
+                  {selectedRequest.oldProfile.skintone}
                 </p>
                 <p>
                   <strong className="text-gray-700">Body Type:</strong>{" "}
-                  {selectedRequest.oldProfile.bodyType}
+                  {selectedRequest.oldProfile.bodytype}
                 </p>
                 <p>
                   <strong className="text-gray-700">Eating Habits:</strong>{" "}
-                  {selectedRequest.oldProfile.eatingHabits}
+                  {selectedRequest.oldProfile.eatinghabits}
                 </p>
                 <p>
                   <strong className="text-gray-700">Smoking Habit:</strong>{" "}
-                  {selectedRequest.oldProfile.smokingHabit}
+                  {selectedRequest.oldProfile.smokinghabits}
                 </p>
                 <p>
                   <strong className="text-gray-700">Drinking Habit:</strong>{" "}
-                  {selectedRequest.oldProfile.drinkingHabit}
+                  {selectedRequest.oldProfile.drinkinghabits}
                 </p>
                 <p>
                   <strong className="text-gray-700">Height:</strong>{" "}
@@ -275,7 +256,7 @@ export function UpdateCompanion() {
             </Button>
             <div className="flex space-x-4">
               <Button
-                onClick={() => handleDelete(selectedRequest.oldProfile.id)}
+                onClick={() => handleDelete(selectedRequest.oldProfile?.id)}
                 variant="destructive"
                 className="bg-red-600 hover:bg-red-700"
               >
@@ -361,8 +342,8 @@ export function UpdateCompanion() {
                           <Avatar />
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
-                              {request.oldProfile.firstName}{" "}
-                              {request.oldProfile.lastName}
+                              {request.oldProfile.firstname}{" "}
+                              {request.oldProfile.lastname}
                             </div>
                           </div>
                         </div>

@@ -116,7 +116,7 @@ function Layout({ activeTab, onTabChange }: LayoutProps) {
       newNotifications.push({
         id: request.id,
         type: "updateCompanion",
-        message: `Update request from ${request.oldProfile.firstName}`,
+        message: `Update request from ${request.oldProfile.firstname}`,
         time: new Date().toLocaleTimeString(),
         updateId: request.id,
       });

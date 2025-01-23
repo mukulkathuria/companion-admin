@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
     } from 'recharts';
 
     interface GeographicInsightsProps {
-      revenueByLocation: { [key: string]: number };
+      revenueBycity: { [key: string]: number };
       topRevenueZones: string[];
       barColor?: string;
     }

@@ -2,30 +2,34 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Label } from "./ui/label";
 import ImageUploader from "./ui/ImageUploader";
-import { CompanionDescriptionEnum, type CompanionForm } from "@/data/dto/companion.data.dto";
+import {
+  CompanionDescriptionEnum,
+  CompanionFormDto,
+  ErrorFormDto,
+} from "@/data/dto/companion.data.dto";
 
 // Dummy data for the original profile
-const initialForm: CompanionForm = {
+const initialForm: CompanionFormDto = {
   images: null,
-  firstName: "John",
-  lastName: "Doe",
+  firstname: "John",
+  lastname: "Doe",
   age: 25,
   gender: "Male",
-  skinTone: "Fair",
-  bodyType: "Athletic",
-  eatingHabits: "Non-Veg",
-  smokingHabit: "Non-Smoker",
-  drinkingHabit: "Occasionally",
-  location: "New York",
+  skintone: "Fair",
+  bodytype: "Athletic",
+  eatinghabits: "Non-Veg",
+  smokinghabits: "Non-Smoker",
+  drinkinghabits: "Occasionally",
+  city: "New York",
   email: "johndoe@example.com",
   password: "",
   description: ["MOVIES", "TRAVEL_BUDDY", "FITNESS_PARTNER"], // Pre-selected descriptions
-  bookingRate: 50,
+  bookingrate: 50,
   height: 180,
 };
 
 interface CompanionFormProps {
-  initialForm?: Partial<CompanionForm>;
+  initialForm?: Partial<CompanionFormDto>;
   buttonText?: string;
 }
 
@@ -33,27 +37,36 @@ export function CompanionForm({
   initialForm: initialValues,
   buttonText = "Create Companion",
 }: CompanionFormProps) {
-  const [form, setForm] = useState<CompanionForm>(
+  const [form, setForm] = useState<CompanionFormDto>(
     initialValues ? { ...initialForm, ...initialValues } : initialForm
   );
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const [error, setError] = useState<ErrorFormDto>({});
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+    const { validateRegisteration } = await import(
+      "../utils/validations/companionform.validate"
+    );
+    const errors = validateRegisteration(form);
+    if (Object.keys(errors).length) {
+      setError(errors);
+      return;
+    }
     // Validate all required fields
-    const requiredFields: (keyof CompanionForm)[] = [
-      "firstName",
-      "lastName",
+    const requiredFields: (keyof CompanionFormDto)[] = [
+      "firstname",
+      "lastname",
       "age",
       "gender",
-      "skinTone",
-      "bodyType",
-      "eatingHabits",
-      "smokingHabit",
-      "drinkingHabit",
-      "location",
+      "skintone",
+      "bodytype",
+      "eatinghabits",
+      "smokinghabits",
+      "drinkinghabits",
+      "city",
       "email",
-      "bookingRate",
+      "bookingrate",
       "height",
     ];
 
@@ -113,6 +126,7 @@ export function CompanionForm({
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setError((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,14 +167,17 @@ export function CompanionForm({
     }
   };
 
-  const getChangedFields = (initial: CompanionForm, current: CompanionForm) => {
+  const getChangedFields = (
+    initial: CompanionFormDto,
+    current: CompanionFormDto
+  ) => {
     const changes: { [key: string]: boolean } = {};
     for (const key in current) {
       if (
         // eslint-disable-next-line no-prototype-builtins
         current.hasOwnProperty(key) &&
-        initial[key as keyof CompanionForm] !==
-          current[key as keyof CompanionForm]
+        initial[key as keyof CompanionFormDto] !==
+          current[key as keyof CompanionFormDto]
       ) {
         changes[key] = true;
       }
@@ -178,10 +195,10 @@ export function CompanionForm({
         {/* Personal Details Section */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-700">Update Details</h3>
-            <ImageUploader
-              images={form.images}
-              onUpload={() => console.log("Uploading Pending")}
-            />
+          <ImageUploader
+            images={form.images}
+            onUpload={() => console.log("Uploading Pending")}
+          />
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -189,15 +206,18 @@ export function CompanionForm({
               </label>
               <input
                 type="text"
-                name="firstName"
-                value={form.firstName}
+                name="firstname"
+                value={form.firstname}
                 onChange={handleChange}
                 className={cn(
                   "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.firstName && "border-green-500"
+                  changedFields.firstname && "border-green-500"
                 )}
                 required
               />
+              {error?.firstname && (
+                <span className="errorMessage">{error.firstname}</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -205,15 +225,18 @@ export function CompanionForm({
               </label>
               <input
                 type="text"
-                name="lastName"
-                value={form.lastName}
+                name="lastname"
+                value={form.lastname}
                 onChange={handleChange}
                 className={cn(
                   "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.lastName && "border-green-500"
+                  changedFields.lastname && "border-green-500"
                 )}
                 required
               />
+              {error?.lastname && (
+                <span className="errorMessage">{error.lastname}</span>
+              )}
             </div>
           </div>
         </div>
@@ -239,36 +262,42 @@ export function CompanionForm({
                 <option value="Female">Female</option>
                 <option value="OTHER">Other</option>
               </select>
+              {error?.gender && (
+                <span className="errorMessage">{error.gender}</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Skin Tone
               </label>
               <select
-                name="skinTone"
-                value={form.skinTone}
+                name="skintone"
+                value={form.skintone}
                 onChange={handleChange}
                 className={cn(
                   "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.skinTone && "border-green-500"
+                  changedFields.skintone && "border-green-500"
                 )}
               >
                 <option value="Fair">Fair</option>
                 <option value="Brown">Brown</option>
                 <option value="Dark">Dark</option>
               </select>
+              {error?.skintone && (
+                <span className="errorMessage">{error.skintone}</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Body Type
               </label>
               <select
-                name="bodyType"
-                value={form.bodyType}
+                name="bodytype"
+                value={form.bodytype}
                 onChange={handleChange}
                 className={cn(
                   "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.bodyType && "border-green-500"
+                  changedFields.bodytype && "border-green-500"
                 )}
               >
                 <option value="">Select Body Type</option>
@@ -278,6 +307,9 @@ export function CompanionForm({
                   </option>
                 ))}
               </select>
+              {error?.bodytype && (
+                <span className="errorMessage">{error.bodytype}</span>
+              )}
             </div>
           </div>
         </div>
@@ -291,12 +323,12 @@ export function CompanionForm({
                 Eating Habits
               </label>
               <select
-                name="eatingHabits"
-                value={form.eatingHabits}
+                name="eatinghabits"
+                value={form.eatinghabits}
                 onChange={handleChange}
                 className={cn(
                   "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.eatingHabits && "border-green-500"
+                  changedFields.eatinghabits && "border-green-500"
                 )}
               >
                 <option value="">Select Eating Habits</option>
@@ -306,18 +338,21 @@ export function CompanionForm({
                 <option value="Jain">Jain</option>
                 <option value="Vegan">Vegan</option>
               </select>
+              {error?.eatinghabits && (
+                <span className="errorMessage">{error.eatinghabits}</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Smoking Habit
               </label>
               <select
-                name="smokingHabit"
-                value={form.smokingHabit}
+                name="smokinghabits"
+                value={form.smokinghabits}
                 onChange={handleChange}
                 className={cn(
                   "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.smokingHabit && "border-green-500"
+                  changedFields.smokinghabits && "border-green-500"
                 )}
               >
                 <option value="">Select Smoking Habit</option>
@@ -326,18 +361,21 @@ export function CompanionForm({
                 <option value="Active Smoking">Active Smoking</option>
                 <option value="Occasionally">Occasionally</option>
               </select>
+              {error?.smokinghabits && (
+                <span className="errorMessage">{error.smokinghabits}</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Drinking Habit
               </label>
               <select
-                name="drinkingHabit"
-                value={form.drinkingHabit}
+                name="drinkinghabits"
+                value={form.drinkinghabits}
                 onChange={handleChange}
                 className={cn(
                   "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.drinkingHabit && "border-green-500"
+                  changedFields.drinkinghabits && "border-green-500"
                 )}
               >
                 <option value="">Select Drinking Habit</option>
@@ -345,6 +383,9 @@ export function CompanionForm({
                 <option value="Drinker">Drinker</option>
                 <option value="Occasionally">Occasionally</option>
               </select>
+              {error?.drinkinghabits && (
+                <span className="errorMessage">{error.drinkinghabits}</span>
+              )}
             </div>
           </div>
         </div>
@@ -360,14 +401,17 @@ export function CompanionForm({
               <input
                 type="text"
                 name="location"
-                value={form.location}
+                value={form.city}
                 onChange={handleChange}
                 className={cn(
                   "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.location && "border-green-500"
+                  changedFields.city && "border-green-500"
                 )}
                 required
               />
+              {error?.city && (
+                <span className="errorMessage">{error.city}</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -384,6 +428,9 @@ export function CompanionForm({
                 )}
                 required
               />
+              {error?.email && (
+                <span className="errorMessage">{error.email}</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -399,6 +446,9 @@ export function CompanionForm({
                   changedFields.password && "border-green-500"
                 )}
               />
+              {error?.password && (
+                <span className="errorMessage">{error.password}</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -406,15 +456,18 @@ export function CompanionForm({
               </label>
               <input
                 type="number"
-                name="bookingRate"
-                value={form.bookingRate}
+                name="bookingrate"
+                value={form.bookingrate}
                 onChange={handleChange}
                 className={cn(
                   "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.bookingRate && "border-green-500"
+                  changedFields.bookingrate && "border-green-500"
                 )}
                 required
               />
+              {error?.bookingrate && (
+                <span className="errorMessage">{error.bookingrate}</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -431,6 +484,9 @@ export function CompanionForm({
                 )}
                 required
               />
+              {error?.height && (
+                <span className="errorMessage">{error.height}</span>
+              )}
             </div>
             <div className="col-span-2 bg-gray-50 p-4 rounded-lg">
               <Label
@@ -462,6 +518,9 @@ export function CompanionForm({
                     </Label>
                   </div>
                 ))}
+                {error?.description && (
+                  <span className="errorMessage">{error.description}</span>
+                )}
               </div>
             </div>
           </div>
