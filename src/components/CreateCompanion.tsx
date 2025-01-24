@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import * as XLSX from "xlsx";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { faker } from "@faker-js/faker";
@@ -23,35 +22,31 @@ import {
 import { getRandomElements } from "@/utils/common.utils";
 import {
   CompanionDescriptionEnum,
-  CompanionDrinkingHabitEnum,
-  CompanionEatingHabitsEnum,
-  CompanionForm,
-  CompanionSkinToneEnum,
-  CompanionSmokingHabitEnum,
+  CompanionFormDto,
   CreateCompanionProps,
+  ErrorFormDto,
   FemaleCompanionBodyTypeEnum,
-  GenderEnum,
   MaleCompanionBodyTypeEnum,
   OtherCompanionBodyTypeEnum,
 } from "@/data/dto/companion.data.dto";
 import { toast } from "sonner";
 import ImageUploader from "./ui/ImageUploader";
 
-const initialForm: CompanionForm = {
+const initialForm: CompanionFormDto = {
   images: null,
-  firstName: "",
-  lastName: "",
+  firstname: "",
+  lastname: "",
   age: 18,
   gender: "Male",
-  skinTone: "Fair",
-  bodyType: "",
-  eatingHabits: "",
-  smokingHabit: "",
-  drinkingHabit: "",
-  location: "",
+  skintone: "Fair",
+  bodytype: "",
+  eatinghabits: "",
+  smokinghabits: "",
+  drinkinghabits: "",
+  city: "",
   email: "",
   description: [],
-  bookingRate: 0,
+  bookingrate: 0,
   height: 160,
 };
 
@@ -59,9 +54,11 @@ export function CreateCompanion({
   initialForm: initialValues,
   buttonText = "Create Companion",
 }: CreateCompanionProps) {
-  const [form, setForm] = useState<CompanionForm>(
+  const [form, setForm] = useState<CompanionFormDto>(
     initialValues ? { ...initialForm, ...initialValues } : initialForm
   );
+  const [error, setError] = useState<ErrorFormDto>({});
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -92,6 +89,15 @@ export function CreateCompanion({
     //   alert('Height must be at least 100cm.');
     //   return;
     // }
+    const { validateRegisteration } = await import(
+      "../utils/validations/companionform.validate"
+    );
+    const errors = validateRegisteration(form);
+    if (Object.keys(errors).length) {
+      setError(errors);
+      return
+    }
+    console.log("Images", form.images);
     const userData = new FormData();
 
     userData.append("firstname", faker.person.firstName("female"));
@@ -150,6 +156,7 @@ export function CreateCompanion({
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setError((prev) => ({ ...prev, [name]: '' }));
   };
 
   const getBodyTypes = (gender: "Male" | "Female" | "OTHER") => {
@@ -165,14 +172,17 @@ export function CreateCompanion({
     }
   };
 
-  const getChangedFields = (initial: CompanionForm, current: CompanionForm) => {
+  const getChangedFields = (
+    initial: CompanionFormDto,
+    current: CompanionFormDto
+  ) => {
     const changes: { [key: string]: boolean } = {};
     for (const key in current) {
       if (
         // eslint-disable-next-line no-prototype-builtins
         current.hasOwnProperty(key) &&
-        initial[key as keyof CompanionForm] !==
-          current[key as keyof CompanionForm]
+        initial[key as keyof CompanionFormDto] !==
+          current[key as keyof CompanionFormDto]
       ) {
         changes[key] = true;
       }
@@ -183,213 +193,8 @@ export function CreateCompanion({
   const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // handling Excel File
 
-    const reader = new FileReader();
-    reader.onload = (event: ProgressEvent<FileReader>) => {
-      const binaryStr = event.target?.result;
-      if (typeof binaryStr === "string") {
-        try {
-          const workbook = XLSX.read(binaryStr, { type: "binary" });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const data = XLSX.utils.sheet_to_json(worksheet) as any[];
-          console.log("Parsed Data:", data);
-
-          if (data.length === 0) {
-            alert("The Excel file is empty.");
-            return;
-          }
-
-          // Check if all required columns are present
-          const requiredColumns = [
-            "firstname",
-            "lastname",
-            "email",
-            "password",
-            "gender",
-            "age",
-            "description",
-            "skintone",
-            "city",
-            "bookingrate",
-            "height",
-            "bodytype",
-            "eatinghabits",
-            "drinkinghabits",
-            "smokinghabits",
-          ];
-
-          const missingColumns = requiredColumns.filter(
-            // eslint-disable-next-line no-prototype-builtins
-            (column) => !data[0].hasOwnProperty(column)
-          );
-
-          if (missingColumns.length > 0) {
-            alert(`Missing required columns: ${missingColumns.join(", ")}`);
-            return;
-          }
-
-          // Validate and transform data
-          const validatedData = [];
-          const invalidRows = [];
-
-          for (const row of data) {
-            try {
-              // Validate numeric fields
-              const age = parseInt(row.age, 10);
-              const bookingRate = parseFloat(row.bookingrate);
-              const height = parseInt(row.height, 10);
-
-              if (isNaN(age) || age < 0) {
-                throw new Error(`Invalid age: ${row.age}`);
-              }
-              if (isNaN(bookingRate) || bookingRate < 0) {
-                throw new Error(`Invalid booking rate: ${row.bookingrate}`);
-              }
-              if (isNaN(height) || height < 0) {
-                throw new Error(`Invalid height: ${row.height}`);
-              }
-
-              // Validate enum fields
-              const gender = Object.values(GenderEnum).includes(row.gender)
-                ? row.gender
-                : null;
-
-              // Split description into an array and validate each value
-              const description = row.description
-                .split(",")
-                .map((d: string) => d.trim())
-                .filter((d: string) => {
-                  // Check if the description is a valid enum value
-                  return Object.values(CompanionDescriptionEnum).includes(
-                    d as CompanionDescriptionEnum
-                  );
-                });
-
-              if (description.length < 2) {
-                throw new Error("At least 2 valid descriptions are required");
-              }
-
-              const skinTone = Object.values(CompanionSkinToneEnum).includes(
-                row.skintone
-              )
-                ? row.skintone
-                : null;
-
-              // Validate body type based on gender
-              let bodyType = null;
-              if (gender === GenderEnum.MALE) {
-                bodyType = Object.values(MaleCompanionBodyTypeEnum).includes(
-                  row.bodytype
-                )
-                  ? row.bodytype
-                  : null;
-              } else if (gender === GenderEnum.FEMALE) {
-                bodyType = Object.values(FemaleCompanionBodyTypeEnum).includes(
-                  row.bodytype
-                )
-                  ? row.bodytype
-                  : null;
-              } else if (gender === GenderEnum.OTHER) {
-                bodyType = Object.values(OtherCompanionBodyTypeEnum).includes(
-                  row.bodytype
-                )
-                  ? row.bodytype
-                  : null;
-              }
-
-              const eatingHabits = Object.values(
-                CompanionEatingHabitsEnum
-              ).includes(row.eatinghabits)
-                ? row.eatinghabits
-                : null;
-
-              const drinkingHabit = Object.values(
-                CompanionDrinkingHabitEnum
-              ).includes(row.drinkinghabits)
-                ? row.drinkinghabits
-                : null;
-
-              const smokingHabit = Object.values(
-                CompanionSmokingHabitEnum
-              ).includes(row.smokinghabits)
-                ? row.smokinghabits
-                : null;
-
-              // Skip row if any enum field is invalid
-              if (
-                !gender ||
-                !skinTone ||
-                !bodyType ||
-                !eatingHabits ||
-                !drinkingHabit ||
-                !smokingHabit
-              ) {
-                throw new Error("Invalid enum value(s)");
-              }
-
-              // Add validated row to the result
-              validatedData.push({
-                firstName: row.firstname,
-                lastName: row.lastname,
-                email: row.email,
-                password: row.password,
-                gender,
-                age,
-                description: description as CompanionDescriptionEnum[], // Cast to enum array
-                skinTone,
-                location: row.city,
-                bookingRate,
-                height,
-                bodyType,
-                eatingHabits,
-                drinkingHabit,
-                smokingHabit,
-              });
-            } catch (error) {
-              // Log invalid rows for debugging
-              invalidRows.push({
-                row,
-                error: error instanceof Error ? error.message : "Unknown error",
-              });
-            }
-          }
-
-          // Log invalid rows (for debugging)
-          if (invalidRows.length > 0) {
-            console.warn("Invalid rows skipped:", invalidRows);
-          }
-
-          // Simulate API call
-          if (validatedData.length > 0) {
-            alert(`${validatedData.length} companions added successfully!`);
-            console.log("Validated Data:", validatedData);
-
-            // Replace the alert with an actual API call
-            // fetch('/api/companions', {
-            //   method: 'POST',
-            //   headers: { 'Content-Type': 'application/json' },
-            //   body: JSON.stringify(validatedData),
-            // })
-            //   .then((response) => response.json())
-            //   .then((data) => console.log('API response:', data))
-            //   .catch((error) => console.error('API error:', error));
-          } else {
-            alert("No valid rows found in the Excel file.");
-          }
-        } catch (error) {
-          if (error instanceof Error) {
-            alert(`Error processing Excel file: ${error.message}`);
-            console.error(error);
-          } else {
-            alert("An unknown error occurred while processing the Excel file.");
-            console.error(error);
-          }
-        }
-      }
-    };
-    reader.readAsBinaryString(file);
   };
 
   const changedFields = initialValues
@@ -420,33 +225,35 @@ export function CreateCompanion({
               <h1>profile picture</h1>
               <ImageUploader
                 images={form.images}
-                onUpload={() => {
-                  console.log("For Uploading Images");
+                onUpload={(images) => {
+                  setForm((l) => ({ ...l, images }));
                 }}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstname">First Name</Label>
                 <Input
                   type="text"
-                  name="firstName"
-                  value={form.firstName}
+                  name="firstname"
+                  value={form.firstname}
                   onChange={handleChange}
-                  className={cn(changedFields.firstName && "border-green-500")}
+                  className={cn(changedFields.firstname && "border-green-500")}
                   required
                 />
+                {error?.firstname && <span className="errorMessage">{error.firstname}</span>}
               </div>
               <div>
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastname">Last Name</Label>
                 <Input
                   type="text"
-                  name="lastName"
-                  value={form.lastName}
+                  name="lastname"
+                  value={form.lastname}
                   onChange={handleChange}
-                  className={cn(changedFields.lastName && "border-green-500")}
+                  className={cn(changedFields.lastname && "border-green-500")}
                   required
                 />
+                   {error?.lastname && <span className="errorMessage">{error.lastname}</span>}
               </div>
             </div>
           </div>
@@ -470,32 +277,34 @@ export function CreateCompanion({
                   <option value="Female">Female</option>
                   <option value="OTHER">Other</option>
                 </select>
+                {error?.gender && <span className="errorMessage">{error.gender}</span>}
               </div>
               <div>
-                <Label htmlFor="skinTone">Skin Tone</Label>
+                <Label htmlFor="skintone">Skin Tone</Label>
                 <select
-                  name="skinTone"
-                  value={form.skinTone}
+                  name="skintone"
+                  value={form.skintone}
                   onChange={handleChange}
                   className={cn(
                     "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                    changedFields.skinTone && "border-green-500"
+                    changedFields.skintone && "border-green-500"
                   )}
                 >
                   <option value="Fair">Fair</option>
                   <option value="Brown">Brown</option>
                   <option value="Dark">Dark</option>
                 </select>
+                {error?.skintone && <span className="errorMessage">{error.skintone}</span>}
               </div>
               <div>
-                <Label htmlFor="bodyType">Body Type</Label>
+                <Label htmlFor="bodytype">Body Type</Label>
                 <select
-                  name="bodyType"
-                  value={form.bodyType}
+                  name="bodytype"
+                  value={form.bodytype}
                   onChange={handleChange}
                   className={cn(
                     "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                    changedFields.bodyType && "border-green-500"
+                    changedFields.bodytype && "border-green-500"
                   )}
                 >
                   <option value="">Select Body Type</option>
@@ -505,6 +314,7 @@ export function CreateCompanion({
                     </option>
                   ))}
                 </select>
+                {error?.bodytype && <span className="errorMessage">{error.bodytype}</span>}
               </div>
             </div>
           </div>
@@ -514,14 +324,14 @@ export function CreateCompanion({
             <h3 className="text-lg font-medium text-gray-700">Habits</h3>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="eatingHabits">Eating Habits</Label>
+                <Label htmlFor="eatinghabits">Eating Habits</Label>
                 <select
-                  name="eatingHabits"
-                  value={form.eatingHabits}
+                  name="eatinghabits"
+                  value={form.eatinghabits}
                   onChange={handleChange}
                   className={cn(
                     "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                    changedFields.eatingHabits && "border-green-500"
+                    changedFields.eatinghabits && "border-green-500"
                   )}
                 >
                   <option value="">Select Eating Habits</option>
@@ -531,16 +341,17 @@ export function CreateCompanion({
                   <option value="Jain">Jain</option>
                   <option value="Vegan">Vegan</option>
                 </select>
+                {error?.eatinghabits && <span className="errorMessage">{error.eatinghabits}</span>}
               </div>
               <div>
-                <Label htmlFor="smokingHabit">Smoking Habit</Label>
+                <Label htmlFor="smokinghabits">Smoking Habit</Label>
                 <select
-                  name="smokingHabit"
-                  value={form.smokingHabit}
+                  name="smokinghabits"
+                  value={form.smokinghabits}
                   onChange={handleChange}
                   className={cn(
                     "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                    changedFields.smokingHabit && "border-green-500"
+                    changedFields.smokinghabits && "border-green-500"
                   )}
                 >
                   <option value="">Select Smoking Habit</option>
@@ -549,16 +360,17 @@ export function CreateCompanion({
                   <option value="Active Smoking">Active Smoking</option>
                   <option value="Occasionally">Occasionally</option>
                 </select>
+                {error?.smokinghabits && <span className="errorMessage">{error.smokinghabits}</span>}
               </div>
               <div>
-                <Label htmlFor="drinkingHabit">Drinking Habit</Label>
+                <Label htmlFor="drinkinghabits">Drinking Habit</Label>
                 <select
-                  name="drinkingHabit"
-                  value={form.drinkingHabit}
+                  name="drinkinghabits"
+                  value={form.drinkinghabits}
                   onChange={handleChange}
                   className={cn(
                     "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                    changedFields.drinkingHabit && "border-green-500"
+                    changedFields.drinkinghabits && "border-green-500"
                   )}
                 >
                   <option value="">Select Drinking Habit</option>
@@ -566,6 +378,7 @@ export function CreateCompanion({
                   <option value="Drinker">Drinker</option>
                   <option value="Occasionally">Occasionally</option>
                 </select>
+                {error?.drinkinghabits && <span className="errorMessage">{error.drinkinghabits}</span>}
               </div>
             </div>
           </div>
@@ -579,11 +392,12 @@ export function CreateCompanion({
                 <Input
                   type="text"
                   name="location"
-                  value={form.location}
+                  value={form.city}
                   onChange={handleChange}
-                  className={cn(changedFields.location && "border-green-500")}
+                  className={cn(changedFields.city && "border-green-500")}
                   required
                 />
+                   {error?.city && <span className="errorMessage">{error.city}</span>}
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>
@@ -595,6 +409,7 @@ export function CreateCompanion({
                   className={cn(changedFields.email && "border-green-500")}
                   required
                 />
+                   {error?.email && <span className="errorMessage">{error.email}</span>}
               </div>
               <div>
                 <Label htmlFor="password">Password</Label>
@@ -605,19 +420,21 @@ export function CreateCompanion({
                   onChange={handleChange}
                   className={cn(changedFields.password && "border-green-500")}
                 />
+                   {error?.password && <span className="errorMessage">{error.password}</span>}
               </div>
               <div>
-                <Label htmlFor="bookingRate">Booking Rate (per hour)</Label>
+                <Label htmlFor="bookingrate">Booking Rate (per hour)</Label>
                 <Input
                   type="number"
-                  name="bookingRate"
-                  value={form.bookingRate}
+                  name="bookingrate"
+                  value={form.bookingrate}
                   onChange={handleChange}
                   className={cn(
-                    changedFields.bookingRate && "border-green-500"
+                    changedFields.bookingrate && "border-green-500"
                   )}
                   required
                 />
+                   {error?.bookingrate && <span className="errorMessage">{error.bookingrate}</span>}
               </div>
               <div>
                 <Label htmlFor="height">Height (cm)</Label>
@@ -629,6 +446,7 @@ export function CreateCompanion({
                   className={cn(changedFields.height && "border-green-500")}
                   required
                 />
+                   {error?.height && <span className="errorMessage">{error.height}</span>}
               </div>
               <div className="col-span-2">
                 <Label htmlFor="description">
@@ -657,6 +475,7 @@ export function CreateCompanion({
                       <Label htmlFor={desc}>{desc}</Label>
                     </div>
                   ))}
+                     {error?.description && <span className="errorMessage">{error.description}</span>}
                 </div>
               </div>
             </div>

@@ -794,3 +794,8 @@ body {
   color: #666;
   cursor: pointer;
 }
+
+.errorMessage{
+  color: red;
+  font-size: 0.8em;
+}
