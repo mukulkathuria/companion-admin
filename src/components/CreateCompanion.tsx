@@ -2,16 +2,16 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { faker } from "@faker-js/faker";
-import {
-  skinToneData,
-  BookingRateData,
-  descriptionData,
-  bodytypeData,
-  eatingHabitsData,
-  drinkingHabitsData,
-  smokingHabitsData,
-} from "@/data/fakercreatedata";
+// import { faker } from "@faker-js/faker";
+// import {
+//   skinToneData,
+//   BookingRateData,
+//   descriptionData,
+//   bodytypeData,
+//   eatingHabitsData,
+//   drinkingHabitsData,
+//   smokingHabitsData,
+// } from "@/data/fakercreatedata";
 import {
   Card,
   CardContent,
@@ -19,7 +19,7 @@ import {
   CardTitle,
   CardDescription,
 } from "./ui/card";
-import { getRandomElements } from "@/utils/common.utils";
+// import { getRandomElements } from "@/utils/common.utils";
 import {
   CompanionDescriptionEnum,
   CompanionFormDto,
@@ -93,51 +93,60 @@ export function CreateCompanion({
       "../utils/validations/companionform.validate"
     );
     const errors = validateRegisteration(form);
-    if (Object.keys(errors).length) {
+    if (
+      Object.keys(errors).length ||
+      !form.images?.length ||
+      (form.images && form.images.length < 2)
+    ) {
       setError(errors);
-      return
+      if (!form.images?.length || (form.images && form.images.length < 2)) {
+        toast.error("Minimum 2 image is required");
+      } else {
+        toast.error("Please fill all required before proceeding");
+      }
+      return;
     }
-    console.log("Images", form.images);
-    const userData = new FormData();
+    console.log("Form Data", form);
+    // const userData = new FormData();
 
-    userData.append("firstname", faker.person.firstName("female"));
-    userData.append("lastname", faker.person.lastName("female"));
-    userData.append("email", faker.internet.email());
-    userData.append("password", "Test@123");
-    userData.append("gender", "FEMALE");
-    const age = faker.number.int({ min: 18, max: 35 });
-    userData.append("age", String(age));
-    userData.append("city", "Mumbai");
-    userData.append("bookingrate", getRandomElements(1, BookingRateData)[0]);
-    userData.append("skintone", getRandomElements(1, skinToneData)[0]);
-    userData.append("bodytype", getRandomElements(1, bodytypeData)[0]);
-    userData.append("eatinghabits", getRandomElements(1, eatingHabitsData)[0]);
-    userData.append(
-      "drinkinghabits",
-      getRandomElements(1, drinkingHabitsData)[0]
-    );
-    userData.append(
-      "smokinghabits",
-      getRandomElements(1, smokingHabitsData)[0]
-    );
-    userData.append(
-      "description",
-      JSON.stringify(getRandomElements(3, descriptionData))
-    );
-    userData.append("height", String(faker.number.int({ min: 110, max: 170 })));
-    userData.append("lat", String(faker.number.float({ min: 60, max: 70 })));
-    userData.append("lng", String(faker.number.float({ min: 60, max: 70 })));
-    // If all validations pass, proceed with form submission
-    try {
-      const { registerUserService } = await import(
-        "../services/auth/register.service"
-      );
-      await registerUserService(userData);
-      toast.success("Companion Created Successfully!!!");
-    } catch (error) {
-      console.log(error);
-      toast.error("Some Error Occured Please Try again after sometime!!");
-    }
+    // userData.append("firstname", faker.person.firstName("female"));
+    // userData.append("lastname", faker.person.lastName("female"));
+    // userData.append("email", faker.internet.email());
+    // userData.append("password", "Test@123");
+    // userData.append("gender", "FEMALE");
+    // const age = faker.number.int({ min: 18, max: 35 });
+    // userData.append("age", String(age));
+    // userData.append("city", "Mumbai");
+    // userData.append("bookingrate", getRandomElements(1, BookingRateData)[0]);
+    // userData.append("skintone", getRandomElements(1, skinToneData)[0]);
+    // userData.append("bodytype", getRandomElements(1, bodytypeData)[0]);
+    // userData.append("eatinghabits", getRandomElements(1, eatingHabitsData)[0]);
+    // userData.append(
+    //   "drinkinghabits",
+    //   getRandomElements(1, drinkingHabitsData)[0]
+    // );
+    // userData.append(
+    //   "smokinghabits",
+    //   getRandomElements(1, smokingHabitsData)[0]
+    // );
+    // userData.append(
+    //   "description",
+    //   JSON.stringify(getRandomElements(3, descriptionData))
+    // );
+    // userData.append("height", String(faker.number.int({ min: 110, max: 170 })));
+    // userData.append("lat", String(faker.number.float({ min: 60, max: 70 })));
+    // userData.append("lng", String(faker.number.float({ min: 60, max: 70 })));
+    // // If all validations pass, proceed with form submission
+    // try {
+    //   const { registerUserService } = await import(
+    //     "../services/auth/register.service"
+    //   );
+    //   await registerUserService(userData);
+    //   toast.success("Companion Created Successfully!!!");
+    // } catch (error) {
+    //   console.log(error);
+    //   toast.error("Some Error Occured Please Try again after sometime!!");
+    // }
     // Handle form submission (e.g., API call)
     // fetch('/api/companions', {
     //   method: 'POST',
@@ -156,7 +165,7 @@ export function CreateCompanion({
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    setError((prev) => ({ ...prev, [name]: '' }));
+    setError((prev) => ({ ...prev, [name]: "" }));
   };
 
   const getBodyTypes = (gender: "Male" | "Female" | "OTHER") => {
@@ -194,7 +203,6 @@ export function CreateCompanion({
     const file = e.target.files?.[0];
     if (!file) return;
     // handling Excel File
-
   };
 
   const changedFields = initialValues
@@ -241,7 +249,9 @@ export function CreateCompanion({
                   className={cn(changedFields.firstname && "border-green-500")}
                   required
                 />
-                {error?.firstname && <span className="errorMessage">{error.firstname}</span>}
+                {error?.firstname && (
+                  <span className="errorMessage">{error.firstname}</span>
+                )}
               </div>
               <div>
                 <Label htmlFor="lastname">Last Name</Label>
@@ -253,7 +263,9 @@ export function CreateCompanion({
                   className={cn(changedFields.lastname && "border-green-500")}
                   required
                 />
-                   {error?.lastname && <span className="errorMessage">{error.lastname}</span>}
+                {error?.lastname && (
+                  <span className="errorMessage">{error.lastname}</span>
+                )}
               </div>
             </div>
           </div>
@@ -277,7 +289,9 @@ export function CreateCompanion({
                   <option value="Female">Female</option>
                   <option value="OTHER">Other</option>
                 </select>
-                {error?.gender && <span className="errorMessage">{error.gender}</span>}
+                {error?.gender && (
+                  <span className="errorMessage">{error.gender}</span>
+                )}
               </div>
               <div>
                 <Label htmlFor="skintone">Skin Tone</Label>
@@ -294,7 +308,9 @@ export function CreateCompanion({
                   <option value="Brown">Brown</option>
                   <option value="Dark">Dark</option>
                 </select>
-                {error?.skintone && <span className="errorMessage">{error.skintone}</span>}
+                {error?.skintone && (
+                  <span className="errorMessage">{error.skintone}</span>
+                )}
               </div>
               <div>
                 <Label htmlFor="bodytype">Body Type</Label>
@@ -314,7 +330,9 @@ export function CreateCompanion({
                     </option>
                   ))}
                 </select>
-                {error?.bodytype && <span className="errorMessage">{error.bodytype}</span>}
+                {error?.bodytype && (
+                  <span className="errorMessage">{error.bodytype}</span>
+                )}
               </div>
             </div>
           </div>
@@ -341,7 +359,9 @@ export function CreateCompanion({
                   <option value="Jain">Jain</option>
                   <option value="Vegan">Vegan</option>
                 </select>
-                {error?.eatinghabits && <span className="errorMessage">{error.eatinghabits}</span>}
+                {error?.eatinghabits && (
+                  <span className="errorMessage">{error.eatinghabits}</span>
+                )}
               </div>
               <div>
                 <Label htmlFor="smokinghabits">Smoking Habit</Label>
@@ -360,7 +380,9 @@ export function CreateCompanion({
                   <option value="Active Smoking">Active Smoking</option>
                   <option value="Occasionally">Occasionally</option>
                 </select>
-                {error?.smokinghabits && <span className="errorMessage">{error.smokinghabits}</span>}
+                {error?.smokinghabits && (
+                  <span className="errorMessage">{error.smokinghabits}</span>
+                )}
               </div>
               <div>
                 <Label htmlFor="drinkinghabits">Drinking Habit</Label>
@@ -378,7 +400,9 @@ export function CreateCompanion({
                   <option value="Drinker">Drinker</option>
                   <option value="Occasionally">Occasionally</option>
                 </select>
-                {error?.drinkinghabits && <span className="errorMessage">{error.drinkinghabits}</span>}
+                {error?.drinkinghabits && (
+                  <span className="errorMessage">{error.drinkinghabits}</span>
+                )}
               </div>
             </div>
           </div>
@@ -388,16 +412,32 @@ export function CreateCompanion({
             <h3 className="text-lg font-medium text-gray-700">Other Details</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="City">City</Label>
                 <Input
                   type="text"
-                  name="location"
+                  name="city"
                   value={form.city}
                   onChange={handleChange}
                   className={cn(changedFields.city && "border-green-500")}
                   required
                 />
-                   {error?.city && <span className="errorMessage">{error.city}</span>}
+                {error?.city && (
+                  <span className="errorMessage">{error.city}</span>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="State">State</Label>
+                <Input
+                  type="text"
+                  name="state"
+                  value={form.state}
+                  onChange={handleChange}
+                  className={cn(changedFields.state && "border-green-500")}
+                  required
+                />
+                {error?.state && (
+                  <span className="errorMessage">{error.state}</span>
+                )}
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>
@@ -409,7 +449,9 @@ export function CreateCompanion({
                   className={cn(changedFields.email && "border-green-500")}
                   required
                 />
-                   {error?.email && <span className="errorMessage">{error.email}</span>}
+                {error?.email && (
+                  <span className="errorMessage">{error.email}</span>
+                )}
               </div>
               <div>
                 <Label htmlFor="password">Password</Label>
@@ -420,7 +462,9 @@ export function CreateCompanion({
                   onChange={handleChange}
                   className={cn(changedFields.password && "border-green-500")}
                 />
-                   {error?.password && <span className="errorMessage">{error.password}</span>}
+                {error?.password && (
+                  <span className="errorMessage">{error.password}</span>
+                )}
               </div>
               <div>
                 <Label htmlFor="bookingrate">Booking Rate (per hour)</Label>
@@ -434,7 +478,9 @@ export function CreateCompanion({
                   )}
                   required
                 />
-                   {error?.bookingrate && <span className="errorMessage">{error.bookingrate}</span>}
+                {error?.bookingrate && (
+                  <span className="errorMessage">{error.bookingrate}</span>
+                )}
               </div>
               <div>
                 <Label htmlFor="height">Height (cm)</Label>
@@ -446,7 +492,9 @@ export function CreateCompanion({
                   className={cn(changedFields.height && "border-green-500")}
                   required
                 />
-                   {error?.height && <span className="errorMessage">{error.height}</span>}
+                {error?.height && (
+                  <span className="errorMessage">{error.height}</span>
+                )}
               </div>
               <div className="col-span-2">
                 <Label htmlFor="description">
@@ -475,7 +523,9 @@ export function CreateCompanion({
                       <Label htmlFor={desc}>{desc}</Label>
                     </div>
                   ))}
-                     {error?.description && <span className="errorMessage">{error.description}</span>}
+                  {error?.description && (
+                    <span className="errorMessage">{error.description}</span>
+                  )}
                 </div>
               </div>
             </div>
