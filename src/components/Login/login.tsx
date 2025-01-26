@@ -91,6 +91,7 @@ const Login: FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  name="email"
                   placeholder="Email"
                   className="lginputfield"
                 />
@@ -105,6 +106,7 @@ const Login: FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  name="password"
                   placeholder="Password"
                   className="lginputfield"
                 />

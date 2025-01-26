@@ -212,8 +212,12 @@ export const validateRegisteration = (
     errors.skintone = "Skin tone is required";
   }
 
-  if (!register.city.trim()) {
+  if (!register.city.trim().length) {
     errors.city = "City is required";
+  }
+
+  if (!register?.state || (register.state && !register.state.trim().length)) {
+    errors.state = "State is required";
   }
 
   // if (register.zipcode && !register.zipcode.trim()) {
