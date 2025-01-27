@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
-import indiaStates from '/india-states.json';
+// import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
+// import indiaStates from '/india-states.json';
 
 interface StateData {
   name: string;
@@ -20,7 +20,7 @@ const StateMap: React.FC<StateMapProps> = ({ stateData, onSelectState }) => {
     content: string;
   } | null>(null);
   const [selectedState, setSelectedState] = useState<string | null>(null);
-
+  // eslint-disable-next-line
   const handleGeographyClick = (feature: any) => {
     const stateName = feature.properties.name;
     const stateInfo = stateData[stateName];
@@ -29,7 +29,7 @@ const StateMap: React.FC<StateMapProps> = ({ stateData, onSelectState }) => {
       onSelectState(stateInfo);
     }
   };
-
+  // eslint-disable-next-line
   const handleGeographyHover = (geo: any, event: React.MouseEvent) => {
     const stateName = geo.properties.name;
     const stateInfo = stateData[stateName];
@@ -41,11 +41,12 @@ const StateMap: React.FC<StateMapProps> = ({ stateData, onSelectState }) => {
       });
     }
   };
-
+  // eslint-disable-next-line
   const handleGeographyLeave = () => {
     setTooltipContent(null);
   };
 
+  // eslint-disable-next-line
   const getFillColor = (feature: any) => {
     const stateName = feature.properties.name;
     const stateInfo = stateData[stateName];
@@ -70,7 +71,7 @@ const StateMap: React.FC<StateMapProps> = ({ stateData, onSelectState }) => {
     <div className="flex" style={{ width: '100%', height: '500px' }}>
       {/* Map Section */}
       <div className="relative" style={{ flex: 2, touchAction: 'none' }}>
-        <ComposableMap
+        {/* <ComposableMap
           projection="geoMercator"
           projectionConfig={{
             center: [80, 23],
@@ -112,7 +113,7 @@ const StateMap: React.FC<StateMapProps> = ({ stateData, onSelectState }) => {
               ))
             }
           </Geographies>
-        </ComposableMap>
+        </ComposableMap> */}
         {tooltipContent && (
           <div
             style={{
