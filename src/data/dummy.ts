@@ -5,6 +5,7 @@ export const requestTableColumns = [
   { id: 1, label: "User" },
   { id: 2, label: "Location" },
   { id: 3, label: "Gender" },
+  { id: 4, label: "Booking Time" },
 ];
 
 export const dummySlotRequests = [

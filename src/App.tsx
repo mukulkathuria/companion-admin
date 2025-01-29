@@ -25,8 +25,7 @@ function App() {
     <>
       <Routes>
         <Route element={<Layout activeTab={activeTab} onTabChange={setActiveTab} />}>
-          <Route path="/requests" element={<Requests />} />
-          <Route path="/requests/:requestId" element={<Requests />} />
+          <Route path="/requests/*" element={<Requests />} />
           <Route path="/create" element={<CreateCompanion />} />
           <Route path="/update" element={<UpdateCompanion />} />
           <Route path="/update/:requestId" element={<UpdateCompanion />} />
