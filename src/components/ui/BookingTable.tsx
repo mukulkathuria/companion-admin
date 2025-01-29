@@ -2,6 +2,7 @@ import {
   bookingColumnsDto,
   bookingtableRowsDto,
 } from "@/data/dto/bookingRequests.dto";
+import { useNavigate } from "react-router-dom";
 
 interface BookingTableProps {
   columns: bookingColumnsDto[];
@@ -9,6 +10,7 @@ interface BookingTableProps {
 }
 
 export function BookingTable(props: BookingTableProps) {
+  const navigate = useNavigate();
   return (
     <div className="bg-white rounded-xl shadow">
       <div className="overflow-x-auto">
@@ -26,26 +28,41 @@ export function BookingTable(props: BookingTableProps) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {props.rows && props.rows.map((l) => (
-            <tr onClick={() => {}} className="hover:bg-gray-50 cursor-pointer" key={l.id}>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-gray-200"></div>
-                  <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">
-                      {l.name}
+            {props.rows?.length ? (
+              props.rows.map((l) => (
+                <tr
+                  onClick={() => {
+                    navigate(`./bookingdetails?bookingId=${l.id}`)
+                  }}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  key={l.id}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">
+                          {l.name}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{l.location}</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{l.gender}</div>
-              </td>
-            </tr>
-            ))}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{l.location}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{l.gender}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{l.bookingTime}</div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td>Loading Records...s</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

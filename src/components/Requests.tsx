@@ -1,16 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Route, Routes } from "react-router-dom";
 import { BookingRequests } from "./ui/BookingRequests";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { bookingtableRowsDto } from "@/data/dto/bookingRequests.dto";
+import { formatBookingTimingsforUi } from "@/utils/booking.utils";
+import { BookingSlotDetails } from "./ui/BookingSlotDetails";
 
 export function Requests() {
+  const [bookindata, setBookingData] = useState<bookingtableRowsDto[]>([])
+
   useEffect(() => {
-    import("../services/requests/bookingrequest.service")
-      .then(({ getBookingRequestsService }) => getBookingRequestsService())
-      .then((res) => {
-        if (res?.data) {
-          console.log(res.data);
-        }
-      });
+      import("../services/requests/bookingrequest.service")
+        .then(({ getBookingRequestsService }) => getBookingRequestsService())
+        .then((res) => {
+          if (res?.data) {
+            const values = res.data?.map((l: any) => ({
+              location: l.Meetinglocation[0].city,
+              id: l.id,
+              name: l.User.filter((p: any) => !p.isCompanion)[0].firstname,
+              gender: l.User.filter((p: any) => !p.isCompanion)[0].gender,
+              bookingTime: formatBookingTimingsforUi(l.bookingstart)
+            }))
+            setBookingData(values)
+          }
+        });
   }, []);
 
   const tabs = [
@@ -37,7 +50,8 @@ export function Requests() {
         ))}
       </div>
       <Routes>
-        <Route path="/" element={<BookingRequests />} />
+        <Route path="/bookingdetails" element={<BookingSlotDetails />} />
+        <Route path="/" element={<BookingRequests data={bookindata}/>} />
       </Routes>
     </div>
   );

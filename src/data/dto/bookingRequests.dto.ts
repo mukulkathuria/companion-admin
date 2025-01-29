@@ -3,6 +3,7 @@ export type bookingtableRowsDto = {
     name: string;
     location: string;
     gender: string;
+    bookingTime: string;
 }
 
 export type bookingColumnsDto = {
