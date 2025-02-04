@@ -4,6 +4,8 @@ export const BookingRateData = [
   1000, 800, 700, 900, 950, 1100, 1150, 1200, 1500, 2000,
 ];
 
+export const GenderData = ["MALE", "FEMALE", "OTHER"];
+
 export const descriptionData = [
   "CASUAL_COMPANIONSHIP",
   "COFFEEANDCONVERSATIONS",

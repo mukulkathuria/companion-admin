@@ -23,22 +23,31 @@ import {
 import {
   CompanionDescriptionEnum,
   CompanionFormDto,
+  CompanionSkinToneEnum,
   CreateCompanionProps,
   ErrorFormDto,
   FemaleCompanionBodyTypeEnum,
+  GenderEnum,
   MaleCompanionBodyTypeEnum,
   OtherCompanionBodyTypeEnum,
 } from "@/data/dto/companion.data.dto";
 import { toast } from "sonner";
 import ImageUploader from "./ui/ImageUploader";
+import {
+  drinkingHabitsData,
+  eatingHabitsData,
+  GenderData,
+  skinToneData,
+  smokingHabitsData,
+} from "@/data/fakercreatedata";
 
 const initialForm: CompanionFormDto = {
   images: null,
   firstname: "",
   lastname: "",
   age: 18,
-  gender: "Male",
-  skintone: "Fair",
+  gender: GenderEnum.MALE,
+  skintone: CompanionSkinToneEnum.FAIR,
   bodytype: "",
   eatinghabits: "",
   smokinghabits: "",
@@ -106,9 +115,22 @@ export function CreateCompanion({
       }
       return;
     }
-    console.log("Form Data", form);
-    // const userData = new FormData();
-
+    const userData = new FormData();
+    const allkeys = Object.keys(form);
+    for (let i = 0; i < allkeys.length; i += 1) {
+      if (
+        form[allkeys[i] as keyof CompanionFormDto] &&
+        allkeys[i] !== "images"
+      ) {
+        userData.append(
+          allkeys[i],
+          String(form[allkeys[i] as keyof CompanionFormDto])
+        );
+      }
+    }
+    userData.append("lat", "17.98");
+    userData.append("lng", "72.8");
+    userData.append("images", new Blob(form.images.map((l) => l.file)))
     // userData.append("firstname", faker.person.firstName("female"));
     // userData.append("lastname", faker.person.lastName("female"));
     // userData.append("email", faker.internet.email());
@@ -134,19 +156,17 @@ export function CreateCompanion({
     //   JSON.stringify(getRandomElements(3, descriptionData))
     // );
     // userData.append("height", String(faker.number.int({ min: 110, max: 170 })));
-    // userData.append("lat", String(faker.number.float({ min: 60, max: 70 })));
-    // userData.append("lng", String(faker.number.float({ min: 60, max: 70 })));
     // // If all validations pass, proceed with form submission
-    // try {
-    //   const { registerUserService } = await import(
-    //     "../services/auth/register.service"
-    //   );
-    //   await registerUserService(userData);
-    //   toast.success("Companion Created Successfully!!!");
-    // } catch (error) {
-    //   console.log(error);
-    //   toast.error("Some Error Occured Please Try again after sometime!!");
-    // }
+    try {
+      const { registerUserService } = await import(
+        "../services/auth/register.service"
+      );
+      await registerUserService(userData);
+      toast.success("Companion Created Successfully!!!");
+    } catch (error) {
+      console.log(error);
+      toast.error("Some Error Occured Please Try again after sometime!!");
+    }
     // Handle form submission (e.g., API call)
     // fetch('/api/companions', {
     //   method: 'POST',
@@ -168,11 +188,11 @@ export function CreateCompanion({
     setError((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const getBodyTypes = (gender: "Male" | "Female" | "OTHER") => {
+  const getBodyTypes = (gender: "MALE" | "FEMALE" | "OTHER") => {
     switch (gender) {
-      case "Male":
+      case "MALE":
         return Object.values(MaleCompanionBodyTypeEnum);
-      case "Female":
+      case "FEMALE":
         return Object.values(FemaleCompanionBodyTypeEnum);
       case "OTHER":
         return Object.values(OtherCompanionBodyTypeEnum);
@@ -285,9 +305,11 @@ export function CreateCompanion({
                     changedFields.gender && "border-green-500"
                   )}
                 >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="OTHER">Other</option>
+                  {GenderData.map((l, i) => (
+                    <option key={i * 20} value={l}>
+                      {l}
+                    </option>
+                  ))}
                 </select>
                 {error?.gender && (
                   <span className="errorMessage">{error.gender}</span>
@@ -304,9 +326,11 @@ export function CreateCompanion({
                     changedFields.skintone && "border-green-500"
                   )}
                 >
-                  <option value="Fair">Fair</option>
-                  <option value="Brown">Brown</option>
-                  <option value="Dark">Dark</option>
+                  {skinToneData.map((l, i) => (
+                    <option key={i * 20} value={l}>
+                      {l}
+                    </option>
+                  ))}
                 </select>
                 {error?.skintone && (
                   <span className="errorMessage">{error.skintone}</span>
@@ -353,11 +377,11 @@ export function CreateCompanion({
                   )}
                 >
                   <option value="">Select Eating Habits</option>
-                  <option value="Veg">Veg</option>
-                  <option value="Eggetarian">Eggetarian</option>
-                  <option value="Non-Veg">Non-Veg</option>
-                  <option value="Jain">Jain</option>
-                  <option value="Vegan">Vegan</option>
+                  {eatingHabitsData.map((l, i) => (
+                    <option key={i * 20} value={l}>
+                      {l}
+                    </option>
+                  ))}
                 </select>
                 {error?.eatinghabits && (
                   <span className="errorMessage">{error.eatinghabits}</span>
@@ -375,10 +399,11 @@ export function CreateCompanion({
                   )}
                 >
                   <option value="">Select Smoking Habit</option>
-                  <option value="Non-Smoker">Non-Smoker</option>
-                  <option value="Passive Smoking">Passive Smoking</option>
-                  <option value="Active Smoking">Active Smoking</option>
-                  <option value="Occasionally">Occasionally</option>
+                  {smokingHabitsData.map((l, i) => (
+                    <option key={i * 20} value={l}>
+                      {l}
+                    </option>
+                  ))}
                 </select>
                 {error?.smokinghabits && (
                   <span className="errorMessage">{error.smokinghabits}</span>
@@ -396,9 +421,11 @@ export function CreateCompanion({
                   )}
                 >
                   <option value="">Select Drinking Habit</option>
-                  <option value="Non-Drinker">Non-Drinker</option>
-                  <option value="Drinker">Drinker</option>
-                  <option value="Occasionally">Occasionally</option>
+                  {drinkingHabitsData.map((l, i) => (
+                    <option key={i * 20} value={l}>
+                      {l}
+                    </option>
+                  ))}
                 </select>
                 {error?.drinkinghabits && (
                   <span className="errorMessage">{error.drinkinghabits}</span>

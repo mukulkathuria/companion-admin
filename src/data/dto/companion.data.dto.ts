@@ -10,8 +10,8 @@ export interface CompanionFormDto {
   firstname: string;
   lastname: string;
   age: number;
-  gender: "Male" | "Female" | "OTHER";
-  skintone: "Fair" | "Brown" | "Dark";
+  gender: GenderEnum;
+  skintone:CompanionSkinToneEnum;
   bodytype: string;
   eatinghabits: string;
   smokinghabits: string;
