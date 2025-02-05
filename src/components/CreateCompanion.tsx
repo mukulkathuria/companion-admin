@@ -70,34 +70,6 @@ export function CreateCompanion({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Password validation regex
-    // const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$/;
-
-    // Validate password
-    // if (form.password && !passwordRegex.test(form.password)) {
-    //   alert(
-    //     'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (#?!@$%^&*-).'
-    //   );
-    //   return;
-    // }
-
-    // // Validate age (minimum 18)
-    // if (form.age < 18) {
-    //   alert('Age must be at least 18.');
-    //   return;
-    // }
-
-    // // Validate at least 2 descriptions
-    // if (form.description.length < 2) {
-    //   alert('Please select at least 2 descriptions.');
-    //   return;
-    // }
-
-    // if (form.height < 100) {
-    //   alert('Height must be at least 100cm.');
-    //   return;
-    // }
     const { validateRegisteration } = await import(
       "../utils/validations/companionform.validate"
     );
@@ -120,7 +92,8 @@ export function CreateCompanion({
     for (let i = 0; i < allkeys.length; i += 1) {
       if (
         form[allkeys[i] as keyof CompanionFormDto] &&
-        allkeys[i] !== "images"
+        allkeys[i] !== "images" &&
+        allkeys[i] !== "description"
       ) {
         userData.append(
           allkeys[i],
@@ -128,54 +101,26 @@ export function CreateCompanion({
         );
       }
     }
+    userData.append("description", JSON.stringify(form.description));
     userData.append("lat", "17.98");
     userData.append("lng", "72.8");
-    userData.append("images", new Blob(form.images.map((l) => l.file)))
-    // userData.append("firstname", faker.person.firstName("female"));
-    // userData.append("lastname", faker.person.lastName("female"));
-    // userData.append("email", faker.internet.email());
-    // userData.append("password", "Test@123");
-    // userData.append("gender", "FEMALE");
-    // const age = faker.number.int({ min: 18, max: 35 });
-    // userData.append("age", String(age));
-    // userData.append("city", "Mumbai");
-    // userData.append("bookingrate", getRandomElements(1, BookingRateData)[0]);
-    // userData.append("skintone", getRandomElements(1, skinToneData)[0]);
-    // userData.append("bodytype", getRandomElements(1, bodytypeData)[0]);
-    // userData.append("eatinghabits", getRandomElements(1, eatingHabitsData)[0]);
-    // userData.append(
-    //   "drinkinghabits",
-    //   getRandomElements(1, drinkingHabitsData)[0]
-    // );
-    // userData.append(
-    //   "smokinghabits",
-    //   getRandomElements(1, smokingHabitsData)[0]
-    // );
-    // userData.append(
-    //   "description",
-    //   JSON.stringify(getRandomElements(3, descriptionData))
-    // );
-    // userData.append("height", String(faker.number.int({ min: 110, max: 170 })));
-    // // If all validations pass, proceed with form submission
+    form.images.forEach((l) => {
+      userData.append("images", l.file);
+    });
     try {
       const { registerUserService } = await import(
         "../services/auth/register.service"
       );
-      await registerUserService(userData);
-      toast.success("Companion Created Successfully!!!");
+      const { error } = await registerUserService(userData);
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Companion Created Successfully!!!");
+      }
     } catch (error) {
       console.log(error);
       toast.error("Some Error Occured Please Try again after sometime!!");
     }
-    // Handle form submission (e.g., API call)
-    // fetch('/api/companions', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(form),
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => console.log('API response:', data))
-    //   .catch((error) => console.error('API error:', error));
   };
 
   const handleChange = (
