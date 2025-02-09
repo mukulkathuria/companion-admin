@@ -60,7 +60,7 @@ export function BookingTable(props: BookingTableProps) {
               ))
             ) : (
               <tr>
-                <td>Loading Records...s</td>
+                <td>No Records Found</td>
               </tr>
             )}
           </tbody>

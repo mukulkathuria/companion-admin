@@ -52,7 +52,7 @@ export const getBookingRequestsService = async () => {
         bookingid: Number(bookingId)
       }
       const url = BASEURL + "/admin/accept/booking";
-      const { data:{ data } } = await get(url, { params: values });
+      const { data } = await get(url, { params: values });
       return { data };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

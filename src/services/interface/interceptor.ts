@@ -44,16 +44,16 @@ const refreshAccessToken = async (refreshToken: string) => {
   const setRefUrl = BASEURL + "/auth/refreshtoken";
   try {
     const response = await fetch(setRefUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         refresh_token: refreshToken,
       }),
     });
     if (!response.ok) {
-      throw new Error('Failed to refresh token');
+      throw new Error("Failed to refresh token");
     }
     const data = await response.json();
     const access_token = data.access_token;
@@ -62,9 +62,9 @@ const refreshAccessToken = async (refreshToken: string) => {
     processQueue(null, access_token);
     return access_token;
   } catch (error) {
-    console.error('Error refreshing token:', error);
+    console.error("Error refreshing token:", error);
     await removeUserData();
-    window.location = '/' as unknown as Location;
+    window.location = "/" as unknown as Location;
     processQueue(error, null);
     throw error;
   } finally {
@@ -80,15 +80,22 @@ axios.interceptors.response.use(
     const refreshToken = cookie.get(REFRESH_TOKEN_LOC);
 
     // Ignore token handling if there's no token and it's not a path that needs the token
-    if (!err.response?.config?.url?.includes(ignoretokenpaths) && !token) {
-      window.location = '/' as unknown as Location;
+    if (ignoretokenpaths.includes(err.response?.config?.url)) {
+      return Promise.reject(err);
+    } else if (
+      !ignoretokenpaths.includes(err.response?.config?.url) &&
+      !token
+    ) {
+      window.location = "/" as unknown as Location;
       return Promise.reject(err);
     }
 
     // Handle 401 and 403 errors by triggering refresh token logic
     if (
       (err?.response?.status === 401 || err?.response?.status === 403) &&
-      !onrequest._retry && token && refreshToken
+      !onrequest._retry &&
+      token &&
+      refreshToken
     ) {
       const { decodedToken } = decodeAccessToken(token);
       const exp = decodedToken ? decodedToken.exp : null;
