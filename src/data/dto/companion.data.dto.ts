@@ -11,13 +11,14 @@ export interface CompanionFormDto {
   lastname: string;
   age: number;
   gender: GenderEnum;
+  phoneno: string;
   skintone:CompanionSkinToneEnum;
   bodytype: string;
   eatinghabits: string;
   smokinghabits: string;
   drinkinghabits: string;
   city: string;
-  state?: string;
+  state: string;
   email: string;
   password?: string;
   description: string[];
@@ -44,6 +45,7 @@ export interface ErrorFormDto {
   description?: string;
   bookingrate?: string;
   height?: string;
+  phoneno?: string;
 }
 
 export interface CreateCompanionProps {

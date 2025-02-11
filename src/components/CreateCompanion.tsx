@@ -46,6 +46,8 @@ const initialForm: CompanionFormDto = {
   firstname: "",
   lastname: "",
   age: 18,
+  state: '',
+  phoneno: '',
   gender: GenderEnum.MALE,
   skintone: CompanionSkinToneEnum.FAIR,
   bodytype: "",
@@ -230,6 +232,20 @@ export function CreateCompanion({
                 />
                 {error?.lastname && (
                   <span className="errorMessage">{error.lastname}</span>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="lastname">Phone Number</Label>
+                <Input
+                  type="text"
+                  name="phoneno"
+                  value={form.phoneno}
+                  onChange={handleChange}
+                  className={cn(changedFields.phoneno && "border-green-500")}
+                  required
+                />
+                {error?.phoneno && (
+                  <span className="errorMessage">{error.phoneno}</span>
                 )}
               </div>
             </div>

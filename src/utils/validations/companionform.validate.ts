@@ -204,6 +204,10 @@ export const validateRegisteration = (
     errors.age = "Age must be a valid number";
   }
 
+  if (!register.phoneno || !/^\d{10}$/.test(register.phoneno)) {
+    errors.phoneno = "Phone no must be valid";
+  }
+
   if (!register.description.length) {
     errors.description = "Description is required";
   }
