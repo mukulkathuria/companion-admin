@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   ACCESS_TOKEN_LOC,
   REFRESH_TOKEN_LOC,
@@ -15,6 +15,15 @@ const Login: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errors, setErrors] = useState({ email: "", password: "" });
+
+  useEffect(() => {
+    import("js-cookie").then(({ default: { get } }) => {
+      if (get(ACCESS_TOKEN_LOC)) {
+        navigate("/requests");
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
