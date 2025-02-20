@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { useNavigate } from 'react-router-dom'
 
 export function IssuesList() {
   const [issuesData, setIssuesData] = useState<any>(null);
+  const navigate = useNavigate();
   useEffect(() => {
     import("../services/issues/issuelist.service")
       .then(({ getAllActiveIssueService }) => getAllActiveIssueService())
@@ -54,7 +56,7 @@ export function IssuesList() {
               {issuesData.map((ticket: any) => (
                 <tr
                   key={ticket.issueId}
-                  onClick={() => console.log("View")}
+                  onClick={() => navigate(`/tickets/issuedetails/?issueId=${ticket.issueId}`)}
                   className="hover:bg-gray-50 cursor-pointer transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap font-medium">

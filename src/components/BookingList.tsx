@@ -2,9 +2,11 @@
 import { BASEURL } from "@/Constants/services.constants";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function BookingList() {
   const [bookingdata, setBookingData] = useState<any>(null);
+  const navigate = useNavigate();
   useEffect(() => {
     import("../services/booking/bookinglist.service")
       .then(({ getBookinglistService }) => getBookinglistService())
@@ -15,6 +17,7 @@ export function BookingList() {
             companiondetails: l.User.filter((p: any) => p.isCompanion)[0],
             bookingTime: formatBookingTimingsforUi(l.bookingstart),
             status: l.bookingstatus,
+            id: l.id,
           }));
           setBookingData(values);
         }
@@ -49,7 +52,7 @@ export function BookingList() {
               {bookingdata.map((booking: any, i: number) => (
                 <tr
                   key={i*300}
-                  onClick={() => console.log("clicked")}
+                  onClick={() => navigate(`/track/bookingdetails/?bookingId=${booking.id}`)}
                   className="hover:bg-gray-50 cursor-pointer"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">

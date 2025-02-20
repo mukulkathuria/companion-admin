@@ -9,6 +9,8 @@ import { Toaster } from "./components/ui/sonner";
 import Login from "./components/Login/login";
 import { BookingList } from "./components/BookingList";
 import { IssuesList } from "./components/IssuesList";
+import { IssueDetails } from "./components/IssueDetails";
+import { BookingDetails } from "./components/BookingDetails";
 
 export type Tab =
   | "requests"
@@ -30,8 +32,9 @@ function App() {
           <Route path="/update" element={<UpdateCompanion />} />
           <Route path="/update/:requestId" element={<UpdateCompanion />} />
           <Route path="/track" element={<BookingList />} />
+          <Route path="/track/bookingdetails" element={<BookingDetails />} />
           <Route path="/tickets" element={<IssuesList />} />
-          <Route path="/tickets/:ticketId" element={<IssuesList />} />
+          <Route path="/tickets/issuedetails" element={<IssueDetails />} />
           <Route path="/analytics" element={<Analytics />} />
         </Route>
         {/* <Layout activeTab={activeTab} onTabChange={setActiveTab}> */}
