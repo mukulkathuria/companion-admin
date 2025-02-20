@@ -24,6 +24,7 @@ interface CompanionDetails {
   updatedAt: string;
   companiondetails: {
     User: {
+      id: string;
       firstname: string;
       lastname: string;
       email: string;
@@ -64,8 +65,7 @@ export function formatCompanionRequestData(companionDetails: CompanionDetails) {
     account: companionDetails.companiondetails.account,
   };
   const newcompaniondetails = {
-    id: companionDetails.id,
-    companionid: companionDetails.companionid,
+    id: companionDetails.companiondetails.User.id,
     firstname: companionDetails.firstname,
     lastname: companionDetails.lastname,
     images: companionDetails.Images,
@@ -75,9 +75,9 @@ export function formatCompanionRequestData(companionDetails: CompanionDetails) {
     phoneno: companionDetails.phoneno,
     description: companionDetails.description,
     skintone: companionDetails.skintone,
+    bookingrate: companionDetails.companiondetails.bookingrate,
     city: companionDetails.city,
     state: companionDetails.state,
-    zipcode: companionDetails.zipcode,
     lat: companionDetails.lat,
     lng: companionDetails.lng,
     height: companionDetails.height,
@@ -85,7 +85,6 @@ export function formatCompanionRequestData(companionDetails: CompanionDetails) {
     eatinghabits: companionDetails.eatinghabits,
     drinkinghabits: companionDetails.drinkinghabits,
     smokinghabits: companionDetails.smokinghabits,
-    status: companionDetails.status,
   };
   return { oldcompaniondetails, newcompaniondetails };
 }

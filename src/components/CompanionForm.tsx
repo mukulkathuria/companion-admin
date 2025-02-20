@@ -17,6 +17,7 @@ import {
   skinToneData,
   smokingHabitsData,
 } from "@/data/fakercreatedata";
+import { toast } from "sonner";
 
 // Dummy data for the original profile
 const initialForm: CompanionFormDto = {
@@ -60,75 +61,74 @@ export function CompanionForm({
     const { validateRegisteration } = await import(
       "../utils/validations/companionform.validate"
     );
+
     const errors = validateRegisteration(form);
     if (Object.keys(errors).length) {
       setError(errors);
       return;
     }
-    // Validate all required fields
-    const requiredFields: (keyof CompanionFormDto)[] = [
-      "firstname",
-      "lastname",
-      "age",
-      "gender",
-      "skintone",
-      "bodytype",
-      "eatinghabits",
-      "smokinghabits",
-      "drinkinghabits",
-      "city",
-      "email",
-      "bookingrate",
-      "height",
-    ];
 
-    const missingFields = requiredFields.filter((field) => !form[field]);
-
-    if (missingFields.length > 0) {
-      alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
+    if (
+      Object.keys(errors).length ||
+      !form.images?.length ||
+      (form.images && form.images.length < 2)
+    ) {
+      setError(errors);
+      if (!form.images?.length || (form.images && form.images.length < 2)) {
+        toast.error("Minimum 2 image is required");
+      } else {
+        toast.error("Please fill all required before proceeding");
+      }
       return;
     }
-
-    // Password validation regex (only if password is provided)
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$/;
-    if (form.password && !passwordRegex.test(form.password)) {
-      alert(
-        "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (#?!@$%^&*-)."
-      );
-      return;
+    const id = form.id;
+    delete form.id;
+    const userData = new FormData();
+    const allkeys = Object.keys(form);
+    for (let i = 0; i < allkeys.length; i += 1) {
+      if (
+        form[allkeys[i] as keyof CompanionFormDto] &&
+        allkeys[i] !== "images" &&
+        allkeys[i] !== "description"
+      ) {
+        userData.append(
+          allkeys[i],
+          String(form[allkeys[i] as keyof CompanionFormDto])
+        );
+      }
     }
-
-    // Validate age (minimum 18)
-    if (form.age < 18) {
-      alert("Age must be at least 18.");
-      return;
+    userData.append("description", JSON.stringify(form.description));
+    const previousImages: string[] = [];
+    form.images.forEach((l) => {
+      if (typeof l === "object") {
+        userData.append("images", l.file);
+      } else {
+        previousImages.push(l);
+      }
+    });
+    if(previousImages.length) {
+      userData.append("previousImages", JSON.stringify(previousImages));
     }
-
-    // Validate height (minimum 100cm)
-    if (form.height < 100) {
-      alert("Height must be at least 100cm.");
-      return;
-    }
-
-    // Validate at least 2 descriptions
-    if (form.description.length < 2) {
-      alert("Please select at least 2 descriptions.");
-      return;
-    }
-
     // If all validations pass, proceed with form submission
     console.log("Form submitted:", form);
-
-    // Handle form submission (e.g., API call)
-    // fetch('/api/companions', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(form),
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => console.log('API response:', data))
-    //   .catch((error) => console.error('API error:', error));
+    for (const pair of userData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+    try {
+      const { updateCompanionProfileService } = await import(
+        "../services/companion/updatecompanion.service"
+      );
+      const { error } = await updateCompanionProfileService(userData, String(id));
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Companion Updated Successfully!!!");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Some Error Occured Please Try again after sometime!!");
+    }
+  
   };
 
   const handleChange = (
@@ -266,10 +266,10 @@ export function CompanionForm({
                 )}
               >
                 {skinToneData.map((l, i) => (
-                    <option key={i * 20} value={l}>
-                      {l}
-                    </option>
-                  ))}
+                  <option key={i * 20} value={l}>
+                    {l}
+                  </option>
+                ))}
               </select>
               {error?.skintone && (
                 <span className="errorMessage">{error.skintone}</span>
@@ -321,10 +321,10 @@ export function CompanionForm({
               >
                 <option value="">Select Eating Habits</option>
                 {eatingHabitsData.map((l, i) => (
-                    <option key={i * 20} value={l}>
-                      {l}
-                    </option>
-                  ))}
+                  <option key={i * 20} value={l}>
+                    {l}
+                  </option>
+                ))}
               </select>
               {error?.eatinghabits && (
                 <span className="errorMessage">{error.eatinghabits}</span>
@@ -345,10 +345,10 @@ export function CompanionForm({
               >
                 <option value="">Select Smoking Habit</option>
                 {smokingHabitsData.map((l, i) => (
-                    <option key={i * 20} value={l}>
-                      {l}
-                    </option>
-                  ))}
+                  <option key={i * 20} value={l}>
+                    {l}
+                  </option>
+                ))}
               </select>
               {error?.smokinghabits && (
                 <span className="errorMessage">{error.smokinghabits}</span>
@@ -369,10 +369,10 @@ export function CompanionForm({
               >
                 <option value="">Select Drinking Habit</option>
                 {drinkingHabitsData.map((l, i) => (
-                    <option key={i * 20} value={l}>
-                      {l}
-                    </option>
-                  ))}
+                  <option key={i * 20} value={l}>
+                    {l}
+                  </option>
+                ))}
               </select>
               {error?.drinkinghabits && (
                 <span className="errorMessage">{error.drinkinghabits}</span>
