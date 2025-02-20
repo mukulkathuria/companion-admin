@@ -2,7 +2,6 @@ import { useState } from "react";
 import Layout  from "./components/Layout";
 import { Requests } from "./components/Requests";
 import { CreateCompanion } from "./components/CreateCompanion";
-import { UpdateCompanion } from "./components/UpdateCompanion";
 import { Routes, Route } from "react-router-dom";
 import { Analytics } from "./components/Analytics";
 import { Toaster } from "./components/ui/sonner";
@@ -11,6 +10,8 @@ import { BookingList } from "./components/BookingList";
 import { IssuesList } from "./components/IssuesList";
 import { IssueDetails } from "./components/IssueDetails";
 import { BookingDetails } from "./components/BookingDetails";
+import { UpdateCompanionRequest } from "./components/UpdateCompanionRequest";
+import { UpdateCompanionDetails } from "./components/UpdateCompanionDetails";
 
 export type Tab =
   | "requests"
@@ -29,8 +30,8 @@ function App() {
         <Route element={<Layout activeTab={activeTab} onTabChange={setActiveTab} />}>
           <Route path="/requests/*" element={<Requests />} />
           <Route path="/create" element={<CreateCompanion />} />
-          <Route path="/update" element={<UpdateCompanion />} />
-          <Route path="/update/:requestId" element={<UpdateCompanion />} />
+          <Route path="/update" element={<UpdateCompanionRequest />} />
+          <Route path="/update/request" element={<UpdateCompanionDetails />} />
           <Route path="/track" element={<BookingList />} />
           <Route path="/track/bookingdetails" element={<BookingDetails />} />
           <Route path="/tickets" element={<IssuesList />} />

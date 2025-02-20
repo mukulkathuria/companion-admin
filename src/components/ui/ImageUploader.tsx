@@ -1,14 +1,19 @@
+import { BASEURL } from "@/Constants/services.constants";
 import { ImageDto } from "@/data/dto/companion.data.dto";
 import { useState } from "react";
 import { toast } from "sonner";
 
 interface ImageUploaderProps {
-  images: ImageDto[] | null; // Array of images with a specific structure
-  onUpload: (updatedImages: ImageDto[]) => void; // Callback to handle image updates
+  images: ImageDto[] | string[] | (ImageDto | string)[] | null; // Array of images with a specific structure
+  onUpload: (
+    updatedImages: ImageDto[] | (ImageDto | string)[] | string[]
+  ) => void; // Callback to handle image updates
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onUpload }) => {
-  const [localImages, setLocalImages] = useState<ImageDto[] | null>(images);
+  const [localImages, setLocalImages] = useState<
+    ImageDto[] | string[] | (ImageDto | string)[] | null
+  >(images);
   const maxImages = 4;
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,10 +63,15 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onUpload }) => {
 
   const setMainImage = (index: number) => {
     if (localImages) {
-      const updatedImages = localImages.map((img, i) => ({
-        ...img,
-        isMain: i === index,
-      }));
+      const updatedImages = localImages.map((img, i) => {
+        if (typeof img === "object") {
+          return {
+            ...img,
+            isMain: i === index,
+          };
+        }
+        return img;
+      });
       setLocalImages(updatedImages);
       onUpload(updatedImages);
     }
@@ -73,11 +83,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onUpload }) => {
         localImages.map((img, index) => (
           <div key={index} className="image-container">
             <img
-              src={img.url}
+              src={typeof img === "object" ? img.url : BASEURL + "/" + img}
               alt={`Uploaded ${index + 1}`}
               className="uploaded-image"
             />
-            {img.isMain ? (
+            {typeof img === "object" && img.isMain ? (
               <span className="main-label">Main</span>
             ) : (
               <span className="index-label" onClick={() => setMainImage(index)}>

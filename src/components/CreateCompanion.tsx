@@ -2,16 +2,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-// import { faker } from "@faker-js/faker";
-// import {
-//   skinToneData,
-//   BookingRateData,
-//   descriptionData,
-//   bodytypeData,
-//   eatingHabitsData,
-//   drinkingHabitsData,
-//   smokingHabitsData,
-// } from "@/data/fakercreatedata";
+
 import {
   Card,
   CardContent,
@@ -19,17 +10,13 @@ import {
   CardTitle,
   CardDescription,
 } from "./ui/card";
-// import { getRandomElements } from "@/utils/common.utils";
 import {
   CompanionDescriptionEnum,
   CompanionFormDto,
   CompanionSkinToneEnum,
   CreateCompanionProps,
   ErrorFormDto,
-  FemaleCompanionBodyTypeEnum,
   GenderEnum,
-  MaleCompanionBodyTypeEnum,
-  OtherCompanionBodyTypeEnum,
 } from "@/data/dto/companion.data.dto";
 import { toast } from "sonner";
 import ImageUploader from "./ui/ImageUploader";
@@ -37,6 +24,7 @@ import {
   drinkingHabitsData,
   eatingHabitsData,
   GenderData,
+  getBodyTypes,
   skinToneData,
   smokingHabitsData,
 } from "@/data/fakercreatedata";
@@ -46,8 +34,8 @@ const initialForm: CompanionFormDto = {
   firstname: "",
   lastname: "",
   age: 18,
-  state: '',
-  phoneno: '',
+  state: "",
+  phoneno: "",
   gender: GenderEnum.MALE,
   skintone: CompanionSkinToneEnum.FAIR,
   bodytype: "",
@@ -107,7 +95,9 @@ export function CreateCompanion({
     userData.append("lat", "17.98");
     userData.append("lng", "72.8");
     form.images.forEach((l) => {
-      userData.append("images", l.file);
+      if (typeof l === "object") {
+        userData.append("images", l.file);
+      }
     });
     try {
       const { registerUserService } = await import(
@@ -133,19 +123,6 @@ export function CreateCompanion({
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setError((prev) => ({ ...prev, [name]: "" }));
-  };
-
-  const getBodyTypes = (gender: "MALE" | "FEMALE" | "OTHER") => {
-    switch (gender) {
-      case "MALE":
-        return Object.values(MaleCompanionBodyTypeEnum);
-      case "FEMALE":
-        return Object.values(FemaleCompanionBodyTypeEnum);
-      case "OTHER":
-        return Object.values(OtherCompanionBodyTypeEnum);
-      default:
-        return [];
-    }
   };
 
   const getChangedFields = (

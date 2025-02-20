@@ -6,7 +6,7 @@ export interface ImageDto {
 
 export interface CompanionFormDto {
   id? : number;
-  images: ImageDto[] | null,
+  images: ImageDto[] | string[] | (ImageDto | string)[] | null,
   firstname: string;
   lastname: string;
   age: number;
