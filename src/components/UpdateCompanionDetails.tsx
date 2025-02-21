@@ -13,6 +13,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { formatCompanionRequestData } from "@/utils/statefunction.utils";
 import { BASEURL } from "@/Constants/services.constants";
+import { statusUpdateInputDto } from "@/data/dto/companion.data.dto";
+import { toast } from "sonner";
 
 export function UpdateCompanionDetails() {
   const [companiondetails, setCompanionDetails] = useState<any>(null);
@@ -32,6 +34,28 @@ export function UpdateCompanionDetails() {
         });
     }
   }, [searchParams]);
+
+  const handleUpdateStatus = async (status: string) => {
+    const requestId = searchParams.get("id");
+    if (requestId) {
+      const data: statusUpdateInputDto = {
+        id: requestId,
+      };
+      if (status === "Approve") {
+        data["approve"] = true;
+      } else {
+        data["reject"] = true;
+      }
+      const { updateCompanionProfileStatusService } = await import('../services/companion/updatecompanion.service')
+      const res = await updateCompanionProfileStatusService(data);
+      if (res?.data) {
+        toast.success("Request Updated Successfully");
+        navigate(-1);
+      }else if(res?.error){
+        toast.error(res.error);
+      }
+    }
+  };
 
   if (!companiondetails) {
     return <div>Loading..</div>;
@@ -61,7 +85,7 @@ export function UpdateCompanionDetails() {
                 companiondetails.oldcompaniondetails.images.map(
                   (image: string, i: number) => (
                     <img
-                      key={i*200}
+                      key={i * 200}
                       src={BASEURL + "/" + image}
                       alt="Profile Picture"
                       className="h-16 w-16"
@@ -149,14 +173,14 @@ export function UpdateCompanionDetails() {
             Delete
           </Button>
           <Button
-            onClick={() => console.log("Approve")}
+            onClick={() => handleUpdateStatus("Reject")}
             variant="destructive"
             className="bg-red-600 hover:bg-red-700"
           >
             Reject
           </Button>
           <Button
-            onClick={() => console.log("Approve")}
+            onClick={() => handleUpdateStatus("Approve")}
             className="bg-blue-600 hover:bg-blue-700"
           >
             Approve

@@ -137,3 +137,10 @@ export enum CompanionDescriptionEnum {
   PET_LOVER_COMPANION = "PET_LOVER_COMPANION",
   UNIQUE_REQUESTS = "UNIQUE_REQUESTS",
 }
+
+
+export interface statusUpdateInputDto {
+  id: string;
+  approve?: boolean;
+  reject?: boolean;
+}

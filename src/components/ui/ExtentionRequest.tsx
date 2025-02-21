@@ -8,8 +8,8 @@ import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 export function ExtentionRequest() {
   const [bookindata, setBookingData] = useState<bookingtableRowsDto[]>([]);
   useEffect(() => {
-    import("../../services/requests/bookingrequest.service")
-      .then(({ getBookingRequestsService }) => getBookingRequestsService())
+    import("../../services/booking/bookinglist.service")
+      .then(({ getExtensionBookinglistService }) => getExtensionBookinglistService())
       .then((res) => {
         if (res?.data) {
           const values = res.data?.map((l: any) => ({

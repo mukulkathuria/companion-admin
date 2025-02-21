@@ -43,7 +43,7 @@ export function UpdateCompanionRequest() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {requestdata.map((request: any, i: number) => (
+              {requestdata.length ? requestdata.map((request: any, i: number) => (
                 <tr
                   key={i * 300}
                   onClick={() =>
@@ -80,7 +80,7 @@ export function UpdateCompanionRequest() {
                     </span>
                   </td>
                 </tr>
-              ))}
+              )): <tr><td colSpan={3} className="text-center">No data found</td></tr>}
             </tbody>
           </table>
         </div>

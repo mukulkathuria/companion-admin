@@ -208,7 +208,7 @@ export const validateRegisteration = (
     errors.phoneno = "Phone no must be valid";
   }
 
-  if (!register.description.length) {
+  if (!register.description || register.description.length < 2) {
     errors.description = "Description is required";
   }
 
