@@ -8,7 +8,7 @@ import {
   RotateCw,
   Calendar,
   Ticket,
-  BarChart,
+  // BarChart,
 } from "lucide-react";
 import type { Tab } from "../App";
 import { useState, useEffect, useRef } from "react";
@@ -29,32 +29,30 @@ interface LayoutProps {
   onTabChange: (tab: Tab) => void;
 }
 
-interface Notification {
-  id: number;
-  type:
-    | "slot"
-    | "extension"
-    | "companionCancellation"
-    | "userCancellation"
-    | "booking"
-    | "ticket"
-    | "updateCompanion";
-  message: string;
-  time: string;
-  requestId?: number;
-  ticketId?: string;
-  purpose?: string;
-  extensionDuration?: number;
-  cancellationReason?: string;
-  updateId?: number;
-}
+// interface Notification {
+//   id: number;
+//   type:
+//     | "slot"
+//     | "extension"
+//     | "companionCancellation"
+//     | "userCancellation"
+//     | "booking"
+//     | "ticket"
+//     | "updateCompanion";
+//   message: string;
+//   time: string;
+//   requestId?: number;
+//   ticketId?: string;
+//   purpose?: string;
+//   extensionDuration?: number;
+//   cancellationReason?: string;
+//   updateId?: number;
+// }
 
 function Layout({ activeTab, onTabChange }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const bellRef = useRef<HTMLButtonElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -81,7 +79,7 @@ function Layout({ activeTab, onTabChange }: LayoutProps) {
     { id: "update" as const, label: "Update Companion", icon: RotateCw },
     { id: "track" as const, label: "Track Bookings", icon: Calendar },
     { id: "tickets" as const, label: "Tickets", icon: Ticket },
-    { id: "analytics" as const, label: "Analytics", icon: BarChart },
+    // { id: "analytics" as const, label: "Analytics", icon: BarChart },
   ];
 
   // Handle tab change
@@ -171,12 +169,12 @@ function Layout({ activeTab, onTabChange }: LayoutProps) {
                     className="relative p-2 rounded-full hover:bg-gray-100 transition-colors"
                   >
                     <Bell className="w-6 h-6 text-gray-700" />
-                    {notifications.length > 0 && (
+                    {[].length > 0 && (
                       <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
                     )}
                   </button>
                 </DropdownMenuTrigger>
-                <NotificationDropDown notifications={notifications} />
+                <NotificationDropDown notifications={[]} />
               </DropdownMenu>
               <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
                 <User className="w-6 h-6 text-gray-700" />

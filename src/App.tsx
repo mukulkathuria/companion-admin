@@ -3,7 +3,6 @@ import Layout  from "./components/Layout";
 import { Requests } from "./components/Requests";
 import { CreateCompanion } from "./components/CreateCompanion";
 import { Routes, Route } from "react-router-dom";
-import { Analytics } from "./components/Analytics";
 import { Toaster } from "./components/ui/sonner";
 import Login from "./components/Login/login";
 import { BookingList } from "./components/BookingList";
@@ -36,7 +35,7 @@ function App() {
           <Route path="/track/bookingdetails" element={<BookingDetails />} />
           <Route path="/tickets" element={<IssuesList />} />
           <Route path="/tickets/issuedetails" element={<IssueDetails />} />
-          <Route path="/analytics" element={<Analytics />} />
+          {/* <Route path="/analytics" element={<Analytics />} /> */}
         </Route>
         {/* <Layout activeTab={activeTab} onTabChange={setActiveTab}> */}
         {/* </Layout> */}
