@@ -13,9 +13,12 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Textarea } from "./ui/textarea";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 
 export function IssueDetails() {
   const [issue, setIssue] = useState<any>(null);
+  const [comment, setComment] = useState({ attachment: null, content: "" });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   useEffect(() => {
@@ -30,6 +33,45 @@ export function IssueDetails() {
         });
     }
   }, [searchParams]);
+
+  const handleComment = async () => {
+    if (!comment.content || !comment.content.trim().length) {
+      toast.error("Please add comment before comment");
+    }
+    try {
+      const issueId = searchParams.get("issueId");
+      if (issueId) {
+        const values = {
+          issueId: issue.id,
+          comment: comment.content,
+        };
+        const { addCommentOnIssueService } = await import(
+          "../services/issues/handleissue.service"
+        );
+        const { data, error } = await addCommentOnIssueService(values);
+        if (data) {
+          const { getIssueDetails } = await import(
+            "../services/issues/issuelist.service"
+          );
+          const { data: issueData, error: issueError } = await getIssueDetails(
+            issueId
+          );
+          if (issueData) {
+            setIssue({ ...issueData, issueId: issueId });
+          } else {
+            toast.error(issueError);
+          }
+        } else {
+          toast.error(error);
+        }
+      }
+    } catch (error: unknown) {
+      console.log(error);
+    } finally {
+      setComment({ attachment: null, content: "" });
+    }
+  };
+
   if (!issue) {
     return <div>Loading...</div>;
   }
@@ -125,27 +167,27 @@ export function IssueDetails() {
                   <div
                     key={index}
                     className={`flex ${
-                      message.sender === "user"
+                      !message.User?.isAdmin
                         ? "justify-start"
                         : "justify-end"
                     }`}
                   >
                     <div
                       className={`flex flex-col max-w-[70%] ${
-                        message.sender === "user" ? "items-start" : "items-end"
+                        !message.User?.isAdmin ? "items-start" : "items-end"
                       }`}
                     >
                       <span className="text-xs text-gray-500 mb-1">
-                        {message.time}
+                        {formatBookingTimingsforUi(message.created)}
                       </span>
                       <div
                         className={`rounded-lg p-3 ${
-                          message.sender === "user"
+                          !message.User?.isAdmin
                             ? "bg-gray-100 text-gray-800"
                             : "bg-blue-600 text-white"
                         }`}
                       >
-                        {message.message}
+                        {message.comment}
                       </div>
                     </div>
                   </div>
@@ -156,8 +198,10 @@ export function IssueDetails() {
           <div className="flex items-center gap-4">
             <Textarea
               placeholder="Reply to user..."
-              value={""}
-              onChange={() => console.log("Reply")}
+              value={comment.content}
+              onChange={(e) =>
+                setComment((l) => ({ ...l, content: e.target.value }))
+              }
               className="flex-1"
               rows={3}
             />
@@ -173,7 +217,7 @@ export function IssueDetails() {
                 <Paperclip className="h-5 w-5 text-gray-500" />
               </label>
               <Button
-                onClick={() => console.log("Send")}
+                onClick={handleComment}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 Send
