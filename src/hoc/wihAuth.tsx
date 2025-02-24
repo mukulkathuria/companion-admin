@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { decodeAccessToken } from "../utils/common.utils";
 import { datafetched } from "../Redux/auth/auth.reducer";
 import { storeType } from "@/Redux/store/store";
+import { removeUserData } from "@/utils/removeUserData";
 
 const withAuth = <P extends object>(
   WrappedComponent: React.ComponentType<P>
@@ -22,7 +23,9 @@ const withAuth = <P extends object>(
       if (!token && !tokenredux) {
         navigate("/", { replace: true });
       } else if (tokenredux && tokenredux.role !== "ADMIN") {
-        navigate("/", { replace: true });
+        removeUserData().then(() => {
+          navigate("/", { replace: true });
+        })
       } else if (!tokenredux && token) {
         dispatch(datafetched(decodeAccessToken(token).decodedToken));
       }
