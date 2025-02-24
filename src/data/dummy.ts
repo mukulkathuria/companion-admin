@@ -1,4 +1,4 @@
-import { ImageDto } from "@/data/dto/companion.data.dto";
+import { CompanionFormDto, CompanionSkinToneEnum, GenderEnum } from "@/data/dto/companion.data.dto";
 import { BookingDto } from "@/utils/dto/booking.dto";
 
 export const requestTableColumns = [
@@ -132,31 +132,11 @@ export const dummyCompanionCancellations = [
   },
 ];
 
-interface Companion {
-  images: ImageDto[] | null;
-  id: number;
-  firstname: string;
-  lastname: string;
-  age: number;
-  gender: "Male" | "Female" | "OTHER"; // Update this line
-  skintone: "Fair" | "Brown" | "Dark";
-  bodytype: string;
-  eatinghabits: string;
-  smokinghabits: string;
-  drinkinghabits: string;
-  city: string;
-  email: string;
-  bookingrate: number;
-  description: string[];
-  password?: string;
-  height: number;
-}
-
 interface UpdateRequest {
   id: number;
   companionId: number;
-  oldProfile: Companion;
-  newProfile: Partial<Companion>;
+  oldProfile: CompanionFormDto;
+  newProfile: Partial<CompanionFormDto>;
   status: "pending" | "approved" | "rejected";
 }
 
@@ -170,8 +150,10 @@ export const dummyUpdateRequests: UpdateRequest[] = [
       firstname: "Sarah",
       lastname: "Wilson",
       age: 24,
-      gender: "Female",
-      skintone: "Fair",
+      phoneno: "9876543210",
+      state: "Maharashtra",
+      gender: GenderEnum.FEMALE,
+      skintone: CompanionSkinToneEnum.FAIR,
       bodytype: "Hourglass",
       eatinghabits: "Non-Veg",
       smokinghabits: "Non-Smoker",
@@ -186,33 +168,6 @@ export const dummyUpdateRequests: UpdateRequest[] = [
       city: "Pune",
       bookingrate: 55,
       description: ["MOVIES", "TRAVEL_BUDDY", "FITNESS_PARTNER"], // Updated to array
-    },
-    status: "pending",
-  },
-  {
-    id: 2,
-    companionId: 2,
-    oldProfile: {
-      images: null,
-      id: 2,
-      firstname: "James",
-      lastname: "Brown",
-      age: 28,
-      gender: "Male",
-      skintone: "Brown",
-      bodytype: "Muscular",
-      eatinghabits: "Non-Veg",
-      smokinghabits: "Non-Smoker",
-      drinkinghabits: "Drinker",
-      city: "Delhi",
-      email: "james@example.com",
-      bookingrate: 60,
-      description: ["MOVIES", "TRAVEL_BUDDY", "FITNESS_PARTNER"],
-      height: 180,
-    },
-    newProfile: {
-      bookingrate: 65,
-      description: ["MOVIES", "ROAD_TRIPS", "FITNESS_PARTNER"],
     },
     status: "pending",
   },

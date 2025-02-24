@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 // import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 // import indiaStates from '/india-states.json';
 
@@ -13,48 +13,48 @@ interface StateMapProps {
   onSelectState: (state: StateData) => void;
 }
 
-const StateMap: React.FC<StateMapProps> = ({ stateData, onSelectState }) => {
-  const [tooltipContent, setTooltipContent] = useState<{
-    x: number;
-    y: number;
-    content: string;
-  } | null>(null);
-  const [selectedState, setSelectedState] = useState<string | null>(null);
-  // eslint-disable-next-line
-  const handleGeographyClick = (feature: any) => {
-    const stateName = feature.properties.name;
-    const stateInfo = stateData[stateName];
-    if (stateInfo) {
-      setSelectedState(stateName);
-      onSelectState(stateInfo);
-    }
-  };
-  // eslint-disable-next-line
-  const handleGeographyHover = (geo: any, event: React.MouseEvent) => {
-    const stateName = geo.properties.name;
-    const stateInfo = stateData[stateName];
-    if (stateInfo) {
-      setTooltipContent({
-        x: event.clientX,
-        y: event.clientY,
-        content: `${stateName}: Users: ${stateInfo.activeUsers}, Companions: ${stateInfo.activeCompanions}`,
-      });
-    }
-  };
-  // eslint-disable-next-line
-  const handleGeographyLeave = () => {
-    setTooltipContent(null);
-  };
+const StateMap: React.FC<StateMapProps> = ({ stateData }) => {
+  // const [tooltipContent, setTooltipContent] = useState<{
+  //   x: number;
+  //   y: number;
+  //   content: string;
+  // } | null>(null);
+  // const [selectedState, setSelectedState] = useState<string | null>(null);
 
-  // eslint-disable-next-line
-  const getFillColor = (feature: any) => {
-    const stateName = feature.properties.name;
-    const stateInfo = stateData[stateName];
-    if (selectedState === stateName) return '#4f46e5';
-    if (stateInfo && stateInfo.activeUsers > 15) return '#4f46e5';
-    if (stateInfo && stateInfo.activeUsers > 5) return '#6b7280';
-    return '#d1d5db';
-  };
+  // const handleGeographyClick = (feature: any) => {
+  //   const stateName = feature.properties.name;
+  //   const stateInfo = stateData[stateName];
+  //   if (stateInfo) {
+  //     setSelectedState(stateName);
+  //     onSelectState(stateInfo);
+  //   }
+  // };
+
+  // const handleGeographyHover = (geo: any, event: React.MouseEvent) => {
+  //   const stateName = geo.properties.name;
+  //   const stateInfo = stateData[stateName];
+  //   if (stateInfo) {
+  //     setTooltipContent({
+  //       x: event.clientX,
+  //       y: event.clientY,
+  //       content: `${stateName}: Users: ${stateInfo.activeUsers}, Companions: ${stateInfo.activeCompanions}`,
+  //     });
+  //   }
+  // };
+
+  // const handleGeographyLeave = () => {
+  //   setTooltipContent(null);
+  // };
+
+
+  // const getFillColor = (feature: any) => {
+  //   const stateName = feature.properties.name;
+  //   const stateInfo = stateData[stateName];
+  //   if (selectedState === stateName) return '#4f46e5';
+  //   if (stateInfo && stateInfo.activeUsers > 15) return '#4f46e5';
+  //   if (stateInfo && stateInfo.activeUsers > 5) return '#6b7280';
+  //   return '#d1d5db';
+  // };
 
   const totalUsers = Object.values(stateData).reduce(
     (sum, state) => sum + state.activeUsers,
@@ -65,7 +65,7 @@ const StateMap: React.FC<StateMapProps> = ({ stateData, onSelectState }) => {
     0
   );
 
-  const selectedStateInfo = selectedState ? stateData[selectedState] : null;
+  const selectedStateInfo = stateData["selectedState"]
 
   return (
     <div className="flex" style={{ width: '100%', height: '500px' }}>
@@ -114,7 +114,7 @@ const StateMap: React.FC<StateMapProps> = ({ stateData, onSelectState }) => {
             }
           </Geographies>
         </ComposableMap> */}
-        {tooltipContent && (
+        {/* {tooltipContent && (
           <div
             style={{
               position: 'absolute',
@@ -129,7 +129,7 @@ const StateMap: React.FC<StateMapProps> = ({ stateData, onSelectState }) => {
               {tooltipContent.content}
             </div>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Analytics Section */}

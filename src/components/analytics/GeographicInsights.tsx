@@ -13,6 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
       revenueBycity: { [key: string]: number };
       topRevenueZones: string[];
       barColor?: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      revenueByLocation: any
     }
 
     const shortenName = (name: string, maxLength: number) => {

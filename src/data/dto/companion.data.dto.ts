@@ -6,18 +6,19 @@ export interface ImageDto {
 
 export interface CompanionFormDto {
   id? : number;
-  images: ImageDto[] | null,
+  images: ImageDto[] | string[] | (ImageDto | string)[] | null,
   firstname: string;
   lastname: string;
   age: number;
   gender: GenderEnum;
+  phoneno: string;
   skintone:CompanionSkinToneEnum;
   bodytype: string;
   eatinghabits: string;
   smokinghabits: string;
   drinkinghabits: string;
   city: string;
-  state?: string;
+  state: string;
   email: string;
   password?: string;
   description: string[];
@@ -44,6 +45,7 @@ export interface ErrorFormDto {
   description?: string;
   bookingrate?: string;
   height?: string;
+  phoneno?: string;
 }
 
 export interface CreateCompanionProps {
@@ -134,4 +136,11 @@ export enum CompanionDescriptionEnum {
   TRAVEL_BUDDY = "TRAVEL_BUDDY",
   PET_LOVER_COMPANION = "PET_LOVER_COMPANION",
   UNIQUE_REQUESTS = "UNIQUE_REQUESTS",
+}
+
+
+export interface statusUpdateInputDto {
+  id: string;
+  approve?: boolean;
+  reject?: boolean;
 }

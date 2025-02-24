@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   ACCESS_TOKEN_LOC,
   REFRESH_TOKEN_LOC,
@@ -10,11 +10,20 @@ import { LoginParamsDto } from "@/services/auth/dto/login.dto";
 import { toast } from "sonner";
 
 const Login: FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [data, setData] = useState({ email: "", password: "" });
+  const [isloading, setisLoading] = useState<boolean>(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errors, setErrors] = useState({ email: "", password: "" });
+
+  useEffect(() => {
+    import("js-cookie").then(({ default: { get } }) => {
+      if (get(ACCESS_TOKEN_LOC)) {
+        navigate("/requests");
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,15 +36,15 @@ const Login: FC = () => {
       password: "",
     };
 
-    if (!email) {
+    if (!data.email) {
       validationErrors.email = "Email is required";
-    } else if (!validateEmail(email)) {
+    } else if (!validateEmail(data.email)) {
       validationErrors.email = "Invalid email format";
     }
 
-    if (!password) {
+    if (!data.password) {
       validationErrors.password = "Password is required";
-    } else if (!Regex.password.test(password)) {
+    } else if (!Regex.password.test(data.password)) {
       validationErrors.password = "Password is not valid";
     }
     setErrors(validationErrors);
@@ -47,30 +56,41 @@ const Login: FC = () => {
     e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLDivElement>
   ) => {
     e.preventDefault();
-    const { datafetched } = await import("../../Redux/auth/auth.reducer");
-    const { decodeAccessToken } = await import("../../utils/common.utils");
-    const { loginUserService } = await import(
-      "../../services/auth/login.service"
-    );
-    const {
-      default: { set },
-    } = await import("js-cookie");
-    if (!validateForm()) {
-      // Submit the form data (for example, send to an API)
-      const logindata = await loginUserService({ email, password });
-      if (logindata?.data) {
-        dispatch(
-          datafetched(
-            decodeAccessToken(logindata.data.access_token).decodedToken
-          )
-        );
-        set(ACCESS_TOKEN_LOC, logindata.data.access_token);
-        set(REFRESH_TOKEN_LOC, logindata.data.refresh_token);
-        navigate("/requests");
-      } else {
-        console.log("Error handling");
-        toast.error("Some error occur. Please try again after sometime");
+    setisLoading(() => true);
+    try {
+      const { datafetched } = await import("../../Redux/auth/auth.reducer");
+      const { decodeAccessToken } = await import("../../utils/common.utils");
+      const { loginUserService } = await import(
+        "../../services/auth/login.service"
+      );
+      const {
+        default: { set },
+      } = await import("js-cookie");
+      if (!validateForm()) {
+        // Submit the form data (for example, send to an API)
+        const logindata = await loginUserService({
+          email: data.email,
+          password: data.password,
+        });
+        if (logindata?.data) {
+          dispatch(
+            datafetched(
+              decodeAccessToken(logindata.data.access_token).decodedToken
+            )
+          );
+          set(ACCESS_TOKEN_LOC, logindata.data.access_token);
+          set(REFRESH_TOKEN_LOC, logindata.data.refresh_token);
+          navigate("/requests");
+        } else {
+          console.log("Error handling");
+          toast.error("Some error occur. Please try again after sometime");
+        }
       }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setData({ email: "", password: "Ī" });
+      setisLoading(() => false);
     }
   };
   return (
@@ -88,8 +108,10 @@ const Login: FC = () => {
               <div className="lginputbox">
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={data.email}
+                  onChange={(e) =>
+                    setData((l) => ({ ...l, email: e.target.value }))
+                  }
                   required
                   name="email"
                   placeholder="Email"
@@ -103,8 +125,8 @@ const Login: FC = () => {
               <div className="lginputbox">
                 <input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={data.password}
+                  onChange={(e) => setData((l) => ({ ...l, password: e.target.value }))}
                   required
                   name="password"
                   placeholder="Password"
@@ -115,8 +137,13 @@ const Login: FC = () => {
                   <span style={{ color: "red" }}>{errors.password}</span>
                 )}
               </div>
-              <button type="submit" className="lgbtn" onClick={handleSubmit}>
-                Login
+              <button
+                type="submit"
+                className="lgbtn"
+                onClick={handleSubmit}
+                disabled={isloading}
+              >
+                {isloading ? "Please Wait.." : "Login"}
               </button>
               <p className="forgotpass">forgot password ?</p>
             </div>

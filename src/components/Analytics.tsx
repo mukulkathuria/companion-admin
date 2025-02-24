@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
     import { RevenueMetrics } from './analytics/RevenueMetrics';
     import { BookingMetrics } from './analytics/BookingMetrics';
-    import { GeographicInsights } from './analytics/GeographicInsights';
+    // import { GeographicInsights } from './analytics/GeographicInsights';
     import { PaymentInsights } from './analytics/PaymentInsights';
     import { CompanionMetrics } from './analytics/CompanionMetrics';
     import { OperationalMetrics } from './analytics/OperationalMetrics';
@@ -82,11 +82,11 @@ import { useState, useEffect } from 'react';
                   totalBookings={dummyDelhiAnalytics.bookings.totalBookings}
                   bookingValueDistribution={dummyDelhiAnalytics.bookings.bookingValueDistribution}
                 />
-                <GeographicInsights
+                {/* <GeographicInsights
                   revenueByLocation={dummyDelhiAnalytics.geographic.revenueByColony}
                   topRevenueZones={dummyDelhiAnalytics.geographic.topRevenueZones}
                   barColor="var(--chart-2)"
-                />
+                /> */}
                 <PaymentInsights
                   paymentBreakdown={dummyDelhiAnalytics.payment.paymentBreakdown}
                   refundsAndChargebacks={dummyDelhiAnalytics.payment.refundsAndChargebacks}
@@ -116,11 +116,11 @@ import { useState, useEffect } from 'react';
                   totalBookings={dummyLucknowAnalytics.bookings.totalBookings}
                   bookingValueDistribution={dummyLucknowAnalytics.bookings.bookingValueDistribution}
                 />
-                <GeographicInsights
+                {/* <GeographicInsights
                   revenueByLocation={dummyLucknowAnalytics.geographic.revenueByColony}
                   topRevenueZones={dummyLucknowAnalytics.geographic.topRevenueZones}
                   barColor="var(--chart-2)"
-                />
+                /> */}
                 <PaymentInsights
                   paymentBreakdown={dummyLucknowAnalytics.payment.paymentBreakdown}
                   refundsAndChargebacks={dummyLucknowAnalytics.payment.refundsAndChargebacks}

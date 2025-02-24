@@ -1,3 +1,5 @@
+import { FemaleCompanionBodyTypeEnum, MaleCompanionBodyTypeEnum, OtherCompanionBodyTypeEnum } from "./dto/companion.data.dto";
+
 export const SkinToneData = ["Fair", "Medium", "Dark"];
 
 export const BookingRateData = [
@@ -63,3 +65,17 @@ export const drinkingHabitsData = [
   "NON_DRINKER",
   "OCCASIONALLY",
 ];
+
+
+export const getBodyTypes = (gender: "MALE" | "FEMALE" | "OTHER") => {
+  switch (gender) {
+    case "MALE":
+      return Object.values(MaleCompanionBodyTypeEnum);
+    case "FEMALE":
+      return Object.values(FemaleCompanionBodyTypeEnum);
+    case "OTHER":
+      return Object.values(OtherCompanionBodyTypeEnum);
+    default:
+      return [];
+  }
+};
