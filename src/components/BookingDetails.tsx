@@ -37,14 +37,21 @@ export function BookingDetails() {
               bookingtime: formatBookingTimingsforUi(data.bookingstart),
               transactions: data.Transactions,
               status: data.bookingstatus,
-              totalamount: data.finalRate
+              totalamount: data.finalRate,
+              ...data,
+              rating: data.rating.length
+                ? {
+                    ratee: data.rating[0].ratee,
+                    rater: data.rating[0].rater,
+                  }
+                : null,
             };
             setBookingDetails(values);
           }
         });
     }
   }, [searchParams]);
-  if(!bookingDetails) return <div>Loading...</div>;
+  if (!bookingDetails) return <div>Loading...</div>;
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 max-w-4xl w-full mx-auto">
       <button
@@ -68,12 +75,15 @@ export function BookingDetails() {
             <div className="flex items-center">
               <img
                 src={BASEURL + "/" + bookingDetails.user.Images[0]}
-                alt={'user profile pic'}
+                alt={"user profile pic"}
                 className="h-16 w-16 rounded-full object-cover"
               />
               <div className="ml-4">
                 <p className="font-medium text-gray-900">
-                  {bookingDetails.user.firstname}   
+                  {bookingDetails.user.firstname}
+                </p>
+                <p className="font-medium text-gray-900">
+                  {bookingDetails.user.gender}
                 </p>
               </div>
             </div>
@@ -94,16 +104,14 @@ export function BookingDetails() {
             <div className="flex items-center">
               <img
                 src={BASEURL + "/" + bookingDetails.companion.Images[0]}
-                alt={'companion profile pic'}
+                alt={"companion profile pic"}
                 className="h-16 w-16 rounded-full object-cover"
               />
               <div className="ml-4">
                 <p className="font-medium text-gray-900">
                   {bookingDetails.companion.firstname}
                 </p>
-                <p className="text-sm text-gray-500">
-                  ID: COMP001
-                </p>
+                <p className="text-sm text-gray-500">{bookingDetails.companion.gender}</p>
               </div>
             </div>
           </CardContent>
@@ -131,7 +139,7 @@ export function BookingDetails() {
             <div>
               <label className="text-sm text-gray-500">Booking Time</label>
               <p className="font-medium text-gray-900">
-              {bookingDetails.bookingtime}
+                {bookingDetails.bookingtime}
               </p>
             </div>
             <div>
@@ -142,15 +150,13 @@ export function BookingDetails() {
             </div>
             <div>
               <label className="text-sm text-gray-500">Location</label>
-              <p className="font-medium text-gray-900">
-                {bookingDetails.city}
-              </p>
+              <p className="font-medium text-gray-900">{bookingDetails.city}</p>
             </div>
             <div>
               <label className="text-sm text-gray-500">Status</label>
               <Badge
                 variant={
-                    bookingDetails.status === "Completed"
+                  bookingDetails.status === "Completed"
                     ? "secondary"
                     : "destructive"
                 }
@@ -175,7 +181,9 @@ export function BookingDetails() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm text-gray-500">No of Transactions</label>
+              <label className="text-sm text-gray-500">
+                No of Transactions
+              </label>
               <p className="font-medium text-gray-900">
                 {bookingDetails.transactions.length}
               </p>
@@ -191,7 +199,7 @@ export function BookingDetails() {
       </Card>
 
       {/* Cancellation Details */}
-      {bookingDetails.cancelledReason && (
+      {bookingDetails.cancellationDetails && (
         <Card className="mt-8">
           <CardHeader>
             <CardTitle className="text-xl font-semibold text-gray-900">
@@ -206,16 +214,18 @@ export function BookingDetails() {
               <div>
                 <label className="text-sm text-gray-500">Canceled By</label>
                 <p className="font-medium text-gray-900">
-                  USER NAME
+                  {bookingDetails.cancellationDetails.firstname}
                 </p>
               </div>
+              <p className="font-medium text-gray-900">
+                Companion:{" "}
+                {String(bookingDetails.cancellationDetails.isCompanion)}
+              </p>
               <div>
                 <label className="text-sm text-gray-500">
                   Cancellation Time
                 </label>
-                <p className="font-medium text-gray-900">
-                  Cancelation Time
-                </p>
+                <p className="font-medium text-gray-900">Cancelation Time</p>
               </div>
             </div>
             {bookingDetails.cancelledReason && (
@@ -231,7 +241,7 @@ export function BookingDetails() {
       )}
 
       {/* Reviews */}
-      {bookingDetails?.ratings && (
+      {bookingDetails?.rating && (
         <Card className="mt-8">
           <CardHeader>
             <CardTitle className="text-xl font-semibold text-gray-900">
@@ -242,18 +252,16 @@ export function BookingDetails() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {bookingDetails.ratings?.user && (
+            {bookingDetails.rating.rater && (
               <div>
-                <p className="font-medium text-gray-700">User Review:</p>
-                <p className="text-gray-900">"User Review"</p>
+                <p className="font-medium text-gray-700">Rater Review:</p>
+                <p className="text-gray-900">"Rater Review"</p>
               </div>
             )}
-            {bookingDetails.ratings?.companion && (
+            {bookingDetails.rating?.ratee && (
               <div>
-                <p className="font-medium text-gray-700">Companion Review:</p>
-                <p className="text-gray-900">
-                  "Companion Review"
-                </p>
+                <p className="font-medium text-gray-700">Ratee Review:</p>
+                <p className="text-gray-900">"Ratee Review"</p>
               </div>
             )}
           </CardContent>
@@ -271,9 +279,9 @@ export function BookingDetails() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-          <MapContainer
+            <MapContainer
               center={[bookingDetails.lat, bookingDetails.lng]}
-              zoom={13}
+              zoom={16}
               style={{
                 height: "300px",
                 width: "100%",

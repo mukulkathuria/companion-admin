@@ -14,12 +14,6 @@ import type { Tab } from "../App";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { DropdownMenu, DropdownMenuTrigger } from "./ui/dropdown-menu";
-// import {
-//   dummySlotRequests,
-//   dummyExtensionRequests,
-//   dummyCompanionCancellations,
-//   dummyUpdateRequests,
-// } from "../data/dummy";
 import withAuth from "@/hoc/wihAuth";
 import NotificationDropDown from "./ui/NotificationDropDown";
 
@@ -28,26 +22,6 @@ interface LayoutProps {
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
 }
-
-// interface Notification {
-//   id: number;
-//   type:
-//     | "slot"
-//     | "extension"
-//     | "companionCancellation"
-//     | "userCancellation"
-//     | "booking"
-//     | "ticket"
-//     | "updateCompanion";
-//   message: string;
-//   time: string;
-//   requestId?: number;
-//   ticketId?: string;
-//   purpose?: string;
-//   extensionDuration?: number;
-//   cancellationReason?: string;
-//   updateId?: number;
-// }
 
 function Layout({ activeTab, onTabChange }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -79,7 +53,16 @@ function Layout({ activeTab, onTabChange }: LayoutProps) {
     { id: "update" as const, label: "Update Companion", icon: RotateCw },
     { id: "track" as const, label: "Track Bookings", icon: Calendar },
     { id: "tickets" as const, label: "Tickets", icon: Ticket },
-  //  { id: "becompanion" as const, label: "becompanion", icon: Ticket }
+    {
+      id: "companionrequest" as const,
+      label: "Companion Requests",
+      icon: Ticket,
+    },
+    {
+      id: "companionrates" as const,
+      label: "Companion Rates",
+      icon: Ticket,
+    },
     // { id: "analytics" as const, label: "Analytics", icon: BarChart },
   ];
 

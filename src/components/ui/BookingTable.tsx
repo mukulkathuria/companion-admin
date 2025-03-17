@@ -32,7 +32,7 @@ export function BookingTable(props: BookingTableProps) {
               props.rows.map((l) => (
                 <tr
                   onClick={() => {
-                    navigate(`./bookingdetails?bookingId=${l.id}`)
+                    navigate(`./bookingdetails?bookingId=${l.id}`);
                   }}
                   className="hover:bg-gray-50 cursor-pointer"
                   key={l.id}
@@ -47,9 +47,11 @@ export function BookingTable(props: BookingTableProps) {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{l.location}</div>
-                  </td>
+                  {l.location && (
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{l.location}</div>
+                    </td>
+                  )}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{l.gender}</div>
                   </td>

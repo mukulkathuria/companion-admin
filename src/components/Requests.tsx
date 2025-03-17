@@ -2,6 +2,8 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { BookingRequests } from "./ui/BookingRequests";
 import { BookingSlotDetails } from "./ui/BookingSlotDetails";
 import { ExtentionRequest } from "./ui/ExtentionRequest";
+import CancellationTab from "./ui/CancellationTab";
+import CompanionCancelDetails from "./Companioncanceldetail";
 
 export function Requests() {
   const navigate = useNavigate();
@@ -12,11 +14,11 @@ export function Requests() {
       label: "Extensions",
       route: "/requests/extensions",
     },
-    // {
-    //   id: "cancellations" as const,
-    //   label: "Cancellations",
-    //   route: "/requests/cancellation",
-    // },
+    {
+      id: "cancellations" as const,
+      label: "Cancellations",
+      route: "/requests/cancellation",
+    },
   ];
 
   return (
@@ -40,9 +42,11 @@ export function Requests() {
       </div>
       <Routes>
         <Route path="/bookingdetails" element={<BookingSlotDetails />} />
+        <Route path="/extensions" element={<ExtentionRequest />} />
+        <Route path="/cancellation" element={<CancellationTab />} />
         <Route
-          path="/extensions"
-          element={<ExtentionRequest />}
+          path="/cancellation/bookingdetails"
+          element={<CompanionCancelDetails />}
         />
         <Route path="/" element={<BookingRequests />} />
       </Routes>

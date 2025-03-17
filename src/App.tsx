@@ -15,9 +15,6 @@ import Becompanion from "./components/Becompanion";
 import Becompaniondetail from "./components/Becompaniondetail";
 import Rate from "./components/Rate";
 import RateDetail from "./components/RateDetail";
-import Companioncancel from "./components/Companioncancel";
-import Companioncanceldetail from "./components/Companioncanceldetail";
-import Usercancel from "./components/Usercancel";
 
 export type Tab =
   | "requests"
@@ -25,8 +22,8 @@ export type Tab =
   | "update"
   | "track"
   | "tickets"
-  | "analytics"
-  "becompanion"
+  | "companionrequest"
+  | "companionrates"
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>("requests");
@@ -43,13 +40,10 @@ function App() {
           <Route path="/track/bookingdetails" element={<BookingDetails />} />
           <Route path="/tickets" element={<IssuesList />} />
           <Route path="/tickets/issuedetails" element={<IssueDetails />} />
-          <Route path="/becompanion" element={<Becompanion />} />
-          <Route path="/becompaniondetail" element={<Becompaniondetail />} />
-          <Route path="/rate" element={<Rate />} />
-          <Route path="/rate/details" element={<RateDetail />} />
-          <Route path="/companioncancel" element={<Companioncancel />} />
-          <Route path="/companioncancel/detail" element={<Companioncanceldetail />} />
-          <Route path="/usercancel" element={<Usercancel />} />
+          <Route path="/companionrequest" element={<Becompanion />} />
+          <Route path="/companionrequest/details" element={<Becompaniondetail />} />
+          <Route path="/companionrates" element={<Rate />} />
+          <Route path="/companionrates/details" element={<RateDetail />} />
           {/* <Route path="/analytics" element={<Analytics />} /> */}
         </Route>
         {/* <Layout activeTab={activeTab} onTabChange={setActiveTab}> */}
