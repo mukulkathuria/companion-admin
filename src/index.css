@@ -803,3 +803,34 @@ body {
   color: red;
   font-size: 0.8em;
 }
+
+.leaflet-container{
+  width: 300px;
+  height: 250px;
+}
+
+
+.becompanion-box{
+  padding: 10px;
+  background-color: white;
+  height: auto;
+}
+.becompanion-box img{
+  width: 150px;
+  height: 180px;
+  border-radius: 20px;
+}
+.becompanion-box button{
+  padding: 15px;
+
+}
+.rate-profile img{
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+.bottom-border{
+  padding-bottom: 5px;
+  border-bottom: #333 2px solid;
+  
+}

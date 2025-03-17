@@ -79,6 +79,7 @@ function Layout({ activeTab, onTabChange }: LayoutProps) {
     { id: "update" as const, label: "Update Companion", icon: RotateCw },
     { id: "track" as const, label: "Track Bookings", icon: Calendar },
     { id: "tickets" as const, label: "Tickets", icon: Ticket },
+  //  { id: "becompanion" as const, label: "becompanion", icon: Ticket }
     // { id: "analytics" as const, label: "Analytics", icon: BarChart },
   ];
 
