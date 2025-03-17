@@ -8,6 +8,12 @@ export const requestTableColumns = [
   { id: 4, label: "Booking Time" },
 ];
 
+export const cancellationTableColumns = [
+  { id: 1, label: "User" },
+  { id: 3, label: "Gender" },
+  { id: 4, label: "Booking Time" },
+]
+
 export const dummySlotRequests = [
   {
     id: 1,

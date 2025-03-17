@@ -1,7 +1,7 @@
 export type bookingtableRowsDto = {
   id: number;
   name: string;
-  location: string;
+  location?: string;
   gender: string;
   bookingTime: string;
 };

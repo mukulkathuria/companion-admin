@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { BASEURL } from "@/Constants/services.constants";
+import { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const indianStates = [
@@ -38,6 +40,17 @@ const Rate: React.FC = () => {
   const [errors, setErrors] = useState<{ state?: string; location?: string }>(
     {}
   );
+  const [companiondata, setcompaniondata] = useState<any>(null);
+
+  useEffect(() => {
+    import("@/services/companion/companionrequest.service")
+      .then(({ getCompanionRateListService }) => getCompanionRateListService())
+      .then(({ data }) => {
+        if (data) {
+          setcompaniondata(data);
+        }
+      });
+  }, []);
 
   const validate = () => {
     const newErrors: { state?: string; location?: string } = {};
@@ -53,6 +66,7 @@ const Rate: React.FC = () => {
       console.log("Form submitted:", { state, location });
     }
   };
+
   return (
     <div>
       <h1 className="text-black text-lg font-bold">
@@ -103,70 +117,40 @@ const Rate: React.FC = () => {
       </div>
       <div className="becompanion-box ">
         <div className="flex justify-between font-bold py-3 px-3 bg-slate-200 my-3 ">
-            <h1 className="ml-6 text-sm">User</h1>
-            <h1 className="ml-6 text-sm">Age</h1>
-            <h1 className="ml-6 text-sm">Gender</h1>
-            <h1 className="ml-6 text-sm">Rate</h1>
-            <h1 className="ml-6 text-sm">weekly booking</h1>
-            <h1 className="text-sm">Total booking</h1>
+          <h1 className="ml-6 text-sm">User</h1>
+          <h1 className="ml-6 text-sm">Age</h1>
+          <h1 className="ml-6 text-sm">Gender</h1>
+          <h1 className="ml-6 text-sm">Rate</h1>
+          <h1 className="ml-6 text-sm">weekly booking</h1>
         </div>
-     <Link to={'/Rate/details'}>  <div className="hover:bg-slate-200">
-        <div className="flex justify-between items-center mb-3 ">
-        <div className="flex items-center rate-profile mr-3">
-            <img src="https://img.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg" alt="profile"  />
-            <h1>Sora</h1>
-        </div>
-        <div >
-        30
-        </div>
-        <div>
-            Female
-        </div>
-        <div>
-            4.5
-        </div>
-        <div>
-            30hr/week
-        </div>
-        <div>
-            300hr
-        </div>
-        
-        </div>
-        
-        <hr />
-        </div>
-        </Link> 
-        <Link to={'/Rate/details'}>
-        <div className="hover:bg-slate-200">
-        <div className="flex justify-between items-center mb-3">
-        <div className="flex items-center rate-profile mr-3">
-            <img src="https://img.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg" alt="profile"  />
-            <h1>Sora</h1>
-        </div>
-        <div >
-        30
-        </div>
-        <div>
-            Female
-        </div>
-        <div>
-            4.5
-        </div>
-        <div>
-            30hr/week
-        </div>
-        <div>
-            300hr
-        </div>
-        
-        </div>
-        <hr />
-        </div>
-        </Link>
+        {!companiondata ? (
+          <div>Loading...</div>
+        ) : companiondata?.length ? (
+          companiondata.map((l: any) => (
+            <Link to={`./details?companionId=${l.id}`} key={l.id}>
+              <div className="hover:bg-slate-200">
+                <div className="flex justify-between items-center mb-3 ">
+                  <div className="flex items-center rate-profile mr-3">
+                    <img src={BASEURL + "/" + l.Images[0]} alt="profile" />
+                    <h1>{l.firstname}</h1>
+                  </div>
+                  <div>{l.age}</div>
+                  <div>{l.gender}</div>
+                  <div>
+                    {Number(l.ratingsReceived / l.totalRatings).toFixed(2)}
+                  </div>
+                  <div>{l.Booking}hr/week</div>
+                </div>
+                <hr />
+              </div>
+            </Link>
+          ))
+        ) : (
+          <div>No Companions Found in this Location</div>
+        )}
       </div>
     </div>
   );
 };
 
-export default Rate;
+export default memo(Rate, () => false);
