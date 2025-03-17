@@ -12,6 +12,7 @@ import { Badge } from "./ui/badge";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 import { BASEURL } from "@/Constants/services.constants";
+import "leaflet/dist/leaflet.css";
 
 export function BookingDetails() {
   const navigate = useNavigate();
