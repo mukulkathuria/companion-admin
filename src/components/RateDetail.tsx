@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BASEURL } from "@/Constants/services.constants";
 import { FC, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { BarChart, Bar, XAxis, YAxis } from "recharts";
+import { toast } from "sonner";
 
 const RateDetail: React.FC = () => {
   const [error, setError] = useState<string>("");
+  const navigate = useNavigate();
   const [companiondata, setcompaniondata] = useState<any>(null);
 
   const [searchParams] = useSearchParams();
@@ -44,7 +46,7 @@ const RateDetail: React.FC = () => {
   };
 
   const validatePrice = (price: string): boolean => {
-    const parsedPrice = parseFloat(price);
+    const parsedPrice = Number(price);
     if (isNaN(parsedPrice) || parsedPrice <= 0) {
       setError("Price must be a positive number");
       return false;
@@ -53,10 +55,23 @@ const RateDetail: React.FC = () => {
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    const companionId = searchParams.get("companionId");
     e.preventDefault();
-    if (validatePrice(companiondata.bookingrate)) {
-      console.log("Price updated");
+    if (validatePrice(companiondata.bookingrate) && companionId) {
+      const { updateCompanionBasePriceService } = await import(
+        "@/services/companion/updatecompanion.service"
+      );
+      const { data, error } = await updateCompanionBasePriceService(
+        { updatedprice: Number(companiondata.bookingrate) },
+        companionId
+      );
+      if (data) {
+        toast.success("Successfully updated the price");
+        navigate(-1);
+      } else {
+        toast.error(error);
+      }
     }
   };
   if (!companiondata) {

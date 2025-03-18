@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { bookingDetailsDto } from "./shared/dto/booking.dto";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 import { BASEURL } from "@/Constants/services.constants";
+import { statusUpdateInputDto } from "@/data/dto/companion.data.dto";
+import { toast } from "sonner";
 
 const CompanionCancelDetails = () => {
   const [searchParams] = useSearchParams();
   const [bookingDetails, setBookingDetails] =
     useState<bookingDetailsDto | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const bookingId = searchParams.get("bookingId");
@@ -27,13 +30,39 @@ const CompanionCancelDetails = () => {
               lat: data.Meetinglocation[0].lat,
               lng: data.Meetinglocation[0].lng,
               bookingtime: formatBookingTimingsforUi(data.bookingstart),
-              cancelledReason: data.cancelledReason
+              cancelledReason: data.cancelledReason,
+              cancellationDetails: data.cancellationDetails,
             };
             setBookingDetails(values);
           }
         });
     }
   }, [searchParams]);
+
+  const updateCancellationStatus = async (status: string) => {
+    const bookingId = searchParams.get("bookingId");
+    if (bookingId) {
+      const data: statusUpdateInputDto = {
+        id: bookingId,
+      };
+      if (status === "Approve") {
+        data["approve"] = true;
+      } else {
+        data["reject"] = true;
+      }
+      const { updateCompanionCancellationStatusService } = await import(
+        "@/services/companion/updatecompanion.service"
+      );
+      const { data: statusdata, error } =
+        await updateCompanionCancellationStatusService(data);
+      if (statusdata) {
+        toast.success("Sucessfully update the status");
+        navigate(-1);
+      } else {
+        toast.error(error);
+      }
+    }
+  };
 
   if (!bookingDetails) {
     return <div>Loading..</div>;
@@ -49,7 +78,9 @@ const CompanionCancelDetails = () => {
           }
           alt="profile"
         />
-        <h1 className="my-3">Companion name: {bookingDetails.companion.firstname}</h1>
+        <h1 className="my-3">
+          Companion name: {bookingDetails.companion.firstname}
+        </h1>
       </div>
 
       <h1 className="font-bold my-3">User detail</h1>
@@ -63,12 +94,6 @@ const CompanionCancelDetails = () => {
         <h1>
           Gender: <span>{bookingDetails.user.gender}</span>
         </h1>
-        <h1>
-          bookingid: <span>12345xyz</span>
-        </h1>
-        <h1>
-          userid: <span>12345bdgdg</span>
-        </h1>
       </div>
       <h1 className="font-bold my-3">Booking detail</h1>
       <div className="flex justify-between">
@@ -76,18 +101,41 @@ const CompanionCancelDetails = () => {
           Booking time: <span>{bookingDetails.bookingtime}</span>
         </h1>
       </div>
+      <h1>Cancellation Details</h1>
       <div>
-        <h1 className="font-bold mt-4">
-          Reason of cancelation by companion :{" "}
-          <span className="font-normal">
-           {bookingDetails.cancelledReason}
-          </span>
-        </h1>
+        <h2>Cancelled By: </h2>
+        <span>{bookingDetails.cancellationDetails?.firstname}</span>
+        <div>
+          Is Cancelled By Companion:{" "}
+          {String(bookingDetails.cancellationDetails?.isCompanion)}
+        </div>
       </div>
-      <div className="flex justify-end gap-4">
-        <button className="bg-green-600">Approve</button>
-        <button className="bg-red-500">reject</button>
-      </div>
+      {bookingDetails.cancelledReason ? (
+        <>
+          <div>
+            <h1 className="font-bold mt-4">
+              Reason of cancelation by companion :{" "}
+              <span className="font-normal">
+                {bookingDetails.cancelledReason}
+              </span>
+            </h1>
+          </div>
+          <div className="flex justify-end gap-4">
+            <button
+              className="bg-green-600"
+              onClick={() => updateCancellationStatus("Approve")}
+            >
+              Approve
+            </button>
+            <button
+              className="bg-red-500"
+              onClick={() => updateCancellationStatus("Reject")}
+            >
+              reject
+            </button>
+          </div>
+        </>
+      ) : null}
       <div></div>
     </div>
   );
