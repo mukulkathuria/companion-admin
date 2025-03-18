@@ -20,6 +20,7 @@ export function BookingSlotDetails() {
   const [searchParams] = useSearchParams();
   const [bookingDetails, setBookingDetails] =
     useState<bookingDetailsDto | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const bookingId = searchParams.get("bookingId");
@@ -55,6 +56,7 @@ export function BookingSlotDetails() {
         const { data } = await acceptBookingService(bookingId);
         if (data) {
           toast.success("Booking is accepted now congratulation");
+          navigate(-1);
         } else {
           toast.error("Something went wrong");
         }
@@ -64,7 +66,6 @@ export function BookingSlotDetails() {
     }
   };
 
-  const navigate = useNavigate();
   if (!bookingDetails) return <div>Loading....</div>;
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 max-w-4xl w-full mx-auto">
@@ -89,8 +90,11 @@ export function BookingSlotDetails() {
         <CardContent className="space-y-6">
           <div className="flex items-start gap-6 mb-4">
             <img
-              src={BASEURL + "/UserPhotos/companion1.jpg"}
-              alt=""
+              src={
+                bookingDetails.user.Images &&
+                BASEURL + "/" + bookingDetails.user.Images[0]
+              }
+              alt="Profile"
               style={{ height: "100px", width: "135px" }}
             />
             <div className="space-y-1">
@@ -99,7 +103,9 @@ export function BookingSlotDetails() {
                 Name: {bookingDetails.user.firstname}{" "}
               </p>
               <div className="flex gap-2">
-                <p className="text-sm text-gray-500">Gender: Male</p>
+                <p className="text-sm text-gray-500">
+                  Gender: {bookingDetails.user.gender}
+                </p>
                 <p className="text-sm text-gray-500">
                   Age: {bookingDetails.user.age}
                 </p>
@@ -141,7 +147,7 @@ export function BookingSlotDetails() {
           {
             <MapContainer
               center={[bookingDetails.lat, bookingDetails.lng]}
-              zoom={13}
+              zoom={16}
               style={{
                 height: "300px",
                 width: "100%",
