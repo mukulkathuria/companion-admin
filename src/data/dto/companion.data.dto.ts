@@ -144,3 +144,7 @@ export interface statusUpdateInputDto {
   approve?: boolean;
   reject?: boolean;
 }
+
+export interface updateCompanionPriceInputDto {
+  updatedprice: number;
+}

@@ -15,10 +15,20 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
+import { BASEURL } from "@/Constants/services.constants";
 
 export function IssueDetails() {
   const [issue, setIssue] = useState<any>(null);
-  const [comment, setComment] = useState({ attachment: null, content: "" });
+  const [comment, setComment] = useState<{
+    attachment:
+      | {
+          url: string;
+          file: File;
+        }[]
+      | null;
+    content: string;
+  }>({ attachment: null, content: "" });
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   useEffect(() => {
@@ -41,14 +51,18 @@ export function IssueDetails() {
     try {
       const issueId = searchParams.get("issueId");
       if (issueId) {
-        const values = {
-          issueId: issue.id,
-          comment: comment.content,
-        };
+        const formData = new FormData();
+        formData.append("issueId", issue.id);
+        formData.append("comment", comment.content);
+        if (comment.attachment) {
+          comment.attachment.forEach((l) => {
+            formData.append("images", l.file);
+          });
+        }
         const { addCommentOnIssueService } = await import(
           "../services/issues/handleissue.service"
         );
-        const { data, error } = await addCommentOnIssueService(values);
+        const { data, error } = await addCommentOnIssueService(formData);
         if (data) {
           const { getIssueDetails } = await import(
             "../services/issues/issuelist.service"
@@ -70,6 +84,30 @@ export function IssueDetails() {
     } finally {
       setComment({ attachment: null, content: "" });
     }
+  };
+
+  const handleAttachments = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const maxImages = 4;
+    if (files.length > maxImages) {
+      toast.error(`You can only upload up to ${maxImages} images.`);
+      return;
+    }
+    const validTypes = ["image/jpeg", "image/png"];
+    for (let i = 0; i < files.length; i += 1) {
+      if (
+        !validTypes.includes(files[i].type) ||
+        files[i].size > 2 * 1024 * 1024
+      ) {
+        toast.error("Invalid Image");
+        return;
+      }
+    }
+    const newImages = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+    setComment((l) => ({ ...l, attachment: newImages }));
   };
 
   if (!issue) {
@@ -147,18 +185,20 @@ export function IssueDetails() {
               <h3 className="font-medium mb-2">Description</h3>
               <p className="text-gray-700">{issue.explanation}</p>
             </div>
-            {/* {selectedTicket.attachments && selectedTicket.attachments.length > 0 && (
-            <div>
-              <h3 className="font-medium mb-2">Attachments</h3>
+            {issue.screenshots && issue.screenshots.length > 0 && (
               <div className="flex gap-4 flex-wrap">
-                {selectedTicket.attachments.map((attachment, index) => (
+                {issue.screenshots.map((file: string, index: number) => (
                   <div key={index}>
-                    {renderAttachmentPreview(attachment)}
+                    <img
+                      src={BASEURL + "/" + file}
+                      alt=""
+                      width={80}
+                      height={80}
+                    />
                   </div>
                 ))}
               </div>
-            </div>
-          )} */}
+            )}
           </div>
           {issue.comments?.length > 0 && (
             <ScrollArea className="h-96 rounded-md border p-4">
@@ -167,9 +207,7 @@ export function IssueDetails() {
                   <div
                     key={index}
                     className={`flex ${
-                      !message.User?.isAdmin
-                        ? "justify-start"
-                        : "justify-end"
+                      !message.User?.isAdmin ? "justify-start" : "justify-end"
                     }`}
                   >
                     <div
@@ -189,6 +227,22 @@ export function IssueDetails() {
                       >
                         {message.comment}
                       </div>
+                      {message.screenshots && message.screenshots.length > 0 && (
+                        <div className="flex gap-4 flex-wrap">
+                          {message.screenshots.map(
+                            (file: string, index: number) => (
+                              <div key={index}>
+                                <img
+                                  src={BASEURL + "/" + file}
+                                  alt=""
+                                  width={80}
+                                  height={80}
+                                />
+                              </div>
+                            )
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -210,9 +264,9 @@ export function IssueDetails() {
                 <input
                   type="file"
                   multiple
-                  onChange={(e) => console.log(e.target.files)}
+                  onChange={handleAttachments}
                   className="hidden"
-                  accept="image/png,image/jpeg,image/jpg,application/pdf"
+                  accept=".jpg, .jpeg, .png"
                 />
                 <Paperclip className="h-5 w-5 text-gray-500" />
               </label>
@@ -224,18 +278,18 @@ export function IssueDetails() {
               </Button>
             </div>
           </div>
-          {/* {attachments.length > 0 && (
-          <div className="flex gap-4 flex-wrap">
-            {attachments.map((file, index) => (
-              <div key={index}>
-                {renderAttachmentPreview(file)}
-                <span className="text-sm text-gray-500 mt-1 block text-center">
-                  {file.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        )} */}
+          {comment.attachment && comment.attachment.length > 0 && (
+            <div className="flex gap-4 flex-wrap">
+              {comment.attachment.map((file, index) => (
+                <div key={index}>
+                  <img src={file.url} alt="" width={40} height={40} />
+                  <span className="text-sm text-gray-500 mt-1 block text-center">
+                    {file.file.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -30,7 +30,7 @@ const Becompanion = () => {
               <h1>{l.firstname}</h1>
               <h1>{l.gender}</h1>
               <h1>{l.age}</h1>
-              <Link to={"./details"}>
+              <Link to={`./details?companionId=${l.id}`}>
                 {" "}
                 <h1 className="bg-black text-white p-2 cursor-pointer rounded-xl">
                   View

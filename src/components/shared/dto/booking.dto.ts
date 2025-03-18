@@ -4,6 +4,7 @@ export interface basicUserDetailsDto{
     gender: string;
     Images?: string[];
     age: number;
+    isCompanion: boolean;
 }
 
 export interface bookingDetailsDto {
@@ -21,4 +22,5 @@ export interface bookingDetailsDto {
     finalRate?: number;
     bookingstatus?: string;
     cancelledReason?: string;
+    cancellationDetails? : basicUserDetailsDto
 }

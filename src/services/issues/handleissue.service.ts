@@ -1,7 +1,5 @@
-import { addCommentonIssueInputDto } from "@/data/dto/bookingRequests.dto";
-
 export const addCommentOnIssueService = async (
-  statusinfo: addCommentonIssueInputDto
+  statusinfo: FormData
 ) => {
   const { BASEURL } = await import("../../Constants/services.constants");
   const {

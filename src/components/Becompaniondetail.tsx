@@ -1,4 +1,30 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { BASEURL } from "@/Constants/services.constants";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+
 const Becompaniondetail = () => {
+  const [companiondata, setcompaniondata] = useState<any>(null);
+
+  const [searchParams] = useSearchParams();
+  useEffect(() => {
+    const companionId = searchParams.get("companionId");
+    if (companionId) {
+      import("@/services/companion/companionrequest.service")
+        .then(({ getewCompanionRequestDetailsService }) =>
+          getewCompanionRequestDetailsService(companionId)
+        )
+        .then(async ({ data }) => {
+          console.log(data);
+          setcompaniondata(data);
+        });
+    }
+  }, [searchParams]);
+
+  if (!companiondata) {
+    return <div>Loading..</div>;
+  }
+
   return (
     <>
       <h1 className="text-xl font-bold">Request companion detail</h1>
@@ -6,29 +32,29 @@ const Becompaniondetail = () => {
         <div className="bg-slate-50 p-3">
           <div className="flex gap-5">
             <img
-              src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bW9kZWx8ZW58MHx8MHx8fDA%3D"
+              src={BASEURL + '/' + companiondata.photos[0]}
               alt="profile"
             />
             <img
-              src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bW9kZWx8ZW58MHx8MHx8fDA%3D"
+              src={BASEURL + '/' + companiondata.photos[1]}
               alt="profile"
             />
           </div>
           <div className="gap-10 mt-3">
             <h1 className="font-bold">
-              Full Name: <span>Alisha ciara</span>
+              Full Name: <span>{companiondata.firstname + ' ' + companiondata.lastname}</span>
             </h1>
             <h1 className="font-bold">
-              Email: <span>Alisha@gmail.com</span>
+              Email: <span>{companiondata.email}</span>
             </h1>
             <h1 className="font-bold">
-              Phone : <span>0987654321</span>
+              Phone : <span>{companiondata.phoneNo}</span>
             </h1>
             <h1 className="font-bold">
-              Age : <span>29</span>
+              Age : <span>{companiondata.age}</span>
             </h1>
             <h1 className="font-bold">
-              Gender: <span>Female</span>
+              Gender: <span>{companiondata.gender}</span>
             </h1>
           </div>
           <div className="flex justify-end gap-4">
