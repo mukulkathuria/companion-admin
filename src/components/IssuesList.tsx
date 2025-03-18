@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 export function IssuesList() {
   const [issuesData, setIssuesData] = useState<any>(null);
@@ -17,6 +17,19 @@ export function IssuesList() {
         }
       });
   }, []);
+
+  const handleDownload = async () => {
+    const { getAccountStatement } = await import(
+      "@/services/requests/accounts.service"
+    );
+    const { generateSCSVFile } = await import("@/utils/filehandling.utils");
+    const { data } = await getAccountStatement();
+    if (data) {
+      console.log(data);
+      generateSCSVFile(data);
+    }
+  };
+
   if (!issuesData) {
     return <div>Loading...</div>;
   }
@@ -33,6 +46,7 @@ export function IssuesList() {
             onChange={() => console.log("Search")}
             className="w-64"
           />
+          <button onClick={handleDownload}>Download Excel</button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -56,7 +70,9 @@ export function IssuesList() {
               {issuesData.map((ticket: any) => (
                 <tr
                   key={ticket.issueId}
-                  onClick={() => navigate(`/tickets/issuedetails/?issueId=${ticket.issueId}`)}
+                  onClick={() =>
+                    navigate(`/tickets/issuedetails/?issueId=${ticket.issueId}`)
+                  }
                   className="hover:bg-gray-50 cursor-pointer transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap font-medium">
