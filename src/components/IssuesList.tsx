@@ -30,10 +30,6 @@ export function IssuesList() {
     }
   };
 
-  if (!issuesData) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="bg-white rounded-xl shadow">
       <div className="p-6">
@@ -67,43 +63,51 @@ export function IssuesList() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {issuesData.map((ticket: any) => (
-                <tr
-                  key={ticket.issueId}
-                  onClick={() =>
-                    navigate(`/tickets/issuedetails/?issueId=${ticket.issueId}`)
-                  }
-                  className="hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap font-medium">
-                    {ticket.issueId}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {ticket.subject}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Badge
-                      variant={
-                        ticket.status === "ACTIVE"
-                          ? "outline"
-                          : ticket.status === "RESOLVED"
-                          ? "secondary"
-                          : "destructive"
-                      }
-                    >
-                      {ticket.status}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Button
-                      onClick={() => console.log("View")}
-                      variant="outline"
-                    >
-                      View
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {!issuesData ? (
+                <tr>Loading...</tr>
+              ) : issuesData.length ? (
+                issuesData.map((ticket: any) => (
+                  <tr
+                    key={ticket.issueId}
+                    onClick={() =>
+                      navigate(
+                        `/tickets/issuedetails/?issueId=${ticket.issueId}`
+                      )
+                    }
+                    className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap font-medium">
+                      {ticket.issueId}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {ticket.subject}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Badge
+                        variant={
+                          ticket.status === "ACTIVE"
+                            ? "outline"
+                            : ticket.status === "RESOLVED"
+                            ? "secondary"
+                            : "destructive"
+                        }
+                      >
+                        {ticket.status}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Button
+                        onClick={() => console.log("View")}
+                        variant="outline"
+                      >
+                        View
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>No Active Issues</tr>
+              )}
             </tbody>
           </table>
         </div>
