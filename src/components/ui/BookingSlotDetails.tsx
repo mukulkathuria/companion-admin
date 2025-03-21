@@ -46,16 +46,23 @@ export function BookingSlotDetails() {
     }
   }, [searchParams]);
 
-  const handleAccept = async () => {
+  const handleAccept = async (status: "Accept" | "Reject") => {
     try {
-      const { acceptBookingService } = await import(
+      const { acceptBookingService, rejectBookingService } = await import(
         "../../services/requests/bookingrequest.service"
       );
       const bookingId = searchParams.get("bookingId");
       if (bookingId) {
-        const { data } = await acceptBookingService(bookingId);
+        const { data } =
+          status === "Accept"
+            ? await acceptBookingService(bookingId)
+            : await rejectBookingService(bookingId);
         if (data) {
-          toast.success("Booking is accepted now congratulation");
+          if (status === "Accept") {
+            toast.success("Booking is accepted now congratulation");
+          } else {
+            toast.success("Booking has been rejected");
+          }
           navigate(-1);
         } else {
           toast.error("Something went wrong");
@@ -167,11 +174,15 @@ export function BookingSlotDetails() {
           }
         </CardContent>
         <CardFooter className="flex justify-end space-x-4">
-          <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
+          <Button
+            variant="destructive"
+            className="bg-red-600 hover:bg-red-700"
+            onClick={() => handleAccept("Reject")}
+          >
             Reject
           </Button>
           <Button
-            onClick={handleAccept}
+            onClick={() => handleAccept("Accept")}
             className="bg-blue-600 hover:bg-blue-700"
           >
             Accept

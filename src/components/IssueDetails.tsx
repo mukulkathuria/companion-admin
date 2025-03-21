@@ -16,6 +16,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 import { BASEURL } from "@/Constants/services.constants";
+import { statusUpdateInputDto } from "@/data/dto/companion.data.dto";
 
 export function IssueDetails() {
   const [issue, setIssue] = useState<any>(null);
@@ -110,6 +111,30 @@ export function IssueDetails() {
     setComment((l) => ({ ...l, attachment: newImages }));
   };
 
+   const updateIssueStatus = async (status: 'Approve' | 'Reject') => {
+      if (issue.id) {
+        const data: statusUpdateInputDto = {
+          id: issue.id,
+        };
+        if (status === "Approve") {
+          data["approve"] = true;
+        } else {
+          data["reject"] = true;
+        }
+        const { updateIssueStatusService } = await import(
+          "@/services/issues/handleissue.service"
+        );
+        const { data: statusdata, error } =
+          await updateIssueStatusService(data);
+        if (statusdata) {
+          toast.success("Sucessfully update the status");
+          navigate(-1);
+        } else {
+          toast.error(error);
+        }
+      }
+    };
+
   if (!issue) {
     return <div>Loading...</div>;
   }
@@ -158,14 +183,14 @@ export function IssueDetails() {
                 className="bg-red-600"
                 size="sm"
                 variant="destructive"
-                onClick={() => console.log("Deny")}
+                onClick={() => updateIssueStatus('Reject')}
               >
                 Deny
               </Button>
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => console.log("Resolve")}
+                onClick={() => updateIssueStatus('Approve')}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 Resolve
