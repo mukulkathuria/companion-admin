@@ -12,7 +12,7 @@ export function BookingList() {
       .then(({ getBookinglistService }) => getBookinglistService())
       .then((res) => {
         if (res?.data) {
-          const values = res.data?.map((l: any) => ({
+          const values = res.data.bookings?.map((l: any) => ({
             userdetails: l.User.filter((p: any) => !p.isCompanion)[0],
             companiondetails: l.User.filter((p: any) => p.isCompanion)[0],
             bookingTime: formatBookingTimingsforUi(l.bookingstart),
