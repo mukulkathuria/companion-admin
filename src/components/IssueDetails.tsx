@@ -111,29 +111,28 @@ export function IssueDetails() {
     setComment((l) => ({ ...l, attachment: newImages }));
   };
 
-   const updateIssueStatus = async (status: 'Approve' | 'Reject') => {
-      if (issue.id) {
-        const data: statusUpdateInputDto = {
-          id: issue.id,
-        };
-        if (status === "Approve") {
-          data["approve"] = true;
-        } else {
-          data["reject"] = true;
-        }
-        const { updateIssueStatusService } = await import(
-          "@/services/issues/handleissue.service"
-        );
-        const { data: statusdata, error } =
-          await updateIssueStatusService(data);
-        if (statusdata) {
-          toast.success("Sucessfully update the status");
-          navigate(-1);
-        } else {
-          toast.error(error);
-        }
+  const updateIssueStatus = async (status: "Approve" | "Reject") => {
+    if (issue.id) {
+      const data: statusUpdateInputDto = {
+        id: issue.id,
+      };
+      if (status === "Approve") {
+        data["approve"] = true;
+      } else {
+        data["reject"] = true;
       }
-    };
+      const { updateIssueStatusService } = await import(
+        "@/services/issues/handleissue.service"
+      );
+      const { data: statusdata, error } = await updateIssueStatusService(data);
+      if (statusdata) {
+        toast.success("Sucessfully update the status");
+        navigate(-1);
+      } else {
+        toast.error(error);
+      }
+    }
+  };
 
   if (!issue) {
     return <div>Loading...</div>;
@@ -183,14 +182,14 @@ export function IssueDetails() {
                 className="bg-red-600"
                 size="sm"
                 variant="destructive"
-                onClick={() => updateIssueStatus('Reject')}
+                onClick={() => updateIssueStatus("Reject")}
               >
                 Deny
               </Button>
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => updateIssueStatus('Approve')}
+                onClick={() => updateIssueStatus("Approve")}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 Resolve
@@ -252,22 +251,29 @@ export function IssueDetails() {
                       >
                         {message.comment}
                       </div>
-                      {message.screenshots && message.screenshots.length > 0 && (
-                        <div className="flex gap-4 flex-wrap">
-                          {message.screenshots.map(
-                            (file: string, index: number) => (
-                              <div key={index}>
-                                <img
-                                  src={BASEURL + "/" + file}
-                                  alt=""
-                                  width={80}
-                                  height={80}
-                                />
-                              </div>
-                            )
-                          )}
-                        </div>
-                      )}
+                      {message.screenshots &&
+                        message.screenshots.length > 0 && (
+                          <div className="flex gap-4 flex-wrap">
+                            {message.screenshots.map(
+                              (file: string, index: number) => (
+                                <div key={index}>
+                                  <a
+                                    href={BASEURL + "/" + file}
+                                    download
+                                    className="attachment-link"
+                                  >
+                                    <img
+                                      src={BASEURL + "/" + file}
+                                      alt=""
+                                      width={80}
+                                      height={80}
+                                    />
+                                  </a>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )}
                     </div>
                   </div>
                 ))}

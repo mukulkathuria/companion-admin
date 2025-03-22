@@ -57,14 +57,18 @@ const refreshAccessToken = async (refreshToken: string) => {
     }
     const data = await response.json();
     const access_token = data.access_token;
-    cookie.set(ACCESS_TOKEN_LOC, access_token);
+    cookie.set(ACCESS_TOKEN_LOC, access_token, {
+      path: "/",
+      secure: true,
+      sameSite: "Lax",
+    });
     axios.defaults.headers.common.Authorization = "Bearer " + access_token;
     processQueue(null, access_token);
     return access_token;
   } catch (error) {
     console.error("Error refreshing token:", error);
     await removeUserData();
-    window.location = "/" as unknown as Location;
+    window.location.href = "/";
     processQueue(error, null);
     throw error;
   } finally {
@@ -86,7 +90,7 @@ axios.interceptors.response.use(
       !ignoretokenpaths.includes(err.response?.config?.url) &&
       !token
     ) {
-      window.location = "/" as unknown as Location;
+      window.location.href = "/";
       return Promise.reject(err);
     }
 

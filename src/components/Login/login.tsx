@@ -78,8 +78,16 @@ const Login: FC = () => {
               decodeAccessToken(logindata.data.access_token).decodedToken
             )
           );
-          set(ACCESS_TOKEN_LOC, logindata.data.access_token);
-          set(REFRESH_TOKEN_LOC, logindata.data.refresh_token);
+          set(ACCESS_TOKEN_LOC, logindata.data.access_token, {
+            path: "/",
+            secure: true,
+            sameSite: "Lax",
+          });
+          set(REFRESH_TOKEN_LOC, logindata.data.refresh_token, {
+            path: "/",
+            secure: true,
+            sameSite: "Lax",
+          });
           navigate("/requests");
         } else {
           console.log("Error handling");
@@ -126,7 +134,9 @@ const Login: FC = () => {
                 <input
                   type="password"
                   value={data.password}
-                  onChange={(e) => setData((l) => ({ ...l, password: e.target.value }))}
+                  onChange={(e) =>
+                    setData((l) => ({ ...l, password: e.target.value }))
+                  }
                   required
                   name="password"
                   placeholder="Password"
