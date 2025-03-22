@@ -14,6 +14,14 @@ export const cancellationTableColumns = [
   { id: 4, label: "Booking Time" },
 ]
 
+
+export const ExtensionTableColumns = [
+  { id: 1, label: "User" },
+  { id: 3, label: "Gender" },
+  { id: 4, label: "Booking Time" },
+  { id: 5, label: 'Last Updated' }
+]
+
 export const dummySlotRequests = [
   {
     id: 1,
