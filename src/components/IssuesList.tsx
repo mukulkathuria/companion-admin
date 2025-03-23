@@ -42,7 +42,7 @@ export function IssuesList() {
             onChange={() => console.log("Search")}
             className="w-64"
           />
-          <button onClick={handleDownload}>Download Excel</button>
+          <Button onClick={handleDownload}>Download Account Statement</Button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">

@@ -15,3 +15,34 @@ export interface addCommentonIssueInputDto {
   issueId: string;
   comment: string;
 }
+
+export enum BookingStatusEnum {
+  ACCEPTED = "ACCEPTED",
+  UNDERREVIEW = "UNDERREVIEW",
+  COMPLETED = "COMPLETED",
+  REJECTED = "REJECTED",
+  UNDERCANCELLATION = "UNDERCANCELLATION",
+  CANCELLATIONAPPROVED = "CANCELLATIONAPPROVED",
+  CANCELLED = "CANCELLED",
+  TRANSACTIONPENDING = "TRANSACTIONPENDING",
+  UNDEREXTENSION = "UNDEREXTENSION",
+  CANCELLEDREFUNDPENDING = "CANCELLEDREFUNDPENDING",
+}
+
+export interface updateBookingStatusInputDto {
+  bookingid: number;
+  status: BookingStatusEnum;
+}
+
+export const BookingStatusData = [
+  "ACCEPTED",
+  "UNDERREVIEW",
+  "COMPLETED",
+  "REJECTED",
+  "UNDERCANCELLATION",
+  "CANCELLATIONAPPROVED",
+  "CANCELLED",
+  "TRANSACTIONPENDING",
+  "UNDEREXTENSION",
+  "CANCELLEDREFUNDPENDING",
+];

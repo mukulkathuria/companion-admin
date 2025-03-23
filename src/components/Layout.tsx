@@ -37,15 +37,6 @@ function Layout({ activeTab, onTabChange }: LayoutProps) {
   }, [location.pathname, onTabChange]);
 
   // Load notifications
-  useEffect(() => {
-    import("../services/notifications/notificationlist.service")
-      .then(({ getAllNotificationService }) => getAllNotificationService())
-      .then((res) => {
-        if (res?.data) {
-          console.log(res.data);
-        }
-      });
-  }, []);
 
   const tabs = [
     { id: "requests" as const, label: "Requests", icon: List },
@@ -158,7 +149,7 @@ function Layout({ activeTab, onTabChange }: LayoutProps) {
                     )}
                   </button>
                 </DropdownMenuTrigger>
-                <NotificationDropDown notifications={[]} />
+                {isDropdownOpen && <NotificationDropDown />}
               </DropdownMenu>
               <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
                 <User className="w-6 h-6 text-gray-700" />
