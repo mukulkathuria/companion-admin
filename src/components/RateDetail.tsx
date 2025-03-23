@@ -181,7 +181,7 @@ export const Dailybooking: FC<WeeklybookingProps> = ({ data }) => {
                 dataKey="bookingHours"
                 label={({ day }) => day}
               >
-                {data.map((entry, index) => (
+                {data.map((_, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
