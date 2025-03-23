@@ -111,7 +111,9 @@ export function BookingDetails() {
                 <p className="font-medium text-gray-900">
                   {bookingDetails.companion.firstname}
                 </p>
-                <p className="text-sm text-gray-500">{bookingDetails.companion.gender}</p>
+                <p className="text-sm text-gray-500">
+                  {bookingDetails.companion.gender}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -163,6 +165,27 @@ export function BookingDetails() {
               >
                 {bookingDetails.status}
               </Badge>
+            </div>
+
+            <div>
+              <label className="text-sm text-gray-500">Booking status</label>
+
+              <select
+                name="bookingstatus"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2"
+              >
+                <option value="volvo">select status</option>
+                <option value="saab">Accepted</option>
+                <option value="mercedes">Underreview</option>
+                <option value="audi">Completed</option>
+                <option value="audi">Rejected</option>
+                <option value="audi">Undercancellation</option>
+                <option value="audi">Cancellationapproved</option>
+                <option value="audi">Cancelled</option>
+                <option value="audi">Transactionpanding</option>
+                <option value="audi">Underextention</option>
+                <option value="audi">Cancelled-refundpending</option>
+              </select>
             </div>
           </div>
         </CardContent>
