@@ -19,7 +19,7 @@ export function BookingList() {
             status: l.bookingstatus,
             id: l.id,
           }));
-          setBookingData(values);
+          setBookingData({ ...res.data, bookings: values });
         }
       });
   }, []);
@@ -49,60 +49,75 @@ export function BookingList() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {bookingdata.map((booking: any, i: number) => (
-                <tr
-                  key={i*300}
-                  onClick={() => navigate(`/track/bookingdetails/?bookingId=${booking.id}`)}
-                  className="hover:bg-gray-50 cursor-pointer"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <img
-                        src={BASEURL + '/' + booking.userdetails.Images[0]}
-                        alt={"user profile pic"}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {booking.userdetails.firstname}
+              {!bookingdata ? (
+                <tr>Loading...</tr>
+              ) : bookingdata.bookings.length ? (
+                bookingdata.bookings.map((booking: any, i: number) => (
+                  <tr
+                    key={i * 300}
+                    onClick={() =>
+                      navigate(`/track/bookingdetails/?bookingId=${booking.id}`)
+                    }
+                    className="hover:bg-gray-50 cursor-pointer"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <img
+                          src={BASEURL + "/" + booking.userdetails.Images[0]}
+                          alt={"user profile pic"}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {booking.userdetails.firstname}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <img
-                        src={BASEURL + '/' + booking.companiondetails.Images[0]}
-                        alt={'companion profile pic'}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {booking.companiondetails.firstname}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <img
+                          src={
+                            BASEURL + "/" + booking.companiondetails.Images[0]
+                          }
+                          alt={"companion profile pic"}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {booking.companiondetails.firstname}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {booking.bookingTime}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        booking.status === "COMPLETED"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {booking.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {booking.bookingTime}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          booking.status === "COMPLETED"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {booking.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>No Bookings till now</tr>
+              )}
             </tbody>
           </table>
+          {bookingdata &&
+            JSON.stringify({
+              totalpages: bookingdata.totalPages,
+              currentpage: bookingdata.currentPage,
+            })}
         </div>
       </div>
     </div>

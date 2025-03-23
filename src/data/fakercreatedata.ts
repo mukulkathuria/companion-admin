@@ -1,6 +1,5 @@
 import { FemaleCompanionBodyTypeEnum, MaleCompanionBodyTypeEnum, OtherCompanionBodyTypeEnum } from "./dto/companion.data.dto";
 
-export const SkinToneData = ["Fair", "Medium", "Dark"];
 
 export const BookingRateData = [
   1000, 800, 700, 900, 950, 1100, 1150, 1200, 1500, 2000,

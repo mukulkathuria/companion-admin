@@ -13,11 +13,15 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 import { BASEURL } from "@/Constants/services.constants";
 import "leaflet/dist/leaflet.css";
+import { BookingStatusData } from "@/data/dto/bookingRequests.dto";
+import { Button } from "./ui/button";
 
 export function BookingDetails() {
   const navigate = useNavigate();
   const [bookingDetails, setBookingDetails] = useState<any>(null);
   const [searchParams] = useSearchParams();
+  const [isApiCalling, setApiCalling] = useState<boolean>(false);
+
   useEffect(() => {
     const bookingId = searchParams.get("bookingId");
     if (bookingId) {
@@ -51,6 +55,33 @@ export function BookingDetails() {
         });
     }
   }, [searchParams]);
+
+  const handleStatusChanged = async () => {
+    const bookingId = searchParams.get("bookingId");
+    if (bookingId && bookingDetails.changedStatus) {
+      setApiCalling(() => true);
+      const { updateBookingStatusService } = await import(
+        "@/services/booking/bookinglist.service"
+      );
+      const {
+        toast: { success, error },
+      } = await import("sonner");
+      const values = {
+        bookingid: Number(bookingId),
+        status: bookingDetails.changedStatus,
+      };
+      const { data, error: statuserror } = await updateBookingStatusService(
+        values
+      );
+      if (data) {
+        success("Successfully Updated the status");
+        setBookingDetails((l: any) => ({ ...l, status: values.status }));
+      } else {
+        error(statuserror);
+      }
+      setApiCalling(() => false);
+    }
+  };
   if (!bookingDetails) return <div>Loading...</div>;
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 max-w-4xl w-full mx-auto">
@@ -158,7 +189,7 @@ export function BookingDetails() {
               <label className="text-sm text-gray-500">Status</label>
               <Badge
                 variant={
-                  bookingDetails.status === "Completed"
+                  bookingDetails.status === "COMPLETED"
                     ? "secondary"
                     : "destructive"
                 }
@@ -169,23 +200,28 @@ export function BookingDetails() {
 
             <div>
               <label className="text-sm text-gray-500">Booking status</label>
-
               <select
                 name="bookingstatus"
+                value={bookingDetails.changedStatus || bookingDetails.status}
+                onChange={(e) => {
+                  setBookingDetails((l: typeof bookingDetails) => ({
+                    ...l,
+                    changedStatus: e.target.value,
+                  }));
+                }}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2"
               >
-                <option value="volvo">select status</option>
-                <option value="saab">Accepted</option>
-                <option value="mercedes">Underreview</option>
-                <option value="audi">Completed</option>
-                <option value="audi">Rejected</option>
-                <option value="audi">Undercancellation</option>
-                <option value="audi">Cancellationapproved</option>
-                <option value="audi">Cancelled</option>
-                <option value="audi">Transactionpanding</option>
-                <option value="audi">Underextention</option>
-                <option value="audi">Cancelled-refundpending</option>
+                {BookingStatusData.map((l, i) => (
+                  <option value={l} key={i * 200}>
+                    {l}
+                  </option>
+                ))}
               </select>
+              {bookingDetails.changedStatus && (
+                <Button onClick={handleStatusChanged} disabled={isApiCalling}>
+                  Update Status
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>

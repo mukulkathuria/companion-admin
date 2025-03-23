@@ -102,7 +102,7 @@ export const updateBookingStatusService = async (
   try {
     const url = BASEURL + "/admin/booking/updatebookingstatus";
     const {
-      data: { data },
+      data,
     } = await post(url, values);
     return { data };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
