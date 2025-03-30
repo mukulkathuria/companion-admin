@@ -15,6 +15,7 @@ import Becompanion from "./components/Becompanion";
 import Becompaniondetail from "./components/Becompaniondetail";
 import Rate from "./components/Rate";
 import RateDetail from "./components/RateDetail";
+import Admincancel from "./components/Admincancel";
 
 export type Tab =
   | "requests"
@@ -44,6 +45,7 @@ function App() {
           <Route path="/companionrequest/details" element={<Becompaniondetail />} />
           <Route path="/companionrates" element={<Rate />} />
           <Route path="/companionrates/details" element={<RateDetail />} />
+          <Route path="/admincancel" element={<Admincancel />} />
           {/* <Route path="/analytics" element={<Analytics />} /> */}
         </Route>
         {/* <Layout activeTab={activeTab} onTabChange={setActiveTab}> */}
