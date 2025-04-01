@@ -18,10 +18,10 @@ const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation }) => {
       }
       try {
         const { loadGoogleMapsScript, getLocationDetails } = await import(
-          '@/components/location'
+          '@/utils/location.utils'
         );
         await loadGoogleMapsScript();
-        const results = await getLocationDetails(locationInput);
+        const results = await getLocationDetails(locationInput,"map");
         if (!isLocationSet && results) {
           setIsLocationSet(true);
         }
@@ -50,12 +50,12 @@ const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation }) => {
           }
           setLocationInput(e.target.value);
         }}
-        className="meetupinputfield"
+          className="border border-black rounded-lg p-1 w-60 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <button
         type="button"
         onClick={handleManualLocationSubmit}
-        className="meet-up-btn"
+        className="ml-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         Check
       </button>
