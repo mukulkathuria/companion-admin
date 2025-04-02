@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BASEURL } from "@/Constants/services.constants";
+import { timeAgo } from "@/utils/booking.utils";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -54,7 +54,7 @@ export function UpdateCompanionRequest() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <img
-                        src={BASEURL + "/" + request.Images[0]}
+                        src={ request.Images[0]}
                         alt={"user profile pic"}
                         className="h-10 w-10 rounded-full object-cover"
                       />
@@ -66,7 +66,7 @@ export function UpdateCompanionRequest() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">"Feb 20 12:00"</div>
+                    <div className="text-sm text-gray-900">{timeAgo(request.createdAt)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span

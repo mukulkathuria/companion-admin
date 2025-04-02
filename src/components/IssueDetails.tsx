@@ -15,7 +15,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
-import { BASEURL } from "@/Constants/services.constants";
 import { statusUpdateInputDto } from "@/data/dto/companion.data.dto";
 
 export function IssueDetails() {
@@ -214,7 +213,7 @@ export function IssueDetails() {
                 {issue.screenshots.map((file: string, index: number) => (
                   <div key={index}>
                     <img
-                      src={BASEURL + "/" + file}
+                      src={ file}
                       alt=""
                       width={80}
                       height={80}
@@ -258,12 +257,12 @@ export function IssueDetails() {
                               (file: string, index: number) => (
                                 <div key={index}>
                                   <a
-                                    href={BASEURL + "/" + file}
+                                    href={ file}
                                     download
                                     className="attachment-link"
                                   >
                                     <img
-                                      src={BASEURL + "/" + file}
+                                      src={ file}
                                       alt=""
                                       width={80}
                                       height={80}

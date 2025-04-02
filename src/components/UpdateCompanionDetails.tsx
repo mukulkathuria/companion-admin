@@ -86,7 +86,7 @@ export function UpdateCompanionDetails() {
                   (image: string, i: number) => (
                     <img
                       key={i * 200}
-                      src={BASEURL + "/" + image}
+                      src={ image}
                       alt="Profile Picture"
                       className="h-16 w-16"
                     />

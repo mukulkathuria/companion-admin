@@ -11,7 +11,6 @@ import {
 import { Badge } from "./ui/badge";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
-import { BASEURL } from "@/Constants/services.constants";
 import "leaflet/dist/leaflet.css";
 import { BookingStatusData } from "@/data/dto/bookingRequests.dto";
 import { Button } from "./ui/button";
@@ -105,7 +104,7 @@ export function BookingDetails() {
           <CardContent className="space-y-4">
             <div className="flex items-center">
               <img
-                src={BASEURL + "/" + bookingDetails.user.Images[0]}
+                src={ bookingDetails.user.Images[0]}
                 alt={"user profile pic"}
                 className="h-16 w-16 rounded-full object-cover"
               />
@@ -134,7 +133,7 @@ export function BookingDetails() {
           <CardContent className="space-y-4">
             <div className="flex items-center">
               <img
-                src={BASEURL + "/" + bookingDetails.companion.Images[0]}
+                src={ bookingDetails.companion.Images[0]}
                 alt={"companion profile pic"}
                 className="h-16 w-16 rounded-full object-cover"
               />

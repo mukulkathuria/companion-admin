@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { bookingDetailsDto } from "./shared/dto/booking.dto";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
-import { BASEURL } from "@/Constants/services.constants";
 import { statusUpdateInputDto } from "@/data/dto/companion.data.dto";
 import { toast } from "sonner";
 
@@ -74,7 +73,7 @@ const CompanionCancelDetails = () => {
         <img
           src={
             bookingDetails.companion.Images &&
-            BASEURL + "/" + bookingDetails.companion.Images[0]
+             bookingDetails.companion.Images[0]
           }
           alt="profile"
         />
