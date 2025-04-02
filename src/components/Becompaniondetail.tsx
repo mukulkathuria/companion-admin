@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BASEURL } from "@/Constants/services.constants";
 import { statusUpdateInputDto } from "@/data/dto/companion.data.dto";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -59,8 +58,8 @@ const Becompaniondetail = () => {
       <div className="becompanion-box">
         <div className="bg-slate-50 p-3">
           <div className="flex gap-5">
-            <img src={BASEURL + "/" + companiondata.photos[0]} alt="profile" />
-            <img src={BASEURL + "/" + companiondata.photos[1]} alt="profile" />
+            <img src={ companiondata.photos[0]} alt="profile" />
+            <img src={ companiondata.photos[1]} alt="profile" />
           </div>
           <div className="gap-10 mt-3">
             <h1 className="font-bold">

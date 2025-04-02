@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BASEURL } from "@/Constants/services.constants";
 import { FC, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
@@ -81,7 +80,7 @@ const RateDetail: React.FC = () => {
     <div>
       <h1 className="text-xl font-bold">Companion detail</h1>
       <div className="becompanion-box">
-        <img src={BASEURL + "/" + companiondata.Images[0]} alt="profile" />
+        <img src={ companiondata.Images[0]} alt="profile" />
         <div className="flex justify-between my-3">
           <h1>
             Name:{" "}

@@ -99,7 +99,7 @@ export function BookingSlotDetails() {
             <img
               src={
                 bookingDetails.user.Images &&
-                BASEURL + "/" + bookingDetails.user.Images[0]
+                 bookingDetails.user.Images[0]
               }
               alt="Profile"
               style={{ height: "100px", width: "135px" }}

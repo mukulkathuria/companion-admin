@@ -1,44 +1,46 @@
+import { BookingMeetingLocationDto } from "@/data/dto/companion.data.dto";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface AddressComponent {
-    long_name: string;
-    short_name: string;
-    types: string[];
+  long_name: string;
+  short_name: string;
+  types: string[];
 }
 
 interface Geometry {
-    location: {
-        lat: () => number | number;
-        lng: () => number | number;
-    };
+  location: {
+    lat: () => number | number;
+    lng: () => number | number;
+  };
 }
 
 interface GoogleAddress {
-    address_components: AddressComponent[];
-    geometry: Geometry;
-    formatted_address: string;
+  address_components: AddressComponent[];
+  geometry: Geometry;
+  formatted_address: string;
 }
 
 export const extractAddressComponent = (googleadress: GoogleAddress) => {
-    let city: string | null = null;
-    let state: string | null = null;
-    const address = googleadress.address_components;
-    for (let i = 0; i < address.length; i += 1) {
-        if (address[i].types.includes("locality")) {
-            city = address[i].long_name;
-        } else if (address[i].types.includes("administrative_area_level_1")) {
-            state = address[i].long_name;
-        }
+  let city: string | null = null;
+  let state: string | null = null;
+  const address = googleadress.address_components;
+  for (let i = 0; i < address.length; i += 1) {
+    if (address[i].types.includes("locality")) {
+      city = address[i].long_name;
+    } else if (address[i].types.includes("administrative_area_level_1")) {
+      state = address[i].long_name;
     }
-    const lat =
-        typeof googleadress.geometry.location.lat === "function"
-            ? googleadress.geometry.location.lat()
-            : googleadress.geometry.location.lat;
-    const lng =
-        typeof googleadress.geometry.location.lng === "function"
-            ? googleadress.geometry.location.lng()
-            : googleadress.geometry.location.lng;
-    const formattedaddress = googleadress.formatted_address;
-    return { lat, lng, formattedaddress, city, state };
+  }
+  const lat =
+    typeof googleadress.geometry.location.lat === "function"
+      ? googleadress.geometry.location.lat()
+      : googleadress.geometry.location.lat;
+  const lng =
+    typeof googleadress.geometry.location.lng === "function"
+      ? googleadress.geometry.location.lng()
+      : googleadress.geometry.location.lng;
+  const formattedaddress = googleadress.formatted_address;
+  return { lat, lng, formattedaddress, city, state };
 };
 
 // Extend the Window interface to include the google property
@@ -62,7 +64,10 @@ export const loadGoogleMapsScript = () => {
   });
 };
 
-export const getLocationDetails = (query: string, mapId: string) => {
+export const getLocationDetails = (
+  query: string,
+  mapId: string
+): Promise<BookingMeetingLocationDto> => {
   return new Promise<any>((res) => {
     if (!query || !query.trim().length || query.length < 4) {
       return res([]);

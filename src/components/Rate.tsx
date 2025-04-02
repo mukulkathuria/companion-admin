@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BASEURL } from "@/Constants/services.constants";
 import { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -131,7 +130,7 @@ const Rate: React.FC = () => {
               <div className="hover:bg-slate-200">
                 <div className="flex justify-between items-center mb-3 ">
                   <div className="flex items-center rate-profile mr-3">
-                    <img src={BASEURL + "/" + l.Images[0]} alt="profile" />
+                    <img src={ l.Images[0]} alt="profile" />
                     <h1>{l.firstname}</h1>
                   </div>
                   <div>{l.age}</div>

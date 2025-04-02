@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BASEURL } from "@/Constants/services.constants";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -63,7 +62,7 @@ export function BookingList() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <img
-                          src={BASEURL + "/" + booking.userdetails.Images[0]}
+                          src={ booking.userdetails.Images[0]}
                           alt={"user profile pic"}
                           className="h-10 w-10 rounded-full object-cover"
                         />
@@ -78,7 +77,7 @@ export function BookingList() {
                       <div className="flex items-center">
                         <img
                           src={
-                            BASEURL + "/" + booking.companiondetails.Images[0]
+                             booking.companiondetails.Images[0]
                           }
                           alt={"companion profile pic"}
                           className="h-10 w-10 rounded-full object-cover"
