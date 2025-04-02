@@ -465,42 +465,30 @@ export function CreateCompanion({
                 )}
               </div>
 
-            {/*  <div>
+             <div>
             <h1 className="text-sm">Baselocation1</h1>
             <Locationaccess/>
-            <div className="flex items-center gap-2">
-            <Input type="checkbox"  className="w-3 h-3 rounded-md accent-blue-600 focus:ring-2 focus:ring-blue-400"/>
-            <p className="text-sm">confirm baselocation1</p>
-            </div>
+           
           </div>
           <br />
           <div>
             <h1 className="text-sm">Baselocation2</h1>
             <Locationaccess/>
-            <div className="flex items-center gap-2">
-            <Input type="checkbox"  className="w-3 h-3 rounded-md accent-blue-600 focus:ring-2 focus:ring-blue-400"/>
-            <p className="text-sm">confirm baselocation2</p>
-            </div>
+           
           </div>
           <br />
           <div>
             <h1 className="text-sm">Baselocation3</h1>
             <Locationaccess/>
-            <div className="flex items-center gap-2">
-            <Input type="checkbox"  className="w-3 h-3 rounded-md accent-blue-600 focus:ring-2 focus:ring-blue-400"/>
-            <p className="text-sm">confirm baselocation3</p>
-            </div>
+            
           </div>
           <br />
           <div>
             <h1 className="text-sm">Baselocation4</h1>
             <Locationaccess/>
-            <div className="flex items-center gap-2">
-            <Input type="checkbox"  className="w-3 h-3 rounded-md accent-blue-600 focus:ring-2 focus:ring-blue-400"/>
-            <p className="text-sm">confirm baselocation4</p>
-            </div>
+          
           </div>
-            */}
+            
               <div className="col-span-2">
                 <Label htmlFor="description">
                   Description (Select at least 2)
