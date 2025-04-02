@@ -12,6 +12,7 @@ import {
   CardDescription,
 } from "./ui/card";
 import {
+  BookingMeetingLocationDto,
   CompanionDescriptionEnum,
   CompanionFormDto,
   CompanionSkinToneEnum,
@@ -35,7 +36,6 @@ const initialForm: CompanionFormDto = {
   firstname: "",
   lastname: "",
   age: 18,
-  state: "",
   phoneno: "",
   gender: GenderEnum.MALE,
   skintone: CompanionSkinToneEnum.FAIR,
@@ -43,11 +43,11 @@ const initialForm: CompanionFormDto = {
   eatinghabits: "",
   smokinghabits: "",
   drinkinghabits: "",
-  city: "",
   email: "",
   description: [],
   bookingrate: 0,
   height: 160,
+  baselocations: [],
 };
 
 export function CreateCompanion({
@@ -84,7 +84,8 @@ export function CreateCompanion({
       if (
         form[allkeys[i] as keyof CompanionFormDto] &&
         allkeys[i] !== "images" &&
-        allkeys[i] !== "description"
+        allkeys[i] !== "description" &&
+        allkeys[i] !== "baselocations"
       ) {
         userData.append(
           allkeys[i],
@@ -93,8 +94,7 @@ export function CreateCompanion({
       }
     }
     userData.append("description", JSON.stringify(form.description));
-    userData.append("lat", "17.98");
-    userData.append("lng", "72.8");
+    userData.append("baselocations", JSON.stringify(form.baselocations));
     form.images.forEach((l) => {
       if (typeof l === "object") {
         userData.append("images", l.file);
@@ -142,6 +142,15 @@ export function CreateCompanion({
       }
     }
     return changes;
+  };
+
+  const setMapBaseLocation = (
+    index: number,
+    value: BookingMeetingLocationDto
+  ) => {
+    const baselocations = [...form.baselocations];
+    baselocations[index] = value;
+    setForm((l) => ({ ...l, baselocations: baselocations }));
   };
 
   const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -373,40 +382,10 @@ export function CreateCompanion({
             </div>
           </div>
 
-          
-
           {/* Other Details Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-700">Other Details</h3>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="City">City</Label>
-                <Input
-                  type="text"
-                  name="city"
-                  value={form.city}
-                  onChange={handleChange}
-                  className={cn(changedFields.city && "border-green-500")}
-                  required
-                />
-                {error?.city && (
-                  <span className="errorMessage">{error.city}</span>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="State">State</Label>
-                <Input
-                  type="text"
-                  name="state"
-                  value={form.state}
-                  onChange={handleChange}
-                  className={cn(changedFields.state && "border-green-500")}
-                  required
-                />
-                {error?.state && (
-                  <span className="errorMessage">{error.state}</span>
-                )}
-              </div>
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -465,30 +444,38 @@ export function CreateCompanion({
                 )}
               </div>
 
-             <div>
-            <h1 className="text-sm">Baselocation1</h1>
-            <Locationaccess/>
-           
-          </div>
-          <br />
-          <div>
-            <h1 className="text-sm">Baselocation2</h1>
-            <Locationaccess/>
-           
-          </div>
-          <br />
-          <div>
-            <h1 className="text-sm">Baselocation3</h1>
-            <Locationaccess/>
-            
-          </div>
-          <br />
-          <div>
-            <h1 className="text-sm">Baselocation4</h1>
-            <Locationaccess/>
-          
-          </div>
-            
+              <div>
+                <h1 className="text-sm">Baselocation1</h1>
+                <Locationaccess
+                  mapkey={0}
+                  setLocation={(l) => setMapBaseLocation(0, l)}
+                />
+              </div>
+              <br />
+              <div>
+                <h1 className="text-sm">Baselocation2</h1>
+                <Locationaccess
+                  mapkey={1}
+                  setLocation={(l) => setMapBaseLocation(1, l)}
+                />
+              </div>
+              <br />
+              <div>
+                <h1 className="text-sm">Baselocation3</h1>
+                <Locationaccess
+                  mapkey={2}
+                  setLocation={(l) => setMapBaseLocation(2, l)}
+                />
+              </div>
+              <br />
+              <div>
+                <h1 className="text-sm">Baselocation4</h1>
+                <Locationaccess
+                  mapkey={3}
+                  setLocation={(l) => setMapBaseLocation(3, l)}
+                />
+              </div>
+
               <div className="col-span-2">
                 <Label htmlFor="description">
                   Description (Select at least 2)

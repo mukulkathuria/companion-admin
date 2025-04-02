@@ -15,7 +15,7 @@ import { EmailRegex, PasswordRegex } from "../dto/companiondata.dto";
 export function validateregisterCompanion(userinfo: CompanionFormDto) {
   const { firstname, lastname, email, password, gender, age } = userinfo;
   const location = {
-    city: userinfo?.city && userinfo.city.trim(),
+    // city: userinfo?.city && userinfo.city.trim(),
     // zipcode: userinfo?.zipcode && userinfo?.zipcode.trim(),
     // lat: userinfo?.lat && userinfo.lat.trim(),
     // lng: userinfo?.lng && userinfo.lng.trim(),
@@ -216,12 +216,8 @@ export const validateRegisteration = (
     errors.skintone = "Skin tone is required";
   }
 
-  if (!register.city.trim().length) {
-    errors.city = "City is required";
-  }
-
-  if (!register?.state || (register.state && !register.state.trim().length)) {
-    errors.state = "State is required";
+  if(register.baselocations.filter((l) => l).length < 4){
+    errors.baselocations = "You must select atleast 4 base location";
   }
 
   // if (register.zipcode && !register.zipcode.trim()) {

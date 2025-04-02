@@ -4,6 +4,17 @@ export interface ImageDto {
   isMain: boolean;
 }
 
+export interface BookingMeetingLocationDto {
+  lat: number;
+  lng: number;
+  city: string;
+  state: string;
+  name: string;
+  userInput: string;
+  formattedaddress: string;
+  googleextra: object;
+}
+
 export interface CompanionFormDto {
   id? : number;
   images: ImageDto[] | string[] | (ImageDto | string)[] | null,
@@ -17,8 +28,7 @@ export interface CompanionFormDto {
   eatinghabits: string;
   smokinghabits: string;
   drinkinghabits: string;
-  city: string;
-  state: string;
+  baselocations: BookingMeetingLocationDto[];
   email: string;
   password?: string;
   description: string[];
@@ -38,14 +48,13 @@ export interface ErrorFormDto {
   eatinghabits?: string;
   smokinghabits?: string;
   drinkinghabits?: string;
-  city?: string;
-  state?: string;
   email?: string;
   password?: string;
   description?: string;
   bookingrate?: string;
   height?: string;
   phoneno?: string;
+  baselocations?: string;
 }
 
 export interface CreateCompanionProps {

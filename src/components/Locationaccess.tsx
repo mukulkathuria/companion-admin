@@ -1,10 +1,12 @@
+import { BookingMeetingLocationDto } from '@/data/dto/companion.data.dto';
 import { useRef, useState } from 'react';
 
 type LocationAccessProps = {
-  setLocation: (location: any) => void;
+  setLocation: (location: BookingMeetingLocationDto) => void;
+  mapkey?: number
 };
 
-const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation }) => {
+const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation, mapkey }) => {
 
     const inputRef = useRef<HTMLInputElement>(null);
     const [locationInput, setLocationInput] = useState<string>('');
@@ -21,7 +23,7 @@ const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation }) => {
           '@/utils/location.utils'
         );
         await loadGoogleMapsScript();
-        const results = await getLocationDetails(locationInput,"map");
+        const results = await getLocationDetails(locationInput, mapkey ? `map${mapkey}` : "map");
         if (!isLocationSet && results) {
           setIsLocationSet(true);
         }
@@ -62,7 +64,7 @@ const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation }) => {
       {error && <p className="text-xs text-pink-600">{error}</p>}
 
       <div
-        id="map"
+        id={mapkey ? `map${mapkey}` : "map"}
         className={isLocationSet ? 'w-[20rem] md:w-[40rem] h-[25rem] my-5' : ''}
       ></div>
     </div>
