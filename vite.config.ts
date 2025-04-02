@@ -1,7 +1,7 @@
 import path from 'path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 
 export default defineConfig({
   plugins: [react()],
@@ -30,10 +30,10 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   server: {
-    https:{
-      key: fs.readFileSync('certificates/localhost-key.pem'),
-      cert: fs.readFileSync('certificates/localhost.pem')
-    },
+    // https:{
+    //   key: fs.readFileSync('certificates/localhost-key.pem'),
+    //   cert: fs.readFileSync('certificates/localhost.pem')
+    // },
     port: 3002,
   },
 });
