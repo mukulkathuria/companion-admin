@@ -40,7 +40,7 @@ const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation, mapkey }) 
     };
   
   return (
-    <div>
+    <div className='w-full'>
        <input
         ref={inputRef}
         type="text"
@@ -57,7 +57,7 @@ const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation, mapkey }) 
       <button
         type="button"
         onClick={handleManualLocationSubmit}
-        className="ml-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
       >
         Check
       </button>
@@ -65,7 +65,7 @@ const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation, mapkey }) 
 
       <div
         id={mapkey ? `map${mapkey}` : "map"}
-        className={isLocationSet ? 'w-[20rem] md:w-[40rem] h-[25rem] my-5' : ''}
+        className={isLocationSet ? 'w-[10rem] md:w-[20rem] h-[25rem] my-5' : ''}
       ></div>
     </div>
   )

@@ -18,6 +18,7 @@ import {
   smokingHabitsData,
 } from "@/data/fakercreatedata";
 import { toast } from "sonner";
+import Locationaccess from "./Locationaccess";
 
 // Dummy data for the original profile
 const initialForm: CompanionFormDto = {
@@ -478,6 +479,33 @@ export function CompanionForm({
               {error?.height && (
                 <span className="errorMessage">{error.height}</span>
               )}
+            </div>
+
+            <div>
+              <div className="">
+                <p>Base location1</p>
+                <div className="flex">
+                <Locationaccess/>
+                </div>
+              </div>
+              <div className="mt-3">
+                <p>Base location2</p>
+                <div className="flex">
+                <Locationaccess/>
+                </div>
+              </div>
+              <div className="mt-3">
+                <p>Base location3</p>
+                <div className="flex">
+                <Locationaccess/>
+                </div>
+              </div>
+              <div className="mt-3">
+                <p>Base location4</p>
+                <div className="flex">
+                <Locationaccess/>
+                </div>
+              </div>
             </div>
             <div className="col-span-2 bg-gray-50 p-4 rounded-lg">
               <Label

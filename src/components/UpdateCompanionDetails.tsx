@@ -46,12 +46,14 @@ export function UpdateCompanionDetails() {
       } else {
         data["reject"] = true;
       }
-      const { updateCompanionProfileStatusService } = await import('../services/companion/updatecompanion.service')
+      const { updateCompanionProfileStatusService } = await import(
+        "../services/companion/updatecompanion.service"
+      );
       const res = await updateCompanionProfileStatusService(data);
       if (res?.data) {
         toast.success("Request Updated Successfully");
         navigate(-1);
-      }else if(res?.error){
+      } else if (res?.error) {
         toast.error(res.error);
       }
     }
@@ -86,7 +88,7 @@ export function UpdateCompanionDetails() {
                   (image: string, i: number) => (
                     <img
                       key={i * 200}
-                      src={ image}
+                      src={image}
                       alt="Profile Picture"
                       className="h-16 w-16"
                     />
@@ -146,6 +148,26 @@ export function UpdateCompanionDetails() {
             <p>
               <strong className="text-gray-700">Height:</strong>{" "}
               {companiondetails.oldcompaniondetails.height}
+            </p>
+            <p>
+              <strong>Baselocation1:</strong>
+              Shop No 9, Lalji Devraj Chawl, Gokuldas Pasta Road, Near Chitra
+              Cinema, Dadar (east)
+            </p>
+            <p>
+              <strong>Baselocation2:</strong>
+              Shop No 9, Lalji Devraj Chawl, Gokuldas Pasta Road, Near Chitra
+              Cinema, Dadar (west)
+            </p>
+            <p>
+              <strong>Baselocation3:</strong>
+              Shop No 9, Lalji Devraj Chawl, Gokuldas Pasta Road, Near Chitra
+              Cinema, Dadar (south)
+            </p>
+            <p>
+              <strong>Baselocation4:</strong>
+              Shop No 9, Lalji Devraj Chawl, Gokuldas Pasta Road, Near Chitra
+              Cinema, Dadar (north)
             </p>
           </CardContent>
         </Card>
