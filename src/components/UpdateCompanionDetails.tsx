@@ -12,7 +12,6 @@ import {
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { formatCompanionRequestData } from "@/utils/statefunction.utils";
-import { BASEURL } from "@/Constants/services.constants";
 import { statusUpdateInputDto } from "@/data/dto/companion.data.dto";
 import { toast } from "sonner";
 
@@ -149,27 +148,13 @@ export function UpdateCompanionDetails() {
               <strong className="text-gray-700">Height:</strong>{" "}
               {companiondetails.oldcompaniondetails.height}
             </p>
-            <p>
-              <strong>Baselocation1:</strong>
-              Shop No 9, Lalji Devraj Chawl, Gokuldas Pasta Road, Near Chitra
-              Cinema, Dadar (east)
-            </p>
-            <p>
-              <strong>Baselocation2:</strong>
-              Shop No 9, Lalji Devraj Chawl, Gokuldas Pasta Road, Near Chitra
-              Cinema, Dadar (west)
-            </p>
-            <p>
-              <strong>Baselocation3:</strong>
-              Shop No 9, Lalji Devraj Chawl, Gokuldas Pasta Road, Near Chitra
-              Cinema, Dadar (south)
-            </p>
-            <p>
-              <strong>Baselocation4:</strong>
-              Shop No 9, Lalji Devraj Chawl, Gokuldas Pasta Road, Near Chitra
-              Cinema, Dadar (north)
-            </p>
           </CardContent>
+          {companiondetails.oldcompaniondetails.baselocations?.map((l: any,i: number) => (
+            <p>
+              <strong>Base Location {i+1}</strong>
+              {l.googleformattedadress}
+            </p>
+          ))}
         </Card>
         <div className="flex-1">
           <CompanionForm
