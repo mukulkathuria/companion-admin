@@ -54,6 +54,11 @@ function Layout({ activeTab, onTabChange }: LayoutProps) {
       label: "Companion Rates",
       icon: Ticket,
     },
+    {
+      id: "refund" as const,
+      label: "Refunds",
+      icon: Ticket,
+    },
     // { id: "analytics" as const, label: "Analytics", icon: BarChart },
   ];
 

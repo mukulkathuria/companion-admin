@@ -27,6 +27,7 @@ export type Tab =
   | "tickets"
   | "companionrequest"
   | "companionrates"
+  | "refund"
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>("requests");
@@ -48,7 +49,7 @@ function App() {
           <Route path="/companionrates" element={<Rate />} />
           <Route path="/companionrates/details" element={<RateDetail />} />
           <Route path="/admincancel" element={<Admincancel />} />
-          <Route path="/refundlist" element={<Refundlist />} />
+          <Route path="/refund" element={<Refundlist />} />
           <Route path="/refund/detail" element={<Refunddetails />} />
           {/* <Route path="/analytics" element={<Analytics />} /> */}
         </Route>
