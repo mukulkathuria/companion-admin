@@ -89,7 +89,7 @@ export function CompanionForm({
       if (
         form[allkeys[i] as keyof CompanionFormDto] &&
         allkeys[i] !== "images" &&
-        allkeys[i] !== "description"
+        allkeys[i] !== "description" && allkeys[i] !== "baselocations"
       ) {
         userData.append(
           allkeys[i],
@@ -98,6 +98,7 @@ export function CompanionForm({
       }
     }
     userData.append("description", JSON.stringify(form.description));
+    userData.append("baselocations", JSON.stringify(form.baselocations));
     const previousImages: string[] = [];
     form.images.forEach((l) => {
       if (typeof l === "object") {

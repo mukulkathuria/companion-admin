@@ -150,9 +150,9 @@ export function UpdateCompanionDetails() {
             </p>
           </CardContent>
           {companiondetails.oldcompaniondetails.baselocations?.map((l: any,i: number) => (
-            <p>
+            <p key={i*300}>
               <strong>Base Location {i+1}</strong>
-              {l.googleformattedadress}
+              {l.formattedaddress}
             </p>
           ))}
         </Card>

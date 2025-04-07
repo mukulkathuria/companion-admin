@@ -117,7 +117,7 @@ export const getLocationDetails = (
               ...extractAddressComponent(place as GoogleAddress),
               name: place.name,
               userInput: query,
-              googleExtra: {
+              googleextra: {
                 photo,
                 place_id: place.place_id,
                 placeType: results[0].types,
