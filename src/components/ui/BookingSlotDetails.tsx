@@ -13,7 +13,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { bookingDetailsDto } from "../shared/dto/booking.dto";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
-import { BASEURL } from "@/Constants/services.constants";
 import { toast } from "sonner";
 
 export function BookingSlotDetails() {

@@ -18,7 +18,7 @@ import {
   smokingHabitsData,
 } from "@/data/fakercreatedata";
 import { toast } from "sonner";
-import Locationaccess from "./Locationaccess";
+import LeafLetMaps from "./ui/LeafletMaps";
 
 // Dummy data for the original profile
 const initialForm: CompanionFormDto = {
@@ -28,18 +28,17 @@ const initialForm: CompanionFormDto = {
   age: 25,
   gender: GenderEnum.MALE,
   skintone: CompanionSkinToneEnum.FAIR,
-  state: "New York",
   phoneno: "9876543210",
   bodytype: "Athletic",
   eatinghabits: "Non-Veg",
   smokinghabits: "Non-Smoker",
   drinkinghabits: "Occasionally",
-  city: "New York",
   email: "johndoe@example.com",
   password: "",
   description: ["MOVIES", "TRAVEL_BUDDY", "FITNESS_PARTNER"], // Pre-selected descriptions
   bookingrate: 50,
   height: 180,
+  baselocations: []
 };
 
 interface CompanionFormProps {
@@ -90,7 +89,7 @@ export function CompanionForm({
       if (
         form[allkeys[i] as keyof CompanionFormDto] &&
         allkeys[i] !== "images" &&
-        allkeys[i] !== "description"
+        allkeys[i] !== "description" && allkeys[i] !== "baselocations"
       ) {
         userData.append(
           allkeys[i],
@@ -99,6 +98,7 @@ export function CompanionForm({
       }
     }
     userData.append("description", JSON.stringify(form.description));
+    userData.append("baselocations", JSON.stringify(form.baselocations));
     const previousImages: string[] = [];
     form.images.forEach((l) => {
       if (typeof l === "object") {
@@ -388,25 +388,6 @@ export function CompanionForm({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Location
-              </label>
-              <input
-                type="text"
-                name="location"
-                value={form.city}
-                onChange={handleChange}
-                className={cn(
-                  "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50",
-                  changedFields.city && "border-green-500"
-                )}
-                required
-              />
-              {error?.city && (
-                <span className="errorMessage">{error.city}</span>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
                 Email
               </label>
               <input
@@ -482,30 +463,12 @@ export function CompanionForm({
             </div>
 
             <div>
-              <div className="">
-                <p>Base location1</p>
-                <div className="flex">
-                <Locationaccess/>
-                </div>
+              {form.baselocations.map((l, i) => (
+              <div className="mt-3" key={i*200}>
+                <p>Base location {i+1}</p>
+                <LeafLetMaps city={l.city} lat={l.lat} lng={l.lng} />
               </div>
-              <div className="mt-3">
-                <p>Base location2</p>
-                <div className="flex">
-                <Locationaccess/>
-                </div>
-              </div>
-              <div className="mt-3">
-                <p>Base location3</p>
-                <div className="flex">
-                <Locationaccess/>
-                </div>
-              </div>
-              <div className="mt-3">
-                <p>Base location4</p>
-                <div className="flex">
-                <Locationaccess/>
-                </div>
-              </div>
+              ))}
             </div>
             <div className="col-span-2 bg-gray-50 p-4 rounded-lg">
               <Label
