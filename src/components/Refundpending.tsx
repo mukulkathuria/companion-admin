@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatBookingTimingsforUi } from "@/utils/booking.utils";
+import React, { useEffect, useState } from "react";
 
 function formatTo12Hour(time24: string) {
   const [hours, minutes] = time24.split(":").map(Number);
@@ -13,6 +15,34 @@ type ModalProps = {
 
 const Refundpending = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [data, setData] = useState<{
+    isLoading: boolean;
+    data: any;
+    error: null | string;
+  }>({ isLoading: true, data: null, error: null });
+
+  useEffect(() => {
+    import("@/services/booking/bookinglist.service")
+      .then(({ getRefundPendingBookingList }) => getRefundPendingBookingList())
+      .then(({ data }) => {
+        if (data) {
+          const values = data.map((l: any) => ({
+            user: l.User.filter((p: any) => !p.isCompanion)[0],
+            companion: l.User.filter((p: any) => p.isCompanion)[0],
+            refundamount: l.refundamount,
+            finalRate: l.finalRate,
+            bookingstart: l.bookingstart,
+            cancelledBy:
+              l.bookingstatus === "REJECTED"
+                ? "Admin"
+                : l.cancellationDetails.isCompanion
+                ? "Companion"
+                : "User",
+          }));
+          setData({ isLoading: false, data: values, error: null });
+        }
+      });
+  }, []);
 
   return (
     <>
@@ -29,20 +59,24 @@ const Refundpending = () => {
             className="flex justify-between items-center  py-2 px-2 hover:bg-slate-200 cursor-pointer"
             onClick={() => setIsModalOpen(true)}
           >
-            <h1 className="text-sm">xyz@gmail.com</h1>
-            <h1 className="text-sm">250</h1>
-            <h1 className="text-sm">User</h1>
-            <h1 className="text-sm">12 may,25 11AM-1PM</h1>
-          </div>
-
-          <div
-            className="flex justify-between items-center  py-2 px-2 hover:bg-slate-200 cursor-pointer"
-            onClick={() => setIsModalOpen(true)}
-          >
-            <h1 className="text-sm">Pending@gmail.com</h1>
-            <h1 className="text-sm">4000</h1>
-            <h1 className="text-sm">Admin</h1>
-            <h1 className="text-sm">15 may,25</h1>
+            {data.isLoading ? (
+              <div>Loading..</div>
+            ) : data.error ? (
+              <div> Error Occoured</div>
+            ) : !data.data?.length ? (
+              <div></div>
+            ) : (
+              data.data.map((l: any) => (
+                <>
+                  <h1 className="text-sm">{l.user.email}</h1>
+                  <h1 className="text-sm">{l.refundamount || l.finalRate}</h1>
+                  <h1 className="text-sm">{l.cancelledBy}</h1>
+                  <h1 className="text-sm">
+                    {formatBookingTimingsforUi(l.bookingstart)}
+                  </h1>
+                </>
+              ))
+            )}
           </div>
         </div>
       </div>
