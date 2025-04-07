@@ -1,22 +1,7 @@
-import { Link } from "react-router-dom";
-
 const Refundcompleted = () => {
-  
   return (
     <>
-     
       <div>
-        <div className="flex items-center  gap-5 my-3 font-semibold">
-
-        
-        <div className="bottom-border cursor-pointer">
-          Refund Completed
-        </div>
-       <Link to={'/refund/pending'}> <div className="cursor-pointer">
-          Refund Pending
-        </div>
-        </Link>
-        </div>
         <div className="bg-white w-full h-full">
           <div className="flex justify-between font-bold py-2 px-2 bg-slate-100">
             <h1>Email</h1>
@@ -48,11 +33,8 @@ const Refundcompleted = () => {
           </div>
         </div>
       </div>
-      
     </>
   );
 };
-
-
 
 export default Refundcompleted;
