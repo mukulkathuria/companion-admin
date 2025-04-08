@@ -150,12 +150,13 @@ interface paymentDetailsDto {
   cardNumber: string;
   cardCategory: string;
   walletName: string;
-  bankName: string;
   bankCode: string;
   bank: string;
   refundDate: string;
   refundTime: string;
   referenceNumber: string;
+  firstname: string;
+  lastname: string;
 }
 
 export const getRefundDetails = (paymentDetails: paymentDetailsDto) => {
@@ -164,7 +165,7 @@ export const getRefundDetails = (paymentDetails: paymentDetailsDto) => {
       paymentDetails.paymentMode === "CC" || paymentDetails.paymentMode === "DC"
         ? `${paymentDetails.paymentMode}-DG`
         : paymentDetails.paymentMode,
-    addedon: "2025-01-15 11:18:52", // YYYY-MM-DD HH:MM:SS
+    addedon: `${paymentDetails.refundDate} ${paymentDetails.refundTime}:00`, // YYYY-MM-DD HH:MM:SS
     address1: "",
     address2: "",
     amount: paymentDetails.refundedAmount,
@@ -172,7 +173,7 @@ export const getRefundDetails = (paymentDetails: paymentDetailsDto) => {
     city: "",
     country: "IN",
     discount: "0.00",
-    email: "user@example.com",
+    email: paymentDetails.email,
     error: "E000",
     error_Message: "No Error",
     field1: "713447452475713900",
@@ -184,10 +185,10 @@ export const getRefundDetails = (paymentDetails: paymentDetailsDto) => {
     field7: "AUTHPOSITIVE",
     field8: "AUTHORIZED",
     field9: "Transaction is Successful",
-    firstname: "John",
+    firstname: paymentDetails.firstname,
     // hash: "d0c76ad59245eee1fb7316e84cacf1552158235b4b35c88bdd45df0f449bc48c817a316e41ab4fefaa5661eb00a140f209daff445f13fad13f6f73098e7011f1",
     // key: "ARqsBX",
-    lastname: "",
+    lastname: paymentDetails.lastname,
     mode: paymentDetails.paymentMode,
     net_amount_debit: paymentDetails.refundedAmount,
     pa_name: "PayU",

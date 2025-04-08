@@ -2,6 +2,8 @@
 import { CardTypeData, NetBankData, WalletBank } from "@/data/fakercreatedata";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 // function formatTo12Hour(time24: string) {
 //   const [hours, minutes] = time24.split(":").map(Number);
@@ -12,10 +14,11 @@ import React, { useEffect, useState } from "react";
 
 type ModalProps = {
   onClose: () => void;
+  data: any;
 };
 
 const Refundpending = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(null);
   const [data, setData] = useState<{
     isLoading: boolean;
     data: any;
@@ -58,7 +61,7 @@ const Refundpending = () => {
               <th>Booking date and time</th>
             </tr>
           </thead>
-          <tbody onClick={() => setIsModalOpen(true)}>
+          <tbody>
             {data.isLoading ? (
               <tr>
                 <td>Loading..</td>
@@ -73,7 +76,11 @@ const Refundpending = () => {
               </tr>
             ) : (
               data.data.map((l: any) => (
-                <tr key={l.id} className="hover:bg-slate-200 cursor-pointer">
+                <tr
+                  key={l.id}
+                  className="hover:bg-slate-200 cursor-pointer"
+                  onClick={() => setIsModalOpen(l)}
+                >
                   <td className="text-sm">{l.user.email}</td>
                   <td className="text-sm">{l.refundamount || l.finalRate}</td>
                   <td className="text-sm">{l.cancelledBy}</td>
@@ -86,15 +93,20 @@ const Refundpending = () => {
           </tbody>
         </table>
       </div>
-      {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(null)} data={isModalOpen} />
+      )}
     </>
   );
 };
 
-export const Modal = ({ onClose }: ModalProps) => {
+export const Modal = ({ onClose, data }: ModalProps) => {
+  const navigate = useNavigate();
   const [paymentDetails, setPaymentDetails] = useState({
-    email: "john@gmail.com",
-    refundedAmount: "1000",
+    firstname: data.user.firstname as string,
+    lastname: data.user.lastname as string,
+    email: data.user.email as string,
+    refundedAmount: String(data.refundamount || data.finalRate),
     paymentMode: "",
     transactionId: "",
     upiId: "",
@@ -142,8 +154,21 @@ export const Modal = ({ onClose }: ModalProps) => {
 
     // const formattedTime = formatTo12Hour(paymentDetails.refundTime);
     const { getRefundDetails } = await import("@/utils/refundpayment.utils");
+    const { addRefundPaymentService } = await import(
+      "@/services/transaction/refundamount.service"
+    );
     const refundsDetails = getRefundDetails(paymentDetails);
-    console.log(refundsDetails);
+    const { data: refundData, error } = await addRefundPaymentService({
+      ...refundsDetails,
+      bookingid: data.id,
+    });
+    if (refundData) {
+      toast.success("Successfully Added the Refund");
+      navigate("/refund/completed");
+      onClose();
+    } else {
+      toast.error(error);
+    }
 
     // onClose();
   };
@@ -164,6 +189,7 @@ export const Modal = ({ onClose }: ModalProps) => {
           <input
             type="text"
             placeholder="UPI ID"
+            name="upiId"
             className="w-full p-2 border border-gray-300 rounded"
             value={paymentDetails.upiId}
             onChange={handlePaymentChange}
