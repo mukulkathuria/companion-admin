@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { CardTypeData, NetBankData, WalletBank } from "@/data/fakercreatedata";
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 import React, { useEffect, useState } from "react";
 
-function formatTo12Hour(time24: string) {
-  const [hours, minutes] = time24.split(":").map(Number);
-  const ampm = hours >= 12 ? "PM" : "AM";
-  const formattedHours = hours % 12 || 12;
-  return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
-}
+// function formatTo12Hour(time24: string) {
+//   const [hours, minutes] = time24.split(":").map(Number);
+//   const ampm = hours >= 12 ? "PM" : "AM";
+//   const formattedHours = hours % 12 || 12;
+//   return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+// }
 
 type ModalProps = {
   onClose: () => void;
@@ -27,6 +28,7 @@ const Refundpending = () => {
       .then(({ data }) => {
         if (data) {
           const values = data.map((l: any) => ({
+            id: l.id,
             user: l.User.filter((p: any) => !p.isCompanion)[0],
             companion: l.User.filter((p: any) => p.isCompanion)[0],
             refundamount: l.refundamount,
@@ -47,38 +49,42 @@ const Refundpending = () => {
   return (
     <>
       <div>
-        <div className="bg-white w-full h-full">
-          <div className="flex justify-between font-bold py-2 px-2 bg-slate-100">
-            <h1>Email</h1>
-            <h1>Amount</h1>
-
-            <h1>Cancelled By</h1>
-            <h1>Booking date and time</h1>
-          </div>
-          <div
-            className="flex justify-between items-center  py-2 px-2 hover:bg-slate-200 cursor-pointer"
-            onClick={() => setIsModalOpen(true)}
-          >
+        <table className="bg-white w-full h-full">
+          <thead>
+            <tr className="font-bold py-2 px-2 bg-slate-100">
+              <th>Email</th>
+              <th>Amount</th>
+              <th>Cancelled By</th>
+              <th>Booking date and time</th>
+            </tr>
+          </thead>
+          <tbody onClick={() => setIsModalOpen(true)}>
             {data.isLoading ? (
-              <div>Loading..</div>
+              <tr>
+                <td>Loading..</td>
+              </tr>
             ) : data.error ? (
-              <div> Error Occoured</div>
+              <tr>
+                <td>Error Occoured</td>{" "}
+              </tr>
             ) : !data.data?.length ? (
-              <div></div>
+              <tr>
+                <td>No Records found</td>
+              </tr>
             ) : (
               data.data.map((l: any) => (
-                <>
-                  <h1 className="text-sm">{l.user.email}</h1>
-                  <h1 className="text-sm">{l.refundamount || l.finalRate}</h1>
-                  <h1 className="text-sm">{l.cancelledBy}</h1>
-                  <h1 className="text-sm">
+                <tr key={l.id} className="hover:bg-slate-200 cursor-pointer">
+                  <td className="text-sm">{l.user.email}</td>
+                  <td className="text-sm">{l.refundamount || l.finalRate}</td>
+                  <td className="text-sm">{l.cancelledBy}</td>
+                  <td className="text-sm">
                     {formatBookingTimingsforUi(l.bookingstart)}
-                  </h1>
-                </>
+                  </td>
+                </tr>
               ))
             )}
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
       {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} />}
     </>
@@ -139,7 +145,7 @@ export const Modal = ({ onClose }: ModalProps) => {
     const refundsDetails = getRefundDetails(paymentDetails);
     console.log(refundsDetails);
 
-    onClose();
+    // onClose();
   };
   const handlePaymentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -150,6 +156,115 @@ export const Modal = ({ onClose }: ModalProps) => {
       [name]: value,
     }));
   };
+
+  const getfieldsforpaymentMethod = (paymentMode: string) => {
+    switch (true) {
+      case paymentMode === "UPI":
+        return (
+          <input
+            type="text"
+            placeholder="UPI ID"
+            className="w-full p-2 border border-gray-300 rounded"
+            value={paymentDetails.upiId}
+            onChange={handlePaymentChange}
+            required
+          />
+        );
+      case paymentMode === "DC" || paymentMode === "CC":
+        return (
+          <>
+            <input
+              type="text"
+              placeholder="Card Number"
+              name="cardNumber"
+              className="w-full p-2 border border-gray-300 rounded"
+              value={paymentDetails.cardNumber}
+              onChange={handlePaymentChange}
+              required
+            />
+            <select
+              className="w-full p-2 border border-gray-300 rounded"
+              value={paymentDetails.cardCategory}
+              onChange={(e) =>
+                setPaymentDetails((l) => ({
+                  ...l,
+                  cardCategory: e.target.value,
+                }))
+              }
+              required
+            >
+              <option value="">Select Card Category</option>
+              {CardTypeData.map((l, i) => (
+                <option value={l.value} key={i}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
+          </>
+        );
+      case paymentMode === "WALLET":
+        return (
+          <select
+            className="w-full p-2 border border-gray-300 rounded"
+            value={paymentDetails.walletName}
+            onChange={(e) =>
+              setPaymentDetails((l) => ({
+                ...l,
+                walletName: e.target.value,
+              }))
+            }
+            required
+          >
+            <option value="">Select Wallet Bank</option>
+            {WalletBank.map((l, i) => (
+              <option value={l.value} key={i}>
+                {l.label}
+              </option>
+            ))}
+          </select>
+        );
+      case paymentMode === "NB":
+        return (
+          <>
+            <select
+              className="w-full p-2 border border-gray-300 rounded"
+              value={paymentDetails.bankCode}
+              onChange={(e) =>
+                setPaymentDetails((l) => ({
+                  ...l,
+                  bankCode: e.target.value,
+                }))
+              }
+              required
+            >
+              <option value="">Select NetBank</option>
+              {NetBankData.map((l, i) => (
+                <option value={l.value} key={i}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
+          </>
+        );
+
+      case paymentMode === "RTGS" || paymentMode === "IMPS":
+        return (
+          <input
+            type="text"
+            placeholder="Bank"
+            name="bank"
+            className="w-full p-2 border border-gray-300 rounded"
+            value={paymentDetails.bank}
+            onChange={handlePaymentChange}
+            required
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg relative w-full max-w-sm">
@@ -189,6 +304,13 @@ export const Modal = ({ onClose }: ModalProps) => {
             onChange={(e) =>
               setPaymentDetails((prev) => ({
                 ...prev,
+                bank: "",
+                bankCode: "",
+                bankName: "",
+                upiId: "",
+                cardCategory: "",
+                cardNumber: "",
+                walletName: "",
                 paymentMode: e.target.value,
               }))
             }
@@ -201,90 +323,7 @@ export const Modal = ({ onClose }: ModalProps) => {
             <option value="WALLET">Wallet</option>
             <option value="NB">Net Banking</option>
           </select>
-
-          {paymentDetails.paymentMode === "upi" && (
-            <input
-              type="text"
-              placeholder="UPI ID"
-              className="w-full p-2 border border-gray-300 rounded"
-              value={paymentDetails.upiId}
-              onChange={handlePaymentChange}
-              required
-            />
-          )}
-
-          {(paymentDetails.paymentMode === "DC" ||
-            paymentDetails.paymentMode === "CC") && (
-            <>
-              <input
-                type="text"
-                placeholder="Card Number"
-                name="cardNumber"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={paymentDetails.cardNumber}
-                onChange={handlePaymentChange}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Card Category"
-                name="cardCategory"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={paymentDetails.cardCategory}
-                onChange={handlePaymentChange}
-                required
-              />
-            </>
-          )}
-
-          {paymentDetails.paymentMode === "WALLET" && (
-            <input
-              type="text"
-              placeholder="Wallet Name"
-              name="walletName"
-              className="w-full p-2 border border-gray-300 rounded"
-              value={paymentDetails.walletName}
-              onChange={handlePaymentChange}
-              required
-            />
-          )}
-
-          {paymentDetails.paymentMode === "NB" && (
-            <>
-              <input
-                type="text"
-                placeholder="Bank Name"
-                name="bankName"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={paymentDetails.bankName}
-                onChange={handlePaymentChange}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Bank Code"
-                name="bankCode"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={paymentDetails.bankCode}
-                onChange={handlePaymentChange}
-                required
-              />
-            </>
-          )}
-
-          {(paymentDetails.paymentMode === "rtgs" ||
-            paymentDetails.paymentMode === "imps") && (
-            <input
-              type="text"
-              placeholder="Bank"
-              name="bank"
-              className="w-full p-2 border border-gray-300 rounded"
-              value={paymentDetails.bank}
-              onChange={handlePaymentChange}
-              required
-            />
-          )}
-
+          {getfieldsforpaymentMethod(paymentDetails.paymentMode)}
           <input
             type="text"
             name="transactionId"
@@ -312,12 +351,6 @@ export const Modal = ({ onClose }: ModalProps) => {
             onChange={handlePaymentChange}
             required
           />
-          {paymentDetails.refundTime && (
-            <div className="text-sm text-gray-600">
-              Formatted Time: {formatTo12Hour(paymentDetails.refundTime)}
-            </div>
-          )}
-
           <input
             type="text"
             placeholder="Bank Reference Number"
@@ -327,7 +360,6 @@ export const Modal = ({ onClose }: ModalProps) => {
             onChange={handlePaymentChange}
             required
           />
-
           <div className="text-right">
             <button
               type="submit"

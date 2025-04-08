@@ -1,4 +1,3 @@
-import { BASEURL } from "@/Constants/services.constants";
 import { ImageDto } from "@/data/dto/companion.data.dto";
 import { useState } from "react";
 import { toast } from "sonner";
