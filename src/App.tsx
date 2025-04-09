@@ -16,8 +16,7 @@ import Becompaniondetail from "./components/Becompaniondetail";
 import Rate from "./components/Rate";
 import RateDetail from "./components/RateDetail";
 import Admincancel from "./components/Admincancel";
-import Refundcompleted from "./components/Refundcompleted";
-import Refundpending from "./components/Refundpending";
+import RefundList from "./components/ui/RefundList";
 
 export type Tab =
   | "requests"
@@ -27,6 +26,7 @@ export type Tab =
   | "tickets"
   | "companionrequest"
   | "companionrates"
+  | "refund"
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>("requests");
@@ -48,8 +48,7 @@ function App() {
           <Route path="/companionrates" element={<Rate />} />
           <Route path="/companionrates/details" element={<RateDetail />} />
           <Route path="/admincancel" element={<Admincancel />} />
-          <Route path="/refund/completed" element={<Refundcompleted />} />
-          <Route path="/refund/pending" element={<Refundpending />} />
+          <Route path="/refund/*" element={<RefundList />} />
           {/* <Route path="/analytics" element={<Analytics />} /> */}
         </Route>
         {/* <Layout activeTab={activeTab} onTabChange={setActiveTab}> */}

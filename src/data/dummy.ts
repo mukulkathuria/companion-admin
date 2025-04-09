@@ -1,4 +1,3 @@
-import { CompanionFormDto, CompanionSkinToneEnum, GenderEnum } from "@/data/dto/companion.data.dto";
 import { BookingDto } from "@/utils/dto/booking.dto";
 
 export const requestTableColumns = [
@@ -146,46 +145,9 @@ export const dummyCompanionCancellations = [
   },
 ];
 
-interface UpdateRequest {
-  id: number;
-  companionId: number;
-  oldProfile: CompanionFormDto;
-  newProfile: Partial<CompanionFormDto>;
-  status: "pending" | "approved" | "rejected";
-}
 
-export const dummyUpdateRequests: UpdateRequest[] = [
-  {
-    id: 1,
-    companionId: 1,
-    oldProfile: {
-      id: 1,
-      images: null,
-      firstname: "Sarah",
-      lastname: "Wilson",
-      age: 24,
-      phoneno: "9876543210",
-      state: "Maharashtra",
-      gender: GenderEnum.FEMALE,
-      skintone: CompanionSkinToneEnum.FAIR,
-      bodytype: "Hourglass",
-      eatinghabits: "Non-Veg",
-      smokinghabits: "Non-Smoker",
-      drinkinghabits: "Occasionally",
-      city: "Mumbai",
-      email: "sarah@example.com",
-      bookingrate: 50,
-      description: ["MOVIES", "TRAVEL_BUDDY"], // Updated to array
-      height: 165,
-    },
-    newProfile: {
-      city: "Pune",
-      bookingrate: 55,
-      description: ["MOVIES", "TRAVEL_BUDDY", "FITNESS_PARTNER"], // Updated to array
-    },
-    status: "pending",
-  },
-];
+
+
 
 export const dummyBookings: BookingDto[] = [
   {
