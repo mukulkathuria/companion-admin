@@ -2,6 +2,7 @@
 import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import NewPagination from "./ui/NewPaginationUI";
 
 export function BookingList() {
   const [bookingdata, setBookingData] = useState<any>(null);
@@ -23,6 +24,28 @@ export function BookingList() {
       });
   }, []);
   if (!bookingdata) return <div>Loading..</div>;
+
+  const onPageChange = async (pageNo: number) => {
+    const values = {
+      pageNo
+    };
+    const { getBookinglistService } = await import(
+      '@/services/booking/bookinglist.service'
+    );
+    const { data } = await getBookinglistService(values);
+    if (data) {
+      if (data) {
+        const values = data.bookings?.map((l: any) => ({
+          userdetails: l.User.filter((p: any) => !p.isCompanion)[0],
+          companiondetails: l.User.filter((p: any) => p.isCompanion)[0],
+          bookingTime: formatBookingTimingsforUi(l.bookingstart),
+          status: l.bookingstatus,
+          id: l.id,
+        }));
+        setBookingData({ ...data, bookings: values });
+    }
+  }}
+
   return (
     <div className="bg-white rounded-xl shadow">
       <div className="p-6">
@@ -62,7 +85,7 @@ export function BookingList() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <img
-                          src={ booking.userdetails.Images[0]}
+                          src={booking.userdetails.Images[0]}
                           alt={"user profile pic"}
                           className="h-10 w-10 rounded-full object-cover"
                         />
@@ -76,9 +99,7 @@ export function BookingList() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <img
-                          src={
-                             booking.companiondetails.Images[0]
-                          }
+                          src={booking.companiondetails.Images[0]}
                           alt={"companion profile pic"}
                           className="h-10 w-10 rounded-full object-cover"
                         />
@@ -112,11 +133,11 @@ export function BookingList() {
               )}
             </tbody>
           </table>
-          {bookingdata &&
-            JSON.stringify({
-              totalpages: bookingdata.totalPages,
-              currentpage: bookingdata.currentPage,
-            })}
+          <NewPagination
+            currentPage={bookingdata.currentPage}
+            totalPage={bookingdata.totalPages}
+            onPageChange={(l) => onPageChange(l)}
+          />
         </div>
       </div>
     </div>

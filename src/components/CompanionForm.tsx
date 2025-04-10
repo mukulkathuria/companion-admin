@@ -466,6 +466,7 @@ export function CompanionForm({
               {form.baselocations.map((l, i) => (
               <div className="mt-3" key={i*200}>
                 <p>Base location {i+1}</p>
+                <p>{l.formattedaddress}</p>
                 <LeafLetMaps city={l.city} lat={l.lat} lng={l.lng} />
               </div>
               ))}

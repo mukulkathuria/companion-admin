@@ -1,15 +1,23 @@
 import { updateBookingStatusInputDto } from "@/data/dto/bookingRequests.dto";
 
-export const getBookinglistService = async () => {
+export interface pageNoQueryDto {
+  pageNo: number;
+}
+
+export const getBookinglistService = async (values?: pageNoQueryDto) => {
   const { BASEURL } = await import("../../Constants/services.constants");
   const {
     default: { get },
   } = await import("../interface/interceptor");
   try {
+    let params = {};
+    if (values) {
+      params = values;
+    }
     const url = BASEURL + "/admin/booking/getallbookinglist";
     const {
       data: { data },
-    } = await get(url);
+    } = await get(url, { params });
     return { data };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

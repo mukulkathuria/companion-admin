@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import NewPagination from "./ui/NewPaginationUI";
 
 const indianStates = [
   "Andhra Pradesh",
@@ -46,7 +47,11 @@ const Rate: React.FC = () => {
       .then(({ getCompanionRateListService }) => getCompanionRateListService())
       .then(({ data }) => {
         if (data) {
-          setcompaniondata(data);
+          setcompaniondata({
+            sliceddata: data.slice((1 - 1) * 10, 1 * 10),
+            allcompaniondata: data,
+            currentPage: 1,
+          });
         }
       });
   }, []);
@@ -64,6 +69,18 @@ const Rate: React.FC = () => {
     if (validate()) {
       console.log("Form submitted:", { state, location });
     }
+  };
+
+  const onPageChange = (pageNo: number) => {
+    const newBookings = companiondata.allcompaniondata.slice(
+      (pageNo - 1) * 10,
+      pageNo * 10
+    );
+    setcompaniondata((prev: any) => ({
+      ...prev,
+      sliceddata: newBookings,
+      currentPage: pageNo,
+    }));
   };
 
   return (
@@ -124,13 +141,13 @@ const Rate: React.FC = () => {
         </div>
         {!companiondata ? (
           <div>Loading...</div>
-        ) : companiondata?.length ? (
-          companiondata.map((l: any) => (
+        ) : companiondata?.sliceddata && companiondata?.sliceddata.length ? (
+          companiondata.sliceddata.map((l: any) => (
             <Link to={`./details?companionId=${l.id}`} key={l.id}>
               <div className="hover:bg-slate-200">
                 <div className="flex justify-between items-center mb-3 ">
                   <div className="flex items-center rate-profile mr-3">
-                    <img src={ l.Images[0]} alt="profile" />
+                    <img src={l.Images[0]} alt="profile" />
                     <h1>{l.firstname}</h1>
                   </div>
                   <div>{l.age}</div>
@@ -148,6 +165,13 @@ const Rate: React.FC = () => {
           <div>No Companions Found in this Location</div>
         )}
       </div>
+      {companiondata && (
+        <NewPagination
+          totalPage={Math.ceil(companiondata.allcompaniondata.length / 10)}
+          currentPage={companiondata.currentPage}
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 };
