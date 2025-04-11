@@ -47,9 +47,16 @@ const Rate: React.FC = () => {
       .then(({ getCompanionRateListService }) => getCompanionRateListService())
       .then(({ data }) => {
         if (data) {
+          const sorteddata = data.sort((a: any, b: any) => {
+            const avgA =
+              a.totalRatings === 0 ? 0 : a.ratingsReceived / a.totalRatings;
+            const avgB =
+              b.totalRatings === 0 ? 0 : b.ratingsReceived / b.totalRatings;
+            return avgB - avgA;
+          });
           setcompaniondata({
-            sliceddata: data.slice((1 - 1) * 10, 1 * 10),
-            allcompaniondata: data,
+            sliceddata: sorteddata.slice((1 - 1) * 10, 1 * 10),
+            allcompaniondata: sorteddata,
             currentPage: 1,
           });
         }
@@ -153,7 +160,9 @@ const Rate: React.FC = () => {
                   <div>{l.age}</div>
                   <div>{l.gender}</div>
                   <div>
-                    {Number(l.ratingsReceived / l.totalRatings).toFixed(2)}
+                    {l.totalRatings
+                      ? Number(l.ratingsReceived / l.totalRatings).toFixed(2)
+                      : 0}
                   </div>
                   <div>{l.Booking}hr/week</div>
                 </div>
