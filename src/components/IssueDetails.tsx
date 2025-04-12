@@ -28,6 +28,7 @@ export function IssueDetails() {
       | null;
     content: string;
   }>({ attachment: null, content: "" });
+  const [isLoading, setisLoading] = useState(false);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -49,6 +50,7 @@ export function IssueDetails() {
       toast.error("Please add comment before comment");
     }
     try {
+      setisLoading(() => true);
       const issueId = searchParams.get("issueId");
       if (issueId) {
         const formData = new FormData();
@@ -83,6 +85,7 @@ export function IssueDetails() {
       console.log(error);
     } finally {
       setComment({ attachment: null, content: "" });
+      setisLoading(() => false);
     }
   };
 
@@ -120,6 +123,7 @@ export function IssueDetails() {
       } else {
         data["reject"] = true;
       }
+      setisLoading(() => true);
       const { updateIssueStatusService } = await import(
         "@/services/issues/handleissue.service"
       );
@@ -130,6 +134,7 @@ export function IssueDetails() {
       } else {
         toast.error(error);
       }
+      setisLoading(() => false);
     }
   };
 
@@ -182,6 +187,7 @@ export function IssueDetails() {
                 size="sm"
                 variant="destructive"
                 onClick={() => updateIssueStatus("Reject")}
+                disabled={isLoading}
               >
                 Deny
               </Button>
@@ -190,6 +196,7 @@ export function IssueDetails() {
                 variant="secondary"
                 onClick={() => updateIssueStatus("Approve")}
                 className="bg-green-600 hover:bg-green-700 text-white"
+                disabled={isLoading}
               >
                 Resolve
               </Button>
@@ -303,8 +310,9 @@ export function IssueDetails() {
               <Button
                 onClick={handleComment}
                 className="bg-blue-600 hover:bg-blue-700"
+                disabled={isLoading}
               >
-                Send
+                {isLoading ? 'Please wait...' : 'Send'}
               </Button>
             </div>
           </div>

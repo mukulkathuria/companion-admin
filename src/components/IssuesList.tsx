@@ -4,6 +4,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useNavigate } from "react-router-dom";
+import { formatBookingTimingsforUi } from "@/utils/booking.utils";
 
 export function IssuesList() {
   const [issuesData, setIssuesData] = useState<any>(null);
@@ -25,8 +26,25 @@ export function IssuesList() {
     const { generateSCSVFile } = await import("@/utils/filehandling.utils");
     const { data } = await getAccountStatement();
     if (data) {
-      console.log(data);
-      generateSCSVFile(data);
+      const values = data.map((l: any) => {
+        const obj = {
+          ...l,
+          GST: l.GST.toFixed(2),
+          cardType: l.paymentdetails?.cardType || "",
+          paymentId: l.paymentdetails?.paymentId || "",
+          cardNumber: l.paymentdetails?.cardNumber || "",
+          cardCategory: l.paymentdetails?.cardCategory || "",
+          UPIid: l.paymentdetails?.UPIid || "",
+          UPIBank: l.paymentdetails?.UPIBank || "",
+          walletBank: l.paymentdetails?.walletBank || "",
+          bankDetails: l.paymentdetails?.bankDetails || "",
+          netBanking: l.paymentdetails?.netBanking || "",
+          transactionTime: formatBookingTimingsforUi(l.transactionTime),
+        };
+        delete obj.paymentdetails;
+        return obj;
+      });
+      generateSCSVFile(values);
     }
   };
 

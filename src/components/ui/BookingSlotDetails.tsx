@@ -19,6 +19,7 @@ export function BookingSlotDetails() {
   const [searchParams] = useSearchParams();
   const [bookingDetails, setBookingDetails] =
     useState<bookingDetailsDto | null>(null);
+  const [isLoading, setisLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export function BookingSlotDetails() {
 
   const handleAccept = async (status: "Accept" | "Reject") => {
     try {
+      setisLoading(() => true);
       const { acceptBookingService, rejectBookingService } = await import(
         "../../services/requests/bookingrequest.service"
       );
@@ -69,6 +71,8 @@ export function BookingSlotDetails() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setisLoading(() => false);
     }
   };
 
@@ -96,10 +100,7 @@ export function BookingSlotDetails() {
         <CardContent className="space-y-6">
           <div className="flex items-start gap-6 mb-4">
             <img
-              src={
-                bookingDetails.user.Images &&
-                 bookingDetails.user.Images[0]
-              }
+              src={bookingDetails.user.Images && bookingDetails.user.Images[0]}
               alt="Profile"
               style={{ height: "100px", width: "135px" }}
             />
@@ -176,15 +177,17 @@ export function BookingSlotDetails() {
           <Button
             variant="destructive"
             className="bg-red-600 hover:bg-red-700"
+            disabled={isLoading}
             onClick={() => handleAccept("Reject")}
           >
-            Reject
+            {isLoading ? 'Please wait...' : 'Reject'}
           </Button>
           <Button
             onClick={() => handleAccept("Accept")}
             className="bg-blue-600 hover:bg-blue-700"
+            disabled={isLoading}
           >
-            Accept
+            {isLoading ? 'Please wait..' : 'Accept'}
           </Button>
         </CardFooter>
       </Card>

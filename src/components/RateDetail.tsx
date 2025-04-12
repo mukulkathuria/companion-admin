@@ -9,6 +9,7 @@ const RateDetail: React.FC = () => {
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
   const [companiondata, setcompaniondata] = useState<any>(null);
+  const [isLoading, setisLoading] = useState(false);
 
   const [searchParams] = useSearchParams();
   useEffect(() => {
@@ -61,6 +62,7 @@ const RateDetail: React.FC = () => {
       const { updateCompanionBasePriceService } = await import(
         "@/services/companion/updatecompanion.service"
       );
+      setisLoading(() => true);
       const { data, error } = await updateCompanionBasePriceService(
         { updatedprice: Number(companiondata.bookingrate) },
         companionId
@@ -71,6 +73,7 @@ const RateDetail: React.FC = () => {
       } else {
         toast.error(error);
       }
+      setisLoading(() => false);
     }
   };
   if (!companiondata) {
@@ -140,8 +143,9 @@ const RateDetail: React.FC = () => {
             <button
               type="submit"
               className=" bg-red-500 text-white py-1  mt-5 rounded"
+              disabled={isLoading}
             >
-              Update Price
+              {isLoading ? 'Updating...' : 'Update Price'}
             </button>
           </form>
         </div>
