@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -58,7 +59,8 @@ export function CreateCompanion({
     initialValues ? { ...initialForm, ...initialValues } : initialForm
   );
   const [error, setError] = useState<ErrorFormDto>({});
-
+  const navigate = useNavigate();
+  const [isLoading, setisLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { validateRegisteration } = await import(
@@ -78,6 +80,7 @@ export function CreateCompanion({
       }
       return;
     }
+    setisLoading(() => true);
     const userData = new FormData();
     const allkeys = Object.keys(form);
     for (let i = 0; i < allkeys.length; i += 1) {
@@ -109,10 +112,13 @@ export function CreateCompanion({
         toast.error(error);
       } else {
         toast.success("Companion Created Successfully!!!");
+        navigate(-1);
       }
     } catch (error) {
       console.log(error);
       toast.error("Some Error Occured Please Try again after sometime!!");
+    }finally{
+      setisLoading(() => false);
     }
   };
 
@@ -551,8 +557,9 @@ export function CreateCompanion({
               type="submit"
               className="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90"
               onClick={handleSubmit}
+              disabled={isLoading}
             >
-              {buttonText}
+              {isLoading ? 'Submitting..' : buttonText}
             </button>
           </div>
           {/* </form> */}

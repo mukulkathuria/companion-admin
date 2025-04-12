@@ -19,6 +19,7 @@ export function UpdateCompanionDetails() {
   const [companiondetails, setCompanionDetails] = useState<any>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [isLoading, setisLoading] = useState(false);
   useEffect(() => {
     const requestId = searchParams.get("id");
     if (requestId) {
@@ -45,6 +46,7 @@ export function UpdateCompanionDetails() {
       } else {
         data["reject"] = true;
       }
+      setisLoading(() => true);
       const { updateCompanionProfileStatusService } = await import(
         "../services/companion/updatecompanion.service"
       );
@@ -55,6 +57,7 @@ export function UpdateCompanionDetails() {
       } else if (res?.error) {
         toast.error(res.error);
       }
+      setisLoading(() => false);
     }
   };
 
@@ -176,6 +179,7 @@ export function UpdateCompanionDetails() {
             onClick={() => console.log("Delete")}
             variant="destructive"
             className="bg-red-600 hover:bg-red-700"
+            disabled={isLoading}
           >
             Delete
           </Button>
@@ -183,12 +187,14 @@ export function UpdateCompanionDetails() {
             onClick={() => handleUpdateStatus("Reject")}
             variant="destructive"
             className="bg-red-600 hover:bg-red-700"
+            disabled={isLoading}
           >
             Reject
           </Button>
           <Button
             onClick={() => handleUpdateStatus("Approve")}
             className="bg-blue-600 hover:bg-blue-700"
+            disabled={isLoading}
           >
             Approve
           </Button>

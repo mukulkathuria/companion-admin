@@ -38,7 +38,7 @@ const initialForm: CompanionFormDto = {
   description: ["MOVIES", "TRAVEL_BUDDY", "FITNESS_PARTNER"], // Pre-selected descriptions
   bookingrate: 50,
   height: 180,
-  baselocations: []
+  baselocations: [],
 };
 
 interface CompanionFormProps {
@@ -54,7 +54,7 @@ export function CompanionForm({
     initialValues ? { ...initialForm, ...initialValues } : initialForm
   );
   const [error, setError] = useState<ErrorFormDto>({});
-
+  const [isLoading, setisLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -89,7 +89,8 @@ export function CompanionForm({
       if (
         form[allkeys[i] as keyof CompanionFormDto] &&
         allkeys[i] !== "images" &&
-        allkeys[i] !== "description" && allkeys[i] !== "baselocations"
+        allkeys[i] !== "description" &&
+        allkeys[i] !== "baselocations"
       ) {
         userData.append(
           allkeys[i],
@@ -107,7 +108,7 @@ export function CompanionForm({
         previousImages.push(l);
       }
     });
-    if(previousImages.length) {
+    if (previousImages.length) {
       userData.append("previousImages", JSON.stringify(previousImages));
     }
     // If all validations pass, proceed with form submission
@@ -116,10 +117,14 @@ export function CompanionForm({
       console.log(pair[0], pair[1]);
     }
     try {
+      setisLoading(() => true);
       const { updateCompanionProfileService } = await import(
         "../services/companion/updatecompanion.service"
       );
-      const { error } = await updateCompanionProfileService(userData, String(id));
+      const { error } = await updateCompanionProfileService(
+        userData,
+        String(id)
+      );
       if (error) {
         toast.error(error);
       } else {
@@ -128,8 +133,9 @@ export function CompanionForm({
     } catch (error) {
       console.log(error);
       toast.error("Some Error Occured Please Try again after sometime!!");
+    } finally {
+      setisLoading(() => false);
     }
-  
   };
 
   const handleChange = (
@@ -464,11 +470,11 @@ export function CompanionForm({
 
             <div>
               {form.baselocations.map((l, i) => (
-              <div className="mt-3" key={i*200}>
-                <p>Base location {i+1}</p>
-                <p>{l.formattedaddress}</p>
-                <LeafLetMaps city={l.city} lat={l.lat} lng={l.lng} />
-              </div>
+                <div className="mt-3" key={i * 200}>
+                  <p>Base location {i + 1}</p>
+                  <p>{l.formattedaddress}</p>
+                  <LeafLetMaps city={l.city} lat={l.lat} lng={l.lng} />
+                </div>
               ))}
             </div>
             <div className="col-span-2 bg-gray-50 p-4 rounded-lg">
@@ -521,8 +527,9 @@ export function CompanionForm({
           <button
             type="submit"
             className="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90"
+            disabled={isLoading}
           >
-            {buttonText}
+            {isLoading ? "Please wait..." : buttonText}
           </button>
         </div>
       </form>

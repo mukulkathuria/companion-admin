@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 const Becompaniondetail = () => {
   const [companiondata, setcompaniondata] = useState<any>(null);
+  const [isLoading, setisLoading] = useState(false);
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -34,6 +35,7 @@ const Becompaniondetail = () => {
       } else {
         data["reject"] = true;
       }
+      setisLoading(() => true);
       const { updatebeCompanionRequestStatusService } = await import(
         "@/services/companion/companionrequest.service"
       );
@@ -45,6 +47,7 @@ const Becompaniondetail = () => {
       } else {
         toast.error(error);
       }
+      setisLoading(() => false);
     }
   };
 
@@ -85,14 +88,16 @@ const Becompaniondetail = () => {
             <button
               className="bg-green-700"
               onClick={() => updateBeCompaionStatus("Approve")}
+              disabled={isLoading}
             >
-              Accept
+              {isLoading ? 'Please wait...' : 'Accept'}
             </button>
             <button
               className="bg-red-600"
               onClick={() => updateBeCompaionStatus("Reject")}
+              disabled={isLoading}
             >
-              Delete
+              {isLoading ? 'Please wait...' : 'Delete'}
             </button>
           </div>
         </div>

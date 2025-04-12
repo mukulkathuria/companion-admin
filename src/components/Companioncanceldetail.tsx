@@ -11,6 +11,7 @@ const CompanionCancelDetails = () => {
   const [bookingDetails, setBookingDetails] =
     useState<bookingDetailsDto | null>(null);
   const navigate = useNavigate();
+    const [isLoading, setisLoading] = useState(false);
 
   useEffect(() => {
     const bookingId = searchParams.get("bookingId");
@@ -49,6 +50,7 @@ const CompanionCancelDetails = () => {
       } else {
         data["reject"] = true;
       }
+      setisLoading(() => true);
       const { updateCompanionCancellationStatusService } = await import(
         "@/services/companion/updatecompanion.service"
       );
@@ -60,6 +62,7 @@ const CompanionCancelDetails = () => {
       } else {
         toast.error(error);
       }
+      setisLoading(() => false);
     }
   };
 
@@ -123,14 +126,16 @@ const CompanionCancelDetails = () => {
             <button
               className="bg-green-600"
               onClick={() => updateCancellationStatus("Approve")}
+              disabled={isLoading}
             >
-              Approve
+              {isLoading ? 'Please wait...' : 'Approve'}
             </button>
             <button
               className="bg-red-500"
               onClick={() => updateCancellationStatus("Reject")}
+              disabled={isLoading}
             >
-              reject
+              {isLoading ? 'Please wait...' : 'reject'}
             </button>
           </div>
         </>
