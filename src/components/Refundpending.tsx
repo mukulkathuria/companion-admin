@@ -5,47 +5,63 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-// function formatTo12Hour(time24: string) {
-//   const [hours, minutes] = time24.split(":").map(Number);
-//   const ampm = hours >= 12 ? "PM" : "AM";
-//   const formattedHours = hours % 12 || 12;
-//   return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
-// }
-
 type ModalProps = {
   onClose: () => void;
   data: any;
 };
 
 const Refundpending = () => {
-  const [isModalOpen, setIsModalOpen] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState<any>(null);
   const [data, setData] = useState<{
     isLoading: boolean;
-    data: any;
+    data: any[];
     error: null | string;
-  }>({ isLoading: true, data: null, error: null });
+  }>({ isLoading: true, data: [], error: null });
 
   useEffect(() => {
     import("@/services/booking/bookinglist.service")
       .then(({ getRefundPendingBookingList }) => getRefundPendingBookingList())
       .then(({ data }) => {
         if (data) {
-          const values = data.map((l: any) => ({
-            id: l.id,
-            user: l.User.filter((p: any) => !p.isCompanion)[0],
-            companion: l.User.filter((p: any) => p.isCompanion)[0],
-            refundamount: l.refundamount,
-            finalRate: l.finalRate,
-            bookingstart: l.bookingstart,
-            cancelledBy:
-              l.bookingstatus === "REJECTED"
-                ? "Admin"
-                : l.cancellationDetails.isCompanion
-                ? "Companion"
-                : "User",
-          }));
+        //  console.log(data);
+
+          const values = data.map((l: any) => {
+            const user = l.User.find((p: any) => !p.isCompanion);
+            const companion = l.User.find((p: any) => p.isCompanion);
+
+            // find latest cancelled entry
+            const cancelledEntry = l.statusHistory
+              ?.filter((h: any) => h.actionType === "CANCELLED")
+              .sort(
+                (a: any, b: any) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              )[0];
+
+            let cancelledBy: string | null = null;
+            if (l.bookingstatus === "REJECTED") {
+              cancelledBy = "Admin";
+            } else if (cancelledEntry) {
+              cancelledBy = cancelledEntry.actionPerformedBy; // USER / COMPANION / ADMIN
+            }
+
+            return {
+              id: l.id,
+              user,
+              companion,
+              refundamount: l.refundamount,
+              finalRate: l.finalRate,
+              bookingstart: l.bookingstart,
+              cancelledBy,
+            };
+          });
+
           setData({ isLoading: false, data: values, error: null });
         }
+      })
+      .catch((err) => {
+        console.error(err);
+        setData({ isLoading: false, data: [], error: "Failed to fetch data" });
       });
   }, []);
 
@@ -68,7 +84,7 @@ const Refundpending = () => {
               </tr>
             ) : data.error ? (
               <tr>
-                <td>Error Occoured</td>{" "}
+                <td>Error Occurred</td>
               </tr>
             ) : !data.data?.length ? (
               <tr>
@@ -81,7 +97,7 @@ const Refundpending = () => {
                   className="hover:bg-slate-200 cursor-pointer"
                   onClick={() => setIsModalOpen(l)}
                 >
-                  <td className="text-sm">{l.user.email}</td>
+                  <td className="text-sm">{l.user?.email}</td>
                   <td className="text-sm">{l.refundamount || l.finalRate}</td>
                   <td className="text-sm">{l.cancelledBy}</td>
                   <td className="text-sm">
@@ -103,9 +119,9 @@ const Refundpending = () => {
 export const Modal = ({ onClose, data }: ModalProps) => {
   const navigate = useNavigate();
   const [paymentDetails, setPaymentDetails] = useState({
-    firstname: data.user.firstname as string,
-    lastname: data.user.lastname as string,
-    email: data.user.email as string,
+    firstname: data.user?.firstname ?? "",
+    lastname: data.user?.lastname ?? "",
+    email: data.user?.email ?? "",
     refundedAmount: String(data.refundamount || data.finalRate),
     paymentMode: "",
     transactionId: "",
@@ -125,21 +141,18 @@ export const Modal = ({ onClose, data }: ModalProps) => {
     e.preventDefault();
 
     const errors: string[] = [];
-
     if (
       !paymentDetails.email ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(paymentDetails.email)
     ) {
       errors.push("Enter a valid email address.");
     }
-
     if (
       !paymentDetails.refundedAmount ||
       isNaN(Number(paymentDetails.refundedAmount))
     ) {
       errors.push("Refunded amount must be a number.");
     }
-
     if (!paymentDetails.transactionId)
       errors.push("Transaction ID is required.");
     if (!paymentDetails.refundDate) errors.push("Refund date is required.");
@@ -152,16 +165,17 @@ export const Modal = ({ onClose, data }: ModalProps) => {
       return;
     }
 
-    // const formattedTime = formatTo12Hour(paymentDetails.refundTime);
     const { getRefundDetails } = await import("@/utils/refundpayment.utils");
     const { addRefundPaymentService } = await import(
       "@/services/transaction/refundamount.service"
     );
+
     const refundsDetails = getRefundDetails(paymentDetails);
     const { data: refundData, error } = await addRefundPaymentService({
       ...refundsDetails,
       bookingid: data.id,
     });
+
     if (refundData) {
       toast.success("Successfully Added the Refund");
       navigate("/refund/completed");
@@ -169,9 +183,8 @@ export const Modal = ({ onClose, data }: ModalProps) => {
     } else {
       toast.error(error);
     }
-
-    // onClose();
   };
+
   const handlePaymentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { name, value },
@@ -251,28 +264,25 @@ export const Modal = ({ onClose, data }: ModalProps) => {
         );
       case paymentMode === "NB":
         return (
-          <>
-            <select
-              className="w-full p-2 border border-gray-300 rounded"
-              value={paymentDetails.bankCode}
-              onChange={(e) =>
-                setPaymentDetails((l) => ({
-                  ...l,
-                  bankCode: e.target.value,
-                }))
-              }
-              required
-            >
-              <option value="">Select NetBank</option>
-              {NetBankData.map((l, i) => (
-                <option value={l.value} key={i}>
-                  {l.label}
-                </option>
-              ))}
-            </select>
-          </>
+          <select
+            className="w-full p-2 border border-gray-300 rounded"
+            value={paymentDetails.bankCode}
+            onChange={(e) =>
+              setPaymentDetails((l) => ({
+                ...l,
+                bankCode: e.target.value,
+              }))
+            }
+            required
+          >
+            <option value="">Select NetBank</option>
+            {NetBankData.map((l, i) => (
+              <option value={l.value} key={i}>
+                {l.label}
+              </option>
+            ))}
+          </select>
         );
-
       case paymentMode === "RTGS" || paymentMode === "IMPS":
         return (
           <input
@@ -285,7 +295,6 @@ export const Modal = ({ onClose, data }: ModalProps) => {
             required
           />
         );
-
       default:
         return null;
     }
@@ -349,7 +358,9 @@ export const Modal = ({ onClose, data }: ModalProps) => {
             <option value="WALLET">Wallet</option>
             <option value="NB">Net Banking</option>
           </select>
+
           {getfieldsforpaymentMethod(paymentDetails.paymentMode)}
+
           <input
             type="text"
             name="transactionId"
@@ -377,6 +388,7 @@ export const Modal = ({ onClose, data }: ModalProps) => {
             onChange={handlePaymentChange}
             required
           />
+
           <input
             type="text"
             placeholder="Bank Reference Number"
@@ -386,6 +398,7 @@ export const Modal = ({ onClose, data }: ModalProps) => {
             onChange={handlePaymentChange}
             required
           />
+
           <div className="text-right">
             <button
               type="submit"
