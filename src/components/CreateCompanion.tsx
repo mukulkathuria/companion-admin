@@ -114,7 +114,7 @@ const initialForm: ExtendedCompanionFormDto = {
 const walletProviders = [
   "PAYTM",
   "PHONEPE",
-  
+
   "AMAZONPAY",
   "MOBIKWIK",
   "AIRTELMONEY",
@@ -223,13 +223,12 @@ export function CreateCompanion({
 
     userData.append("paymentmethods", JSON.stringify(formattedPaymentMethods));
 
- 
     form.images.forEach((l) => {
       if (typeof l === "object") {
         userData.append("images", l.file);
       }
     });
-  
+
     try {
       const { registerUserService } = await import(
         "../services/auth/register.service"
