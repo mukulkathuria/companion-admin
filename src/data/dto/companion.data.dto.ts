@@ -78,7 +78,7 @@ export enum FemaleCompanionBodyTypeEnum {
   RECTANGLE = "RECTANGLE",
   TRIANGLE = "TRIANGLE",
   SPOON = "SPOON",
-  HOURGLASS = "HOURGLASS",
+  HOURGLASS = "SPOON",
   TOPHOURGLASS = "TOPHOURGLASS",
 }
 

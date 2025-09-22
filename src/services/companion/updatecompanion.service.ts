@@ -95,3 +95,32 @@ export const updateCompanionCancellationStatusService = async (
     return { error: "Server Error" };
   }
 };
+
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const companionPaymentService = async (values: any) => {
+  try {
+    const { BASEURL } = await import("../../Constants/services.constants");
+    const {
+      default: { post },
+    } = await import("../interface/interceptor");
+
+    const url = `${BASEURL}/admin/profile/updatecompanionbaseprice`;
+    const response = await post(url, values);
+
+    return { data: response.data };
+  } catch (error: any) {
+    if (error instanceof Error) {
+      console.error("Error:", error.message);
+    }
+
+    console.error(error?.response);
+
+    if (error?.response?.status >= 400) {
+      return { error: error.response.data?.message || "Request failed" };
+    }
+
+    return { error: "Server Error" };
+  }
+};
+

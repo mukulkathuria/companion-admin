@@ -175,6 +175,9 @@ export const Modal = ({ onClose, data }: ModalProps) => {
       ...refundsDetails,
       bookingid: data.id,
     });
+    const apicall = {
+      
+    }
 
     if (refundData) {
       toast.success("Successfully Added the Refund");

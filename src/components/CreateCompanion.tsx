@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -32,7 +32,66 @@ import {
   smokingHabitsData,
 } from "@/data/fakercreatedata";
 
-const initialForm: CompanionFormDto = {
+// Updated Payment method types and interfaces
+export enum PaymentMethodType {
+  BANK_ACCOUNT = "BANK_ACCOUNT",
+  UPI = "UPI",
+  WALLET = "WALLET",
+}
+
+export enum AccountType {
+  SAVINGS = "SAVINGS",
+  CURRENT = "CURRENT",
+}
+
+export interface BankAccountDto {
+  recipientName: string;
+  accountHolderName: string;
+  accountNumber: string;
+  ifscCode: string;
+  bankName: string;
+  branchName: string;
+  accountType: AccountType;
+  nickname: string;
+}
+
+export interface UpiDto {
+  recipientName: string;
+  upiId: string;
+  nickname: string;
+  upiProvider: string;
+}
+
+export interface WalletDto {
+  recipientName: string;
+  walletProvider: string;
+  walletIdentifier: string;
+  nickname: string;
+}
+
+export interface PaymentMethodDto {
+  type: PaymentMethodType;
+  recipientName: string;
+  nickname: string;
+  // Optional fields based on type
+  upiId?: string;
+  upiProvider?: string;
+  accountHolderName?: string;
+  accountNumber?: string;
+  ifscCode?: string;
+  bankName?: string;
+  branchName?: string;
+  accountType?: AccountType;
+  walletProvider?: string;
+  walletIdentifier?: string;
+}
+
+// Extended form interface
+interface ExtendedCompanionFormDto extends CompanionFormDto {
+  paymentMethods: PaymentMethodDto[];
+}
+
+const initialForm: ExtendedCompanionFormDto = {
   images: null,
   firstname: "",
   lastname: "",
@@ -49,20 +108,46 @@ const initialForm: CompanionFormDto = {
   bookingrate: 0,
   height: 160,
   baselocations: [],
+  paymentMethods: [],
 };
+
+const walletProviders = [
+  "PAYTM",
+  "PHONEPE",
+
+  "AMAZONPAY",
+  "MOBIKWIK",
+  "AIRTELMONEY",
+  "JIOMONEY",
+  "OTHER",
+];
+
+const upiProviders = [
+  "Paytm",
+  "PhonePe",
+  "Google Pay",
+  "Amazon Pay",
+  "BHIM",
+  "MobiKwik",
+  "Airtel Money",
+  "Other",
+];
 
 export function CreateCompanion({
   initialForm: initialValues,
   buttonText = "Create Companion",
 }: CreateCompanionProps) {
-  const [form, setForm] = useState<CompanionFormDto>(
+  const [form, setForm] = useState<ExtendedCompanionFormDto>(
     initialValues ? { ...initialForm, ...initialValues } : initialForm
   );
   const [error, setError] = useState<ErrorFormDto>({});
   const navigate = useNavigate();
   const [isLoading, setisLoading] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // console.log(form);
+
     const { validateRegisteration } = await import(
       "../utils/validations/companionform.validate"
     );
@@ -85,24 +170,65 @@ export function CreateCompanion({
     const allkeys = Object.keys(form);
     for (let i = 0; i < allkeys.length; i += 1) {
       if (
-        form[allkeys[i] as keyof CompanionFormDto] &&
+        form[allkeys[i] as keyof ExtendedCompanionFormDto] &&
         allkeys[i] !== "images" &&
         allkeys[i] !== "description" &&
-        allkeys[i] !== "baselocations"
+        allkeys[i] !== "baselocations" &&
+        allkeys[i] !== "paymentMethods"
       ) {
         userData.append(
           allkeys[i],
-          String(form[allkeys[i] as keyof CompanionFormDto])
+          String(form[allkeys[i] as keyof ExtendedCompanionFormDto])
         );
       }
     }
     userData.append("description", JSON.stringify(form.description));
     userData.append("baselocations", JSON.stringify(form.baselocations));
+
+    // Format payment methods according to backend requirements
+    const formattedPaymentMethods = form.paymentMethods.map((method) => {
+      const baseMethod = {
+        type: method.type,
+        recipientName: method.recipientName,
+        nickname: method.nickname,
+      };
+
+      switch (method.type) {
+        case PaymentMethodType.UPI:
+          return {
+            ...baseMethod,
+            upiId: method.upiId,
+            upiProvider: method.upiProvider,
+          };
+        case PaymentMethodType.BANK_ACCOUNT:
+          return {
+            ...baseMethod,
+            accountHolderName: method.accountHolderName,
+            accountNumber: method.accountNumber,
+            ifscCode: method.ifscCode,
+            bankName: method.bankName,
+            branchName: method.branchName,
+            accountType: method.accountType,
+          };
+        case PaymentMethodType.WALLET:
+          return {
+            ...baseMethod,
+            walletProvider: method.walletProvider,
+            walletIdentifier: method.walletIdentifier,
+          };
+        default:
+          return baseMethod;
+      }
+    });
+
+    userData.append("paymentmethods", JSON.stringify(formattedPaymentMethods));
+
     form.images.forEach((l) => {
       if (typeof l === "object") {
         userData.append("images", l.file);
       }
     });
+
     try {
       const { registerUserService } = await import(
         "../services/auth/register.service"
@@ -117,7 +243,7 @@ export function CreateCompanion({
     } catch (error) {
       console.log(error);
       toast.error("Some Error Occured Please Try again after sometime!!");
-    }finally{
+    } finally {
       setisLoading(() => false);
     }
   };
@@ -133,16 +259,15 @@ export function CreateCompanion({
   };
 
   const getChangedFields = (
-    initial: CompanionFormDto,
-    current: CompanionFormDto
+    initial: ExtendedCompanionFormDto,
+    current: ExtendedCompanionFormDto
   ) => {
     const changes: { [key: string]: boolean } = {};
     for (const key in current) {
       if (
-        // eslint-disable-next-line no-prototype-builtins
         current.hasOwnProperty(key) &&
-        initial[key as keyof CompanionFormDto] !==
-          current[key as keyof CompanionFormDto]
+        initial[key as keyof ExtendedCompanionFormDto] !==
+          current[key as keyof ExtendedCompanionFormDto]
       ) {
         changes[key] = true;
       }
@@ -157,6 +282,288 @@ export function CreateCompanion({
     const baselocations = [...form.baselocations];
     baselocations[index] = value;
     setForm((l) => ({ ...l, baselocations: baselocations }));
+  };
+
+  // Payment method handlers
+  const addPaymentMethod = () => {
+    if (form.paymentMethods.length >= 3) {
+      toast.error("Maximum 3 payment methods allowed");
+      return;
+    }
+    const newPaymentMethod: PaymentMethodDto = {
+      type: PaymentMethodType.BANK_ACCOUNT,
+      recipientName: "",
+      nickname: "",
+      accountHolderName: "",
+      accountNumber: "",
+      ifscCode: "",
+      bankName: "",
+      branchName: "",
+      accountType: AccountType.SAVINGS,
+    };
+    setForm((prev) => ({
+      ...prev,
+      paymentMethods: [...prev.paymentMethods, newPaymentMethod],
+    }));
+  };
+
+  const removePaymentMethod = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      paymentMethods: prev.paymentMethods.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updatePaymentMethodType = (index: number, type: PaymentMethodType) => {
+    const updatedMethods = [...form.paymentMethods];
+    const currentMethod = updatedMethods[index];
+
+    // Create new method with common fields preserved
+    const newMethod: PaymentMethodDto = {
+      type,
+      recipientName: currentMethod.recipientName || "",
+      nickname: currentMethod.nickname || "",
+    };
+
+    // Add type-specific fields
+    switch (type) {
+      case PaymentMethodType.BANK_ACCOUNT:
+        newMethod.accountHolderName = "";
+        newMethod.accountNumber = "";
+        newMethod.ifscCode = "";
+        newMethod.bankName = "";
+        newMethod.branchName = "";
+        newMethod.accountType = AccountType.SAVINGS;
+        break;
+      case PaymentMethodType.UPI:
+        newMethod.upiId = "";
+        newMethod.upiProvider = "";
+        break;
+      case PaymentMethodType.WALLET:
+        newMethod.walletProvider = "";
+        newMethod.walletIdentifier = "";
+        break;
+    }
+
+    updatedMethods[index] = newMethod;
+    setForm((prev) => ({ ...prev, paymentMethods: updatedMethods }));
+  };
+
+  const updatePaymentMethodField = (
+    index: number,
+    field: string,
+    value: string
+  ) => {
+    const updatedMethods = [...form.paymentMethods];
+    updatedMethods[index] = {
+      ...updatedMethods[index],
+      [field]: value,
+    };
+    setForm((prev) => ({ ...prev, paymentMethods: updatedMethods }));
+  };
+
+  const renderPaymentMethodForm = (method: PaymentMethodDto, index: number) => {
+    return (
+      <div className="space-y-4">
+        {/* Common fields for all payment methods */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor={`recipient-name-${index}`}>Recipient Name</Label>
+            <Input
+              type="text"
+              value={method.recipientName}
+              onChange={(e) =>
+                updatePaymentMethodField(index, "recipientName", e.target.value)
+              }
+              placeholder="Enter recipient name"
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor={`nickname-${index}`}>Nickname</Label>
+            <Input
+              type="text"
+              value={method.nickname}
+              onChange={(e) =>
+                updatePaymentMethodField(index, "nickname", e.target.value)
+              }
+              placeholder="Enter nickname for this payment method"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Type-specific fields */}
+        {method.type === PaymentMethodType.BANK_ACCOUNT && (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor={`account-holder-${index}`}>
+                Account Holder Name
+              </Label>
+              <Input
+                type="text"
+                value={method.accountHolderName || ""}
+                onChange={(e) =>
+                  updatePaymentMethodField(
+                    index,
+                    "accountHolderName",
+                    e.target.value
+                  )
+                }
+                placeholder="Enter account holder name"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor={`account-number-${index}`}>Account Number</Label>
+              <Input
+                type="text"
+                value={method.accountNumber || ""}
+                onChange={(e) =>
+                  updatePaymentMethodField(
+                    index,
+                    "accountNumber",
+                    e.target.value
+                  )
+                }
+                placeholder="Enter account number"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor={`ifsc-${index}`}>IFSC Code</Label>
+              <Input
+                type="text"
+                value={method.ifscCode || ""}
+                onChange={(e) =>
+                  updatePaymentMethodField(index, "ifscCode", e.target.value)
+                }
+                placeholder="Enter IFSC code"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor={`bank-name-${index}`}>Bank Name</Label>
+              <Input
+                type="text"
+                value={method.bankName || ""}
+                onChange={(e) =>
+                  updatePaymentMethodField(index, "bankName", e.target.value)
+                }
+                placeholder="Enter bank name"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor={`branch-name-${index}`}>Branch Name</Label>
+              <Input
+                type="text"
+                value={method.branchName || ""}
+                onChange={(e) =>
+                  updatePaymentMethodField(index, "branchName", e.target.value)
+                }
+                placeholder="Enter branch name"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor={`account-type-${index}`}>Account Type</Label>
+              <select
+                value={method.accountType || AccountType.SAVINGS}
+                onChange={(e) =>
+                  updatePaymentMethodField(index, "accountType", e.target.value)
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                required
+              >
+                <option value={AccountType.SAVINGS}>Savings</option>
+                <option value={AccountType.CURRENT}>Current</option>
+              </select>
+            </div>
+          </div>
+        )}
+
+        {method.type === PaymentMethodType.UPI && (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor={`upi-id-${index}`}>UPI ID</Label>
+              <Input
+                type="text"
+                value={method.upiId || ""}
+                onChange={(e) =>
+                  updatePaymentMethodField(index, "upiId", e.target.value)
+                }
+                placeholder="Enter UPI ID (e.g., user@paytm)"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor={`upi-provider-${index}`}>UPI Provider</Label>
+              <select
+                value={method.upiProvider || ""}
+                onChange={(e) =>
+                  updatePaymentMethodField(index, "upiProvider", e.target.value)
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                required
+              >
+                <option value="">Select UPI Provider</option>
+                {upiProviders.map((provider) => (
+                  <option key={provider} value={provider}>
+                    {provider}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {method.type === PaymentMethodType.WALLET && (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor={`wallet-provider-${index}`}>
+                Wallet Provider
+              </Label>
+              <select
+                value={method.walletProvider || ""}
+                onChange={(e) =>
+                  updatePaymentMethodField(
+                    index,
+                    "walletProvider",
+                    e.target.value
+                  )
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                required
+              >
+                <option value="">Select Wallet Provider</option>
+                {walletProviders.map((provider) => (
+                  <option key={provider} value={provider}>
+                    {provider}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor={`wallet-id-${index}`}>Wallet Identifier</Label>
+              <Input
+                type="text"
+                value={method.walletIdentifier || ""}
+                onChange={(e) =>
+                  updatePaymentMethodField(
+                    index,
+                    "walletIdentifier",
+                    e.target.value
+                  )
+                }
+                placeholder="Enter wallet ID/phone number"
+                required
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,7 +590,6 @@ export function CreateCompanion({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* <form onSubmit={handleSubmit} className="space-y-6"> */}
           {/* Personal Details Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-700">
@@ -388,6 +794,67 @@ export function CreateCompanion({
             </div>
           </div>
 
+          {/* Payment Methods Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-medium text-gray-700">
+                Payment Methods
+              </h3>
+              <button
+                type="button"
+                onClick={addPaymentMethod}
+                disabled={form.paymentMethods.length >= 3}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                Add Payment Method ({form.paymentMethods.length}/3)
+              </button>
+            </div>
+
+            {form.paymentMethods.map((method, index) => (
+              <Card key={index} className="border-l-4 border-blue-500">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-base">
+                      Payment Method {index + 1}
+                    </CardTitle>
+                    <button
+                      type="button"
+                      onClick={() => removePaymentMethod(index)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      ✕ Remove
+                    </button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor={`payment-type-${index}`}>
+                      Payment Method Type
+                    </Label>
+                    <select
+                      value={method.type}
+                      onChange={(e) =>
+                        updatePaymentMethodType(
+                          index,
+                          e.target.value as PaymentMethodType
+                        )
+                      }
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                      required
+                    >
+                      <option value={PaymentMethodType.BANK_ACCOUNT}>
+                        Bank Account
+                      </option>
+                      <option value={PaymentMethodType.UPI}>UPI</option>
+                      <option value={PaymentMethodType.WALLET}>Wallet</option>
+                    </select>
+                  </div>
+                  {renderPaymentMethodForm(method, index)}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
           {/* Other Details Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-700">Other Details</h3>
@@ -559,10 +1026,9 @@ export function CreateCompanion({
               onClick={handleSubmit}
               disabled={isLoading}
             >
-              {isLoading ? 'Submitting..' : buttonText}
+              {isLoading ? "Submitting.." : buttonText}
             </button>
           </div>
-          {/* </form> */}
         </CardContent>
       </Card>
     </div>
