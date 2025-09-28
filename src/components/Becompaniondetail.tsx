@@ -61,8 +61,8 @@ const Becompaniondetail = () => {
       <div className="becompanion-box">
         <div className="bg-slate-50 p-3">
           <div className="flex gap-5">
-            <img src={ companiondata.photos[0]} alt="profile" />
-            <img src={ companiondata.photos[1]} alt="profile" />
+            <img src={ companiondata.Images[0]} alt="profile" />
+            <img src={ companiondata.Images[1]} alt="profile" />
           </div>
           <div className="gap-10 mt-3">
             <h1 className="font-bold">
@@ -75,7 +75,7 @@ const Becompaniondetail = () => {
               Email: <span>{companiondata.email}</span>
             </h1>
             <h1 className="font-bold">
-              Phone : <span>{companiondata.phoneNo}</span>
+              Phone : <span>{companiondata.phoneno}</span>
             </h1>
             <h1 className="font-bold">
               Age : <span>{companiondata.age}</span>
@@ -83,6 +83,47 @@ const Becompaniondetail = () => {
             <h1 className="font-bold">
               Gender: <span>{companiondata.gender}</span>
             </h1>
+            <h1 className="font-bold">
+              height: <span>{companiondata.Companion[0]?.height}</span>
+            </h1>
+            <h1 className="font-bold">
+              smokinghabit: <span>{companiondata.Companion[0]?.smokinghabits}</span>
+            </h1>
+            <h1 className="font-bold">
+              Eating habit: <span>{companiondata.Companion[0]?.eatinghabits}</span>
+            </h1>
+            <h1 className="font-bold">
+              Gender: <span>{companiondata.Companion[0]?.drinkinghabits}</span>
+            </h1>
+            
+             <h1 className="font-bold">
+              Skintone: <span>{companiondata.Companion[0]?.Skintone}</span>
+            </h1>
+             <h1 className="font-bold">
+              bodytype: <span>{companiondata.Companion[0]?.bodytype}</span>
+            </h1>
+           
+            {companiondata.Companion[0]?.baselocation.map((location:any,)=> (
+              <div  >
+            <h1 className="font-bold">
+              baselocation: <span>{location.formattedaddress}</span>
+            </h1>
+            </div>
+            ))
+}
+
+<div>
+   <div>
+            {companiondata.Companion[0]?.description.map((desc:any,)=> (
+              <div  >
+            <h1 className="font-bold">
+              description: <span>{desc}</span>
+            </h1>
+            </div>
+            ))
+          }
+            </div>
+</div>
           </div>
           <div className="flex justify-end gap-4">
             <button

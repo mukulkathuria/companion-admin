@@ -47,6 +47,8 @@ const Rate: React.FC = () => {
       .then(({ getCompanionRateListService }) => getCompanionRateListService())
       .then(({ data }) => {
         if (data) {
+          
+          
           const sorteddata = data.sort((a: any, b: any) => {
             const avgA =
               a.totalRatings === 0 ? 0 : a.ratingsReceived / a.totalRatings;
