@@ -228,6 +228,7 @@ export function CreateCompanion({
         userData.append("images", l.file);
       }
     });
+    console.log(userData);
 
     try {
       const { registerUserService } = await import(
