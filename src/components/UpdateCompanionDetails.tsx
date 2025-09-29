@@ -17,6 +17,7 @@ import { toast } from "sonner";
 
 export function UpdateCompanionDetails() {
   const [companiondetails, setCompanionDetails] = useState<any>(null);
+  const [data, setData] = useState<any>([]);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isLoading, setisLoading] = useState(false);
@@ -29,6 +30,10 @@ export function UpdateCompanionDetails() {
         )
         .then((res) => {
           if (res?.data) {
+            setData(res.data?.paymentmethods);
+            
+            
+            
             setCompanionDetails(formatCompanionRequestData(res.data));
           }
         });
@@ -64,6 +69,8 @@ export function UpdateCompanionDetails() {
   if (!companiondetails) {
     return <div>Loading..</div>;
   }
+
+    const hiddenKeys = ["id", "createdAt", "updatedAt"];
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 max-w-9xl w-full mx-auto">
@@ -158,6 +165,30 @@ export function UpdateCompanionDetails() {
               {l.formattedaddress}
             </p>
           ))}
+          <div>
+   <div className="p-4 space-y-4">
+      {data.map((item:any, index:any) => {
+        const filteredEntries = Object.entries(item).filter(
+          ([key, value]) =>
+            !hiddenKeys.includes(key) && // exclude system fields
+            value !== null &&
+            value !== "" &&
+            value !== false
+        );
+
+        return (
+          <div key={index} className="p-3 border rounded">
+            <h3 className="font-bold mb-2">Payment: {index + 1}</h3>
+            {filteredEntries.map(([key, value]) => (
+              <div key={key} className="my-1">
+                <strong>{key}: </strong> {String(value)}
+              </div>
+            ))}
+          </div>
+        );
+      })}
+    </div>
+          </div>
         </Card>
         <div className="flex-1">
           <CompanionForm
