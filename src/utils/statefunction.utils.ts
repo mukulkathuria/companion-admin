@@ -1,4 +1,5 @@
 import { BookingMeetingLocationDto } from "@/data/dto/companion.data.dto";
+import { UserPaymentMethod } from "@/data/dto/companion.data.dto";
 
 interface CompanionDetails {
   id: number;
@@ -24,6 +25,7 @@ interface CompanionDetails {
   createdAt: string;
   updatedAt: string;
   baselocations: BookingMeetingLocationDto[];
+  paymentmethods: UserPaymentMethod[]
   companiondetails: {
     User: {
       id: string;
@@ -45,6 +47,7 @@ interface CompanionDetails {
     smokinghabits: string;
     account: string;
     baselocation: BookingMeetingLocationDto[];
+    paymentmethods: UserPaymentMethod[]
   };
 }
 
@@ -66,7 +69,8 @@ export function formatCompanionRequestData(companionDetails: CompanionDetails) {
     drinkinghabits: companionDetails.companiondetails.drinkinghabits,
     smokinghabits: companionDetails.companiondetails.smokinghabits,
     account: companionDetails.companiondetails.account,
-    baselocations: companionDetails.companiondetails.baselocation
+    baselocations: companionDetails.companiondetails.baselocation,
+    paymentmethods: companionDetails.companiondetails.paymentmethods,
   };
   const newcompaniondetails = {
     id: companionDetails.companiondetails.User.id,
@@ -85,7 +89,9 @@ export function formatCompanionRequestData(companionDetails: CompanionDetails) {
     eatinghabits: companionDetails.eatinghabits,
     drinkinghabits: companionDetails.drinkinghabits,
     smokinghabits: companionDetails.smokinghabits,
-    baselocations: companionDetails.baselocations
+    baselocations: companionDetails.baselocations,
+    paymentmethods: companionDetails.paymentmethods
+
   };
   return { oldcompaniondetails, newcompaniondetails };
 }

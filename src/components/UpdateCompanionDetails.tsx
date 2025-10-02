@@ -15,12 +15,15 @@ import { formatCompanionRequestData } from "@/utils/statefunction.utils";
 import { statusUpdateInputDto } from "@/data/dto/companion.data.dto";
 import { toast } from "sonner";
 
+import Companionprofiledata from "./Companionprofiledata";
+
 export function UpdateCompanionDetails() {
   const [companiondetails, setCompanionDetails] = useState<any>(null);
   const [data, setData] = useState<any>([]);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isLoading, setisLoading] = useState(false);
+
   useEffect(() => {
     const requestId = searchParams.get("id");
     if (requestId) {
@@ -31,10 +34,11 @@ export function UpdateCompanionDetails() {
         .then((res) => {
           if (res?.data) {
             setData(res.data?.paymentmethods);
-            
-            
-            
+
             setCompanionDetails(formatCompanionRequestData(res.data));
+            const wala = formatCompanionRequestData(res?.data);
+            console.log("wala: ", wala);
+            console.log("bina wala: ", res.data);
           }
         });
     }
@@ -70,8 +74,6 @@ export function UpdateCompanionDetails() {
     return <div>Loading..</div>;
   }
 
-    const hiddenKeys = ["id", "createdAt", "updatedAt"];
-
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 max-w-9xl w-full mx-auto">
       <div className="flex justify-between items-start mb-6">
@@ -91,104 +93,10 @@ export function UpdateCompanionDetails() {
           </CardHeader>
           <div></div>
           <CardContent className="space-y-4">
-            <div className="flex items-center">
-              {companiondetails.oldcompaniondetails.images &&
-                companiondetails.oldcompaniondetails.images.map(
-                  (image: string, i: number) => (
-                    <img
-                      key={i * 200}
-                      src={image}
-                      alt="Profile Picture"
-                      className="h-16 w-16"
-                    />
-                  )
-                )}
-              <div className="ml-4">
-                <p className="font-medium text-gray-900">
-                  {companiondetails.oldcompaniondetails.firstname}{" "}
-                  {companiondetails.oldcompaniondetails.lastname}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {companiondetails.oldcompaniondetails.email}
-                </p>
-              </div>
-            </div>
-            <p>
-              <strong className="text-gray-700">Location:</strong>{" "}
-              {companiondetails.oldcompaniondetails.city}
-            </p>
-            <p>
-              <strong className="text-gray-700">Booking Rate:</strong>{" "}
-              {companiondetails.oldcompaniondetails.bookingrate}
-            </p>
-            <p>
-              <strong className="text-gray-700">Description:</strong>{" "}
-              {companiondetails.oldcompaniondetails.description.join(", ")}
-            </p>{" "}
-            {/* Updated */}
-            <p>
-              <strong className="text-gray-700">Age:</strong>{" "}
-              {companiondetails.oldcompaniondetails.age}
-            </p>
-            <p>
-              <strong className="text-gray-700">Gender:</strong>{" "}
-              {companiondetails.oldcompaniondetails.gender}
-            </p>
-            <p>
-              <strong className="text-gray-700">Skin Tone:</strong>{" "}
-              {companiondetails.oldcompaniondetails.skintone}
-            </p>
-            <p>
-              <strong className="text-gray-700">Body Type:</strong>{" "}
-              {companiondetails.oldcompaniondetails.bodytype}
-            </p>
-            <p>
-              <strong className="text-gray-700">Eating Habits:</strong>{" "}
-              {companiondetails.oldcompaniondetails.eatinghabits}
-            </p>
-            <p>
-              <strong className="text-gray-700">Smoking Habit:</strong>{" "}
-              {companiondetails.oldcompaniondetails.smokinghabits}
-            </p>
-            <p>
-              <strong className="text-gray-700">Drinking Habit:</strong>{" "}
-              {companiondetails.oldcompaniondetails.drinkinghabits}
-            </p>
-            <p>
-              <strong className="text-gray-700">Height:</strong>{" "}
-              {companiondetails.oldcompaniondetails.height}
-            </p>
+            <Companionprofiledata
+              initialData={companiondetails.oldcompaniondetails}
+            />
           </CardContent>
-          {companiondetails.oldcompaniondetails.baselocations?.map((l: any,i: number) => (
-            <p key={i*300}>
-              <strong>Base Location {i+1}</strong>
-              {l.formattedaddress}
-            </p>
-          ))}
-          <div>
-   <div className="p-4 space-y-4">
-      {data.map((item:any, index:any) => {
-        const filteredEntries = Object.entries(item).filter(
-          ([key, value]) =>
-            !hiddenKeys.includes(key) && // exclude system fields
-            value !== null &&
-            value !== "" &&
-            value !== false
-        );
-
-        return (
-          <div key={index} className="p-3 border rounded">
-            <h3 className="font-bold mb-2">Payment: {index + 1}</h3>
-            {filteredEntries.map(([key, value]) => (
-              <div key={key} className="my-1">
-                <strong>{key}: </strong> {String(value)}
-              </div>
-            ))}
-          </div>
-        );
-      })}
-    </div>
-          </div>
         </Card>
         <div className="flex-1">
           <CompanionForm
