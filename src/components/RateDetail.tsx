@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FC, useEffect, useState, useMemo } from "react";
+import { FC, useEffect, useState, useMemo, act } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { BarChart, Bar, XAxis, YAxis } from "recharts";
@@ -24,7 +24,6 @@ const RateDetail: FC = () => {
   const navigate = useNavigate();
   const [companiondata, setCompanionData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [earningstate, setEarningState] = useState<string>("");
   const [filterEarndata, setFilterEarndata] = useState<EarningItem[]>([]);
   const [totals, setTotals] = useState({ net: 0, tax: 0 });
   const [selectedEarnings, setSelectedEarnings] = useState<
@@ -33,6 +32,12 @@ const RateDetail: FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<"PENDING" | "COMPLETED">(
+    "PENDING"
+  ); // typed state
+  const [activePending, setActivePending] = useState<"7DAYS" | "30DAYS">(
+    "7DAYS"
+  );
 
   // Compute total selected
   const totalSelected = useMemo(
@@ -54,7 +59,7 @@ const RateDetail: FC = () => {
         if (data) {
           console.log(
             "Fetched companion data:",
-            data.last7daysearnings[0]?.txnId
+            data
           );
           const { Convert24HoursPieChart, Convert7daysBarchart } = await import(
             "@/utils/booking.utils"
@@ -73,12 +78,13 @@ const RateDetail: FC = () => {
           setCompanionData(values);
 
           let earnings: EarningItem[] = [];
-          if (earningstate === "pending7days")
+          if (activeTab === "PENDING" && activePending === "7DAYS") {
             earnings = data.last7daysearnings || [];
-          else if (earningstate === "pending30days")
+          } else if (activeTab === "PENDING" && activePending === "30DAYS") {
             earnings = data.last30daysearnings || [];
-          else if (earningstate === "completed")
+          } else if (activeTab === "COMPLETED") {
             earnings = data.completedearnings || [];
+          }
 
           setFilterEarndata(earnings);
 
@@ -99,7 +105,7 @@ const RateDetail: FC = () => {
     };
 
     fetchData();
-  }, [searchParams, earningstate]);
+  }, [searchParams, activeTab, activePending]);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanionData((prev: any) => ({
@@ -232,21 +238,67 @@ const RateDetail: FC = () => {
 
         <div>
           <div className="flex justify-between">
-            <h1>Earning list</h1>
-            <select
-              className="border p-1 rounded"
-              value={earningstate}
-              onChange={(e) => setEarningState(e.target.value)}
-            >
-              <option value="">Select State</option>
-              <option value="pending7days">Pending earnings of 7 days</option>
-              <option value="pending30days">Pending earnings of 30 days</option>
-              <option value="completed">Completed earnings</option>
-            </select>
+            <h1 className="font-bold">Earning list</h1>
           </div>
 
           <div>
-            <div className="flex justify-between px-5 mt-4 py-3 rounded-lg bg-slate-400">
+            <div>
+              {/* Parent Tabs */}
+              <div className="flex gap-8 mt-4 font-semibold">
+                <div
+                  onClick={() => setActiveTab("PENDING")}
+                  className={`cursor-pointer pb-1 ${
+                    activeTab === "PENDING"
+                      ? "border-b-2 border-blue-500 text-blue-500"
+                      : "text-gray-500"
+                  }`}
+                >
+                  PENDING
+                </div>
+
+                <div
+                  onClick={() => setActiveTab("COMPLETED")}
+                  className={`cursor-pointer pb-1 ${
+                    activeTab === "COMPLETED"
+                      ? "border-b-2 border-green-500 text-green-500"
+                      : "text-gray-500"
+                  }`}
+                >
+                  COMPLETED
+                </div>
+              </div>
+
+              {/* Child Tabs (only when PENDING is active) */}
+              {activeTab === "PENDING" && (
+                <div className="flex gap-6 mt-3 ml-2 text-sm font-medium">
+                  <div
+                    onClick={() => setActivePending("7DAYS")}
+                    className={`cursor-pointer pb-1 ${
+                      activePending === "7DAYS"
+                        ? "border-b-2 border-purple-500 text-purple-500"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    PENDING 7 DAYS
+                  </div>
+
+                  <div
+                    onClick={() => setActivePending("30DAYS")}
+                    className={`cursor-pointer pb-1 ${
+                      activePending === "30DAYS"
+                        ? "border-b-2 border-purple-500 text-purple-500"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    PENDING 30 DAYS
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between px-5 mt-4 py-3 rounded-lg bg-slate-200 font-bold">
               <h1>Booking date and time</h1>
               <h1>Earned Amount</h1>
             </div>
@@ -278,11 +330,13 @@ const RateDetail: FC = () => {
                         <div
                           key={txnId}
                           className={`flex justify-between px-5 mt-4 py-3 rounded-lg cursor-pointer ${
-                            isSelected ? "bg-green-200" : "bg-slate-200"
+                            isSelected ? "bg-slate-300" : "bg-slate-200"
                           }`}
-                          onClick={handleClick}
                         >
-                          <div>
+                          <div className="flex items-center gap-3">
+                            {activeTab === "PENDING" && (
+                              <input type="checkbox" onClick={handleClick} />
+                            )}
                             <h1>
                               {formatBookingTimingswithEndTime(
                                 item.Booking.bookingstart,
@@ -310,13 +364,14 @@ const RateDetail: FC = () => {
                         </h1>
                       </div>
                     )}
-
-                    <button
-                      className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                      onClick={() => setIsModalOpen(true)}
-                    >
-                      Pay
-                    </button>
+                    {activeTab === "PENDING" && filterEarndata.length > 0 && (
+                      <button
+                        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        Pay
+                      </button>
+                    )}
                   </>
                 ) : (
                   <p className="text-center mt-4 text-gray-500">
@@ -420,8 +475,8 @@ export const RefundModal = ({
   companionId,
 }: RefundModalProps) => {
   const [paymentDetails, setPaymentDetails] = useState({
-    firstName: "admin",
-    lastName: "Side",
+    firstname: "admin",
+    lastname: "Side",
     email: "",
     refundedAmount: "2360",
     paymentMode: "",
@@ -577,7 +632,7 @@ export const RefundModal = ({
       metadata: refundsDetails,
       txId: refundsDetails.txnid,
       netamount: Number(refundsDetails.net_amount_debit),
-      ids:ids.join(","),
+      ids: ids.join(","),
       companionId,
     });
 

@@ -15,6 +15,27 @@ export interface BookingMeetingLocationDto {
   googleextra: object;
 }
 
+export interface UserPaymentMethod {
+  id: string;
+  userid: string;
+  nickname: string;
+  type: string;
+  isVerified: boolean;
+  accountHolderName: string | null;
+  accountNumber: string | null;
+  ifscCode: string | null;
+  bankName: string | null;
+  branchName: string | null;
+  accountType: string | null;
+  upiId: string | null;
+  upiProvider: string | null;
+  walletProvider: string | null;
+  walletIdentifier: string | null;
+  recipientName: string | null;
+  isDefault: boolean;
+  isActive: boolean;
+}
+
 export interface CompanionFormDto {
   id? : number;
   images: ImageDto[] | string[] | (ImageDto | string)[] | null,
