@@ -51,6 +51,9 @@ const Companionprofiledata = (initialData: any = {}) => {
             Height: <span className="text-gray-700">{data?.height}</span>
           </h1>
           <h1 className="font-semibold">
+            booking rate per Hour: <span className="text-gray-700">{data?.bookingrate}</span>
+          </h1>
+          <h1 className="font-semibold">
             Smoking Habit:{" "}
             <span className="text-gray-700">{data?.smokinghabits}</span>
           </h1>
@@ -63,7 +66,7 @@ const Companionprofiledata = (initialData: any = {}) => {
             <span className="text-gray-700">{data?.drinkinghabits}</span>
           </h1>
           <h1 className="font-semibold">
-            Skin Tone: <span className="text-gray-700">{data?.skintone}</span>
+            Skin Tone: <span className="text-gray-700">{data?.Skintone}</span>
           </h1>
           <h1 className="font-semibold">
             Body Type: <span className="text-gray-700">{data?.bodytype}</span>

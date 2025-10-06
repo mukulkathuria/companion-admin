@@ -36,9 +36,8 @@ export function UpdateCompanionDetails() {
             setData(res.data?.paymentmethods);
 
             setCompanionDetails(formatCompanionRequestData(res.data));
-            const wala = formatCompanionRequestData(res?.data);
-            console.log("wala: ", wala);
-            console.log("bina wala: ", res.data);
+          
+            
           }
         });
     }

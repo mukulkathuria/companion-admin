@@ -50,6 +50,7 @@ export interface CompanionFormDto {
   smokinghabits: string;
   drinkinghabits: string;
   baselocations: BookingMeetingLocationDto[];
+  paymentmethods: UserPaymentMethod[]
   email: string;
   password?: string;
   description: string[];

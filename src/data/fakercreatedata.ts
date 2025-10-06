@@ -177,3 +177,61 @@ export const CardTypeData = [
   { value: "RUPAY", label: "Rupay" },
   { value: "RUPAYCC", label: "Rupay Credit Card" },
 ];
+
+export enum PaymentMethodType {
+  BANK_ACCOUNT = "BANK_ACCOUNT",
+  UPI = "UPI",
+  WALLET = "WALLET",
+}
+
+export enum AccountType {
+  SAVINGS = "SAVINGS",
+  CURRENT = "CURRENT",
+}
+
+export interface BankAccountDto {
+  recipientName: string;
+  accountHolderName: string;
+  accountNumber: string;
+  ifscCode: string;
+  bankName: string;
+  branchName: string;
+  accountType: AccountType;
+  nickname: string;
+}
+
+export interface UpiDto {
+  recipientName: string;
+  upiId: string;
+  nickname: string;
+  upiProvider: string;
+}
+
+export interface WalletDto {
+  recipientName: string;
+  walletProvider: string;
+  walletIdentifier: string;
+  nickname: string;
+}
+
+export const walletProviders = [
+  "PAYTM",
+  "PHONEPE",
+
+  "AMAZONPAY",
+  "MOBIKWIK",
+  "AIRTELMONEY",
+  "JIOMONEY",
+  "OTHER",
+];
+
+export const upiProviders = [
+  "Paytm",
+  "PhonePe",
+  "Google Pay",
+  "Amazon Pay",
+  "BHIM",
+  "MobiKwik",
+  "Airtel Money",
+  "Other",
+];

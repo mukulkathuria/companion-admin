@@ -30,44 +30,16 @@ import {
   getBodyTypes,
   skinToneData,
   smokingHabitsData,
+  PaymentMethodType,
+  AccountType,
+  BankAccountDto,
+  UpiDto,
+  WalletDto,
+  walletProviders,
+  upiProviders
 } from "@/data/fakercreatedata";
 
 // Updated Payment method types and interfaces
-export enum PaymentMethodType {
-  BANK_ACCOUNT = "BANK_ACCOUNT",
-  UPI = "UPI",
-  WALLET = "WALLET",
-}
-
-export enum AccountType {
-  SAVINGS = "SAVINGS",
-  CURRENT = "CURRENT",
-}
-
-export interface BankAccountDto {
-  recipientName: string;
-  accountHolderName: string;
-  accountNumber: string;
-  ifscCode: string;
-  bankName: string;
-  branchName: string;
-  accountType: AccountType;
-  nickname: string;
-}
-
-export interface UpiDto {
-  recipientName: string;
-  upiId: string;
-  nickname: string;
-  upiProvider: string;
-}
-
-export interface WalletDto {
-  recipientName: string;
-  walletProvider: string;
-  walletIdentifier: string;
-  nickname: string;
-}
 
 export interface PaymentMethodDto {
   type: PaymentMethodType;
@@ -111,27 +83,6 @@ const initialForm: ExtendedCompanionFormDto = {
   paymentMethods: [],
 };
 
-const walletProviders = [
-  "PAYTM",
-  "PHONEPE",
-
-  "AMAZONPAY",
-  "MOBIKWIK",
-  "AIRTELMONEY",
-  "JIOMONEY",
-  "OTHER",
-];
-
-const upiProviders = [
-  "Paytm",
-  "PhonePe",
-  "Google Pay",
-  "Amazon Pay",
-  "BHIM",
-  "MobiKwik",
-  "Airtel Money",
-  "Other",
-];
 
 export function CreateCompanion({
   initialForm: initialValues,

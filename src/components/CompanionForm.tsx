@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Label } from "./ui/label";
 import ImageUploader from "./ui/ImageUploader";
@@ -16,6 +16,8 @@ import {
   getBodyTypes,
   skinToneData,
   smokingHabitsData,
+  walletProviders,
+  upiProviders,
 } from "@/data/fakercreatedata";
 import { toast } from "sonner";
 import LeafLetMaps from "./ui/LeafletMaps";
@@ -39,6 +41,7 @@ const initialForm: CompanionFormDto = {
   bookingrate: 50,
   height: 180,
   baselocations: [],
+  paymentmethods: [],
 };
 
 interface CompanionFormProps {
@@ -55,87 +58,139 @@ export function CompanionForm({
   );
   const [error, setError] = useState<ErrorFormDto>({});
   const [isLoading, setisLoading] = useState(false);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
-    const { validateRegisteration } = await import(
-      "../utils/validations/companionform.validate"
-    );
 
-    const errors = validateRegisteration(form);
-    if (Object.keys(errors).length) {
-      setError(errors);
-      return;
+useEffect(() => {
+    if (initialValues && initialValues.paymentmethods) {
+      console.log("initialValues.paymentmethods: ", initialValues.paymentmethods);
+      
+      setPaymentForms(
+        initialValues.paymentmethods.map((pm: any) => ({
+          type: pm.type ?? "",
+          recipientName: pm.recipientName ?? "",
+          nickname: pm.nickname ?? "",
+          accountHolderName: pm.accountHolderName ?? "",
+          accountNumber: pm.accountNumber ?? "",
+          ifscCode: pm.ifscCode ?? "",
+          bankName: pm.bankName ?? "",
+          branchName: pm.branchName ?? "",
+          accountType: pm.accountType ?? "",
+          upiId: pm.upiId ?? "",
+          upiProvider: pm.upiProvider ?? "",
+          walletProvider: pm.walletProvider ?? "",
+          walletIdentifier: pm.walletIdentifier ?? "",
+          isDefault: pm.isDefault ?? false,
+        }))
+      );
     }
+}, [initialValues]);
 
-    if (
-      Object.keys(errors).length ||
-      !form.images?.length ||
-      (form.images && form.images.length < 2)
-    ) {
-      setError(errors);
-      if (!form.images?.length || (form.images && form.images.length < 2)) {
-        toast.error("Minimum 2 image is required");
-      } else {
-        toast.error("Please fill all required before proceeding");
-      }
-      return;
-    }
-    const id = form.id;
-    delete form.id;
-    const userData = new FormData();
-    const allkeys = Object.keys(form);
-    for (let i = 0; i < allkeys.length; i += 1) {
-      if (
-        form[allkeys[i] as keyof CompanionFormDto] &&
-        allkeys[i] !== "images" &&
-        allkeys[i] !== "description" &&
-        allkeys[i] !== "baselocations"
-      ) {
-        userData.append(
-          allkeys[i],
-          String(form[allkeys[i] as keyof CompanionFormDto])
+ 
+
+   const [paymentForms, setPaymentForms] = useState<PaymentForm[]>([
+    {
+      type: "",
+      recipientName: "",
+      nickname: "",
+      accountHolderName: "",
+      accountNumber: "",
+      ifscCode: "",
+      bankName: "",
+      branchName: "",
+      accountType: "",
+      upiId: "",
+      upiProvider: "",
+      walletProvider: "",
+      walletIdentifier: "",
+      isDefault: false,
+    },
+  ]);
+  const [paymentErrors, setPaymentErrors] = useState<PaymentErrors>({});
+
+  const addPaymentMethod = () => {
+    setPaymentForms((prev) => [
+      ...prev,
+      {
+        type: "",
+        recipientName: "",
+        nickname: "",
+        accountHolderName: "",
+        accountNumber: "",
+        ifscCode: "",
+        bankName: "",
+        branchName: "",
+        accountType: "",
+        upiId: "",
+        upiProvider: "",
+        walletProvider: "",
+        walletIdentifier: "",
+        isDefault: false,
+      },
+    ]);
+  };
+
+  const removePaymentMethod = (index: number) => {
+    setPaymentForms((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handlePaymentChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    setPaymentForms((prev) => {
+      const updated = [...prev];
+
+      if (name === "type") {
+        const currentForm = updated[index];
+
+        const typeFields: Record<string, string[]> = {
+          Bankmethod: [
+            "accountHolderName",
+            "accountNumber",
+            "ifscCode",
+            "bankName",
+            "branchName",
+            "accountType",
+          ],
+          UPI: ["upiId", "upiProvider"],
+          WALLET: ["walletProvider", "walletIdentifier"],
+        };
+
+        const currentFields = typeFields[currentForm.type] || [];
+        const hasFilledFields = currentFields.some(
+          (field) =>
+            (currentForm[field as keyof PaymentForm] as string)?.trim() !== ""
         );
+
+        if (hasFilledFields && currentForm.type && currentForm.type !== value) {
+          setPaymentErrors((prevErr) => ({
+            ...prevErr,
+            [index]: `Please clear all ${currentForm.type} fields before switching to ${value}`,
+          }));
+          return prev;
+        } else {
+          setPaymentErrors((prevErr) => {
+            const newErr = { ...prevErr };
+            delete newErr[index];
+            return newErr;
+          });
+        }
       }
-    }
-    userData.append("description", JSON.stringify(form.description));
-    userData.append("baselocations", JSON.stringify(form.baselocations));
-    const previousImages: string[] = [];
-    form.images.forEach((l) => {
-      if (typeof l === "object") {
-        userData.append("images", l.file);
-      } else {
-        previousImages.push(l);
-      }
+
+      updated[index] = { ...updated[index], [name]: value };
+      return updated;
     });
-    if (previousImages.length) {
-      userData.append("previousImages", JSON.stringify(previousImages));
-    }
-    // If all validations pass, proceed with form submission
-    console.log("Form submitted:", form);
-    for (const pair of userData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
-    try {
-      setisLoading(() => true);
-      const { updateCompanionProfileService } = await import(
-        "../services/companion/updatecompanion.service"
-      );
-      const { error } = await updateCompanionProfileService(
-        userData,
-        String(id)
-      );
-      if (error) {
-        toast.error(error);
-      } else {
-        toast.success("Companion Updated Successfully!!!");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Some Error Occured Please Try again after sometime!!");
-    } finally {
-      setisLoading(() => false);
-    }
+  };
+
+  const handlePrimaryChange = (index: number) => {
+    setPaymentForms((prev) =>
+      prev.map((form, i) => ({
+        ...form,
+        isDefault: i === index ? true : false,
+      }))
+    );
   };
 
   const handleChange = (
@@ -179,6 +234,92 @@ export function CompanionForm({
   const changedFields = initialValues
     ? getChangedFields(initialForm, form)
     : {};
+
+     const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const { validateRegisteration } = await import(
+      "../utils/validations/companionform.validate"
+    );
+
+    const errors = validateRegisteration(form);
+    if (Object.keys(errors).length) {
+      setError(errors);
+      return;
+    }
+
+    if (
+      Object.keys(errors).length ||
+      !form.images?.length ||
+      (form.images && form.images.length < 2)
+    ) {
+      setError(errors);
+      if (!form.images?.length || (form.images && form.images.length < 2)) {
+        toast.error("Minimum 2 image is required");
+      } else {
+        toast.error("Please fill all required before proceeding");
+      }
+      return;
+    }
+    const id = form.id;
+    delete form.id;
+    const userData = new FormData();
+    const allkeys = Object.keys(form);
+    for (let i = 0; i < allkeys.length; i += 1) {
+      if (
+        form[allkeys[i] as keyof CompanionFormDto] &&
+        allkeys[i] !== "images" &&
+        allkeys[i] !== "description" &&
+        allkeys[i] !== "baselocations" &&
+        allkeys[i] !== "paymentmethods"
+      ) {
+        userData.append(
+          allkeys[i],
+          String(form[allkeys[i] as keyof CompanionFormDto])
+        );
+      }
+    }
+    userData.append("description", JSON.stringify(form.description));
+    userData.append("baselocations", JSON.stringify(form.baselocations));
+    console.log("paymentForms value:", paymentForms);
+    userData.append("paymentmethods", JSON.stringify(paymentForms));
+    const previousImages: string[] = [];
+    form.images.forEach((l) => {
+      if (typeof l === "object") {
+        userData.append("images", l.file);
+      } else {
+        previousImages.push(l);
+      }
+    });
+    if (previousImages.length) {
+      userData.append("previousImages", JSON.stringify(previousImages));
+    }
+    // If all validations pass, proceed with form submission
+    console.log("Form submitted:", form);
+    for (const pair of userData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+    try {
+      setisLoading(() => true);
+      const { updateCompanionProfileService } = await import(
+        "../services/companion/updatecompanion.service"
+      );
+      const { error } = await updateCompanionProfileService(
+        userData,
+        String(id)
+      );
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Companion Updated Successfully!!!");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Some Error Occured Please Try again after sometime!!");
+    } finally {
+      setisLoading(() => false);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -512,6 +653,207 @@ export function CompanionForm({
                 )}
               </div>
             </div>
+            <div>
+              <h1>payment info</h1>
+            <div>
+        {paymentForms.map((form, index) => (
+          <div
+            key={index}
+            className="border p-4 my-4 rounded-lg shadow-sm bg-gray-50 w-96"
+          >
+            <div className="flex justify-between items-center">
+              <h3 className="font-semibold text-lg mb-2">
+                Payment Method {index + 1}
+              </h3>
+
+              {paymentForms.length > 1 && (
+                <button
+                  onClick={() => removePaymentMethod(index)}
+                  className="text-red-500 text-sm hover:underline"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-2 my-2">
+              <input
+                type="radio"
+                name="primaryPayment"
+                checked={form.isDefault === true}
+                onChange={() => handlePrimaryChange(index)}
+              />
+              <label className="text-sm">Set as Primary</label>
+            </div>
+
+            <div className="flex gap-5 flex-wrap">
+              <div className="">
+                <label className="block text-sm font-medium text-gray-700">
+                  Select Payment Method Type
+                </label>
+                <select
+                  name="type"
+                  value={form.type}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  className="inputfield-glg-be mt-1 block w-full mb-3 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                >
+                  <option value="">Select Payment Method</option>
+                  <option value="Bankmethod">Bank Method</option>
+                  <option value="UPI">UPI</option>
+                  <option value="WALLET">Wallet</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Recipient Name
+                </label>
+                <input
+                  type="text"
+                  name="recipientName"
+                  value={form.recipientName}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                  placeholder="Enter recipient name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Nickname
+                </label>
+                <input
+                  type="text"
+                  name="nickname"
+                  value={form.nickname}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                  placeholder="Enter nickname"
+                />
+              </div>
+            </div>
+            {paymentErrors[index] && (
+              <span className="text-xs text-red-500">
+                {paymentErrors[index]}
+              </span>
+            )}
+
+            {form.type === "Bankmethod" && (
+              <div className="flex gap-5 flex-wrap my-3">
+                <input
+                  type="text"
+                  name="accountHolderName"
+                  value={form.accountHolderName}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  placeholder="Account Holder Name"
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+                <input
+                  type="text"
+                  name="accountNumber"
+                  value={form.accountNumber}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  placeholder="Account Number"
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+                <input
+                  type="text"
+                  name="ifscCode"
+                  value={form.ifscCode}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  placeholder="IFSC Code"
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+                <input
+                  type="text"
+                  name="bankName"
+                  value={form.bankName}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  placeholder="Bank Name"
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+                <input
+                  type="text"
+                  name="branchName"
+                  value={form.branchName}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  placeholder="Branch Name"
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+                <select
+                  name="accountType"
+                  value={form.accountType}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                >
+                  <option value="">Select Account Type</option>
+                  <option value="Saving">Savings</option>
+                  <option value="Current">Current</option>
+                </select>
+              </div>
+            )}
+
+            {form.type === "UPI" && (
+              <div className="flex gap-5 flex-wrap my-3">
+                <input
+                  type="text"
+                  name="upiId"
+                  value={form.upiId || ""}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  placeholder="UPI ID"
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+                <select
+                  name="upiProvider"
+                  value={form.upiProvider}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                >
+                  <option value="">Select UPI Provider</option>
+                  {upiProviders.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {form.type === "WALLET" && (
+              <div className="flex gap-5 flex-wrap my-3">
+                <select
+                  name="walletProvider"
+                  value={form.walletProvider}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                >
+                  <option value="">Select Wallet Provider</option>
+                  {walletProviders.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  name="walletIdentifier"
+                  value={form.walletIdentifier}
+                  onChange={(e) => handlePaymentChange(index, e)}
+                  placeholder="Wallet ID / Phone Number"
+                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+              </div>
+            )}
+          </div>
+        ))}
+
+        <button
+          onClick={addPaymentMethod}
+          className="mt-3 px-4 py-2 bg-red-400 text-white rounded-lg"
+          type="button"
+        >
+          + Add More Payment Method
+        </button>
+      </div>
+            </div>
           </div>
         </div>
 
@@ -536,3 +878,26 @@ export function CompanionForm({
     </div>
   );
 }
+
+interface PaymentForm {
+  type: string;
+  recipientName: string;
+  nickname: string;
+  accountHolderName: string;
+  accountNumber: string;
+  ifscCode: string;
+  bankName: string;
+  branchName: string;
+  accountType: string;
+  upiId: string;
+  upiProvider: string;
+  walletProvider: string;
+  walletIdentifier: string;
+  isDefault: boolean;
+}
+
+interface PaymentErrors {
+  [key: number]: string;
+}
+
+
