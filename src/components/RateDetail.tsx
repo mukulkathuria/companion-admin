@@ -38,6 +38,7 @@ const RateDetail: FC = () => {
   const [activePending, setActivePending] = useState<"7DAYS" | "30DAYS">(
     "7DAYS"
   );
+  const [Paymentdata, setPaymentdata] = useState<any>(null);
 
   // Compute total selected
   const totalSelected = useMemo(
@@ -57,10 +58,9 @@ const RateDetail: FC = () => {
         const { data } = await getCompanionRateDetailsService(companionId);
 
         if (data) {
-          console.log(
-            "Fetched companion data:",
-            data
-          );
+          setPaymentdata(
+            data.user_payment_methods
+          )
           const { Convert24HoursPieChart, Convert7daysBarchart } = await import(
             "@/utils/booking.utils"
           );
@@ -158,6 +158,8 @@ const RateDetail: FC = () => {
   const companionId = companiondata?.id || "";
 
   if (!companiondata) return <div>Loading...</div>;
+    const hiddenKeys = ["id", "createdAt", "updatedAt"];
+
 
   return (
     <>
@@ -233,6 +235,43 @@ const RateDetail: FC = () => {
                 {isLoading ? "Updating..." : "Update Price"}
               </button>
             </form>
+          </div>
+        </div>
+
+        <div className="my-6">
+          
+            <div className="mt-6">
+            <h2 className="text-lg font-bold mb-3">Payment Information</h2>
+            <div className="grid gap-4">
+              {Array.isArray(Paymentdata) && Paymentdata.map((item: any, index: number) => {
+                const filteredEntries = Object.entries(item).filter(
+                  ([key, value]) =>
+                    !hiddenKeys.includes(key) &&
+                    value !== null &&
+                    value !== "" &&
+                    value !== false
+                );
+
+                return (
+                  <div
+                    key={index}
+                    className="p-4 border rounded-md bg-gray-50 shadow-sm"
+                  >
+                    <h3 className="font-semibold mb-2">Payment {index + 1}</h3>
+                    {filteredEntries.map(([key, value]) => (
+                      <div key={key} className="text-sm text-gray-700">
+                        <strong className="capitalize">{key}: </strong>
+                        {String(value)}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+
           </div>
         </div>
 

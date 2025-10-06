@@ -28,6 +28,7 @@ interface CompanionDetails {
   paymentmethods: UserPaymentMethod[]
   companiondetails: {
     User: {
+      userpaymentmethods: any;
       id: string;
       firstname: string;
       lastname: string;
@@ -36,6 +37,7 @@ interface CompanionDetails {
       age: number;
       Images: string[];
       gender: string;
+      paymentmethods: UserPaymentMethod[]
     };
     bookingrate: number;
     description: string[];
@@ -47,7 +49,7 @@ interface CompanionDetails {
     smokinghabits: string;
     account: string;
     baselocation: BookingMeetingLocationDto[];
-    paymentmethods: UserPaymentMethod[]
+    
   };
 }
 
@@ -70,7 +72,7 @@ export function formatCompanionRequestData(companionDetails: CompanionDetails) {
     smokinghabits: companionDetails.companiondetails.smokinghabits,
     account: companionDetails.companiondetails.account,
     baselocations: companionDetails.companiondetails.baselocation,
-    paymentmethods: companionDetails.companiondetails.paymentmethods,
+    paymentmethods: companionDetails.companiondetails.User.userpaymentmethods,
   };
   const newcompaniondetails = {
     id: companionDetails.companiondetails.User.id,
