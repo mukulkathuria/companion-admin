@@ -11,7 +11,7 @@ const CompanionCancelDetails = () => {
   const [bookingDetails, setBookingDetails] =
     useState<bookingDetailsDto | null>(null);
   const navigate = useNavigate();
-    const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
 
   useEffect(() => {
     const bookingId = searchParams.get("bookingId");
@@ -22,6 +22,8 @@ const CompanionCancelDetails = () => {
         )
         .then(({ data }) => {
           if (data) {
+            console.log("companion cancel data in page:", data);
+
             const values = {
               user: data.User.filter((l: any) => !l.isCompanion)[0],
               companion: data.User.filter((l: any) => l.isCompanion)[0],
@@ -30,7 +32,7 @@ const CompanionCancelDetails = () => {
               lat: data.Meetinglocation[0].lat,
               lng: data.Meetinglocation[0].lng,
               bookingtime: formatBookingTimingsforUi(data.bookingstart),
-              cancelledReason: data.cancelledReason,
+              cancelledReason: data.bookingpurpose,
               cancellationDetails: data.cancellationDetails,
             };
             setBookingDetails(values);
@@ -76,7 +78,7 @@ const CompanionCancelDetails = () => {
         <img
           src={
             bookingDetails.companion.Images &&
-             bookingDetails.companion.Images[0]
+            bookingDetails.companion.Images[0]
           }
           alt="profile"
         />
@@ -128,14 +130,14 @@ const CompanionCancelDetails = () => {
               onClick={() => updateCancellationStatus("Approve")}
               disabled={isLoading}
             >
-              {isLoading ? 'Please wait...' : 'Approve'}
+              {isLoading ? "Please wait..." : "Approve"}
             </button>
             <button
               className="bg-red-500"
               onClick={() => updateCancellationStatus("Reject")}
               disabled={isLoading}
             >
-              {isLoading ? 'Please wait...' : 'reject'}
+              {isLoading ? "Please wait..." : "reject"}
             </button>
           </div>
         </>

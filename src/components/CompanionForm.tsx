@@ -59,11 +59,10 @@ export function CompanionForm({
   const [error, setError] = useState<ErrorFormDto>({});
   const [isLoading, setisLoading] = useState(false);
 
-
-useEffect(() => {
+  useEffect(() => {
     if (initialValues && initialValues.paymentmethods) {
-      console.log("initialValues.paymentmethods: ", initialValues.paymentmethods);
-      
+      console.log("initialValues: ", initialValues);
+
       setPaymentForms(
         initialValues.paymentmethods.map((pm: any) => ({
           type: pm.type ?? "",
@@ -83,11 +82,11 @@ useEffect(() => {
         }))
       );
     }
-}, [initialValues]);
+    console.log('preloaded form data id:', form.id);
+    
+  }, [initialValues]);
 
- 
-
-   const [paymentForms, setPaymentForms] = useState<PaymentForm[]>([
+  const [paymentForms, setPaymentForms] = useState<PaymentForm[]>([
     {
       type: "",
       recipientName: "",
@@ -235,7 +234,7 @@ useEffect(() => {
     ? getChangedFields(initialForm, form)
     : {};
 
-     const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const { validateRegisteration } = await import(
@@ -262,7 +261,7 @@ useEffect(() => {
       return;
     }
     const id = form.id;
-    delete form.id;
+   // delete form.id;
     const userData = new FormData();
     const allkeys = Object.keys(form);
     for (let i = 0; i < allkeys.length; i += 1) {
@@ -281,7 +280,7 @@ useEffect(() => {
     }
     userData.append("description", JSON.stringify(form.description));
     userData.append("baselocations", JSON.stringify(form.baselocations));
-    console.log("paymentForms value:", paymentForms);
+ //   console.log("paymentForms value:", paymentForms);
     userData.append("paymentmethods", JSON.stringify(paymentForms));
     const previousImages: string[] = [];
     form.images.forEach((l) => {
@@ -295,10 +294,14 @@ useEffect(() => {
       userData.append("previousImages", JSON.stringify(previousImages));
     }
     // If all validations pass, proceed with form submission
-    console.log("Form submitted:", form);
-    for (const pair of userData.entries()) {
-      console.log(pair[0], pair[1]);
+    // console.log("Form submitted:", userData);
+    const obj: Record<string, any> = {};
+    for (let [key, value] of userData.entries()) {
+      obj[key] = value;
     }
+   // console.log("update companion form submitted", obj);
+   // console.log('hey this is id',id);
+    
     try {
       setisLoading(() => true);
       const { updateCompanionProfileService } = await import(
@@ -655,204 +658,204 @@ useEffect(() => {
             </div>
             <div>
               <h1>payment info</h1>
-            <div>
-        {paymentForms.map((form, index) => (
-          <div
-            key={index}
-            className="border p-4 my-4 rounded-lg shadow-sm bg-gray-50 w-96"
-          >
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-lg mb-2">
-                Payment Method {index + 1}
-              </h3>
+              <div>
+                {paymentForms.map((form, index) => (
+                  <div
+                    key={index}
+                    className="border p-4 my-4 rounded-lg shadow-sm bg-gray-50 w-96"
+                  >
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-semibold text-lg mb-2">
+                        Payment Method {index + 1}
+                      </h3>
 
-              {paymentForms.length > 1 && (
+                      {paymentForms.length > 1 && (
+                        <button
+                          onClick={() => removePaymentMethod(index)}
+                          className="text-red-500 text-sm hover:underline"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 my-2">
+                      <input
+                        type="radio"
+                        name="primaryPayment"
+                        checked={form.isDefault === true}
+                        onChange={() => handlePrimaryChange(index)}
+                      />
+                      <label className="text-sm">Set as Primary</label>
+                    </div>
+
+                    <div className="flex gap-5 flex-wrap">
+                      <div className="">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Select Payment Method Type
+                        </label>
+                        <select
+                          name="type"
+                          value={form.type}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="inputfield-glg-be mt-1 block w-full mb-3 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                        >
+                          <option value="">Select Payment Method</option>
+                          <option value="Bankmethod">Bank Method</option>
+                          <option value="UPI">UPI</option>
+                          <option value="WALLET">Wallet</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Recipient Name
+                        </label>
+                        <input
+                          type="text"
+                          name="recipientName"
+                          value={form.recipientName}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                          placeholder="Enter recipient name"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Nickname
+                        </label>
+                        <input
+                          type="text"
+                          name="nickname"
+                          value={form.nickname}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                          placeholder="Enter nickname"
+                        />
+                      </div>
+                    </div>
+                    {paymentErrors[index] && (
+                      <span className="text-xs text-red-500">
+                        {paymentErrors[index]}
+                      </span>
+                    )}
+
+                    {form.type === "Bankmethod" && (
+                      <div className="flex gap-5 flex-wrap my-3">
+                        <input
+                          type="text"
+                          name="accountHolderName"
+                          value={form.accountHolderName}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          placeholder="Account Holder Name"
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        />
+                        <input
+                          type="text"
+                          name="accountNumber"
+                          value={form.accountNumber}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          placeholder="Account Number"
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        />
+                        <input
+                          type="text"
+                          name="ifscCode"
+                          value={form.ifscCode}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          placeholder="IFSC Code"
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        />
+                        <input
+                          type="text"
+                          name="bankName"
+                          value={form.bankName}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          placeholder="Bank Name"
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        />
+                        <input
+                          type="text"
+                          name="branchName"
+                          value={form.branchName}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          placeholder="Branch Name"
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        />
+                        <select
+                          name="accountType"
+                          value={form.accountType}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        >
+                          <option value="">Select Account Type</option>
+                          <option value="Saving">Savings</option>
+                          <option value="Current">Current</option>
+                        </select>
+                      </div>
+                    )}
+
+                    {form.type === "UPI" && (
+                      <div className="flex gap-5 flex-wrap my-3">
+                        <input
+                          type="text"
+                          name="upiId"
+                          value={form.upiId || ""}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          placeholder="UPI ID"
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        />
+                        <select
+                          name="upiProvider"
+                          value={form.upiProvider}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        >
+                          <option value="">Select UPI Provider</option>
+                          {upiProviders.map((item) => (
+                            <option key={item} value={item}>
+                              {item}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {form.type === "WALLET" && (
+                      <div className="flex gap-5 flex-wrap my-3">
+                        <select
+                          name="walletProvider"
+                          value={form.walletProvider}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        >
+                          <option value="">Select Wallet Provider</option>
+                          {walletProviders.map((item) => (
+                            <option key={item} value={item}>
+                              {item}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="text"
+                          name="walletIdentifier"
+                          value={form.walletIdentifier}
+                          onChange={(e) => handlePaymentChange(index, e)}
+                          placeholder="Wallet ID / Phone Number"
+                          className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+
                 <button
-                  onClick={() => removePaymentMethod(index)}
-                  className="text-red-500 text-sm hover:underline"
+                  onClick={addPaymentMethod}
+                  className="mt-3 px-4 py-2 bg-red-400 text-white rounded-lg"
+                  type="button"
                 >
-                  Remove
+                  + Add More Payment Method
                 </button>
-              )}
-            </div>
-            <div className="flex items-center gap-2 my-2">
-              <input
-                type="radio"
-                name="primaryPayment"
-                checked={form.isDefault === true}
-                onChange={() => handlePrimaryChange(index)}
-              />
-              <label className="text-sm">Set as Primary</label>
-            </div>
-
-            <div className="flex gap-5 flex-wrap">
-              <div className="">
-                <label className="block text-sm font-medium text-gray-700">
-                  Select Payment Method Type
-                </label>
-                <select
-                  name="type"
-                  value={form.type}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  className="inputfield-glg-be mt-1 block w-full mb-3 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
-                >
-                  <option value="">Select Payment Method</option>
-                  <option value="Bankmethod">Bank Method</option>
-                  <option value="UPI">UPI</option>
-                  <option value="WALLET">Wallet</option>
-                </select>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Recipient Name
-                </label>
-                <input
-                  type="text"
-                  name="recipientName"
-                  value={form.recipientName}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                  placeholder="Enter recipient name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Nickname
-                </label>
-                <input
-                  type="text"
-                  name="nickname"
-                  value={form.nickname}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                  placeholder="Enter nickname"
-                />
-              </div>
-            </div>
-            {paymentErrors[index] && (
-              <span className="text-xs text-red-500">
-                {paymentErrors[index]}
-              </span>
-            )}
-
-            {form.type === "Bankmethod" && (
-              <div className="flex gap-5 flex-wrap my-3">
-                <input
-                  type="text"
-                  name="accountHolderName"
-                  value={form.accountHolderName}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  placeholder="Account Holder Name"
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-                <input
-                  type="text"
-                  name="accountNumber"
-                  value={form.accountNumber}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  placeholder="Account Number"
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-                <input
-                  type="text"
-                  name="ifscCode"
-                  value={form.ifscCode}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  placeholder="IFSC Code"
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-                <input
-                  type="text"
-                  name="bankName"
-                  value={form.bankName}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  placeholder="Bank Name"
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-                <input
-                  type="text"
-                  name="branchName"
-                  value={form.branchName}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  placeholder="Branch Name"
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-                <select
-                  name="accountType"
-                  value={form.accountType}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                >
-                  <option value="">Select Account Type</option>
-                  <option value="Saving">Savings</option>
-                  <option value="Current">Current</option>
-                </select>
-              </div>
-            )}
-
-            {form.type === "UPI" && (
-              <div className="flex gap-5 flex-wrap my-3">
-                <input
-                  type="text"
-                  name="upiId"
-                  value={form.upiId || ""}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  placeholder="UPI ID"
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-                <select
-                  name="upiProvider"
-                  value={form.upiProvider}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                >
-                  <option value="">Select UPI Provider</option>
-                  {upiProviders.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {form.type === "WALLET" && (
-              <div className="flex gap-5 flex-wrap my-3">
-                <select
-                  name="walletProvider"
-                  value={form.walletProvider}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                >
-                  <option value="">Select Wallet Provider</option>
-                  {walletProviders.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  name="walletIdentifier"
-                  value={form.walletIdentifier}
-                  onChange={(e) => handlePaymentChange(index, e)}
-                  placeholder="Wallet ID / Phone Number"
-                  className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
-            )}
-          </div>
-        ))}
-
-        <button
-          onClick={addPaymentMethod}
-          className="mt-3 px-4 py-2 bg-red-400 text-white rounded-lg"
-          type="button"
-        >
-          + Add More Payment Method
-        </button>
-      </div>
             </div>
           </div>
         </div>
@@ -899,5 +902,3 @@ interface PaymentForm {
 interface PaymentErrors {
   [key: number]: string;
 }
-
-
