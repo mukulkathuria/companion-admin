@@ -49,7 +49,7 @@ const Refundpending = () => {
               id: l.id,
               user,
               companion,
-              refundamount: l.refundamount,
+              refundamount: l.refundAmount,
               finalRate: l.finalRate,
               bookingstart: l.bookingstart,
               cancelledBy,

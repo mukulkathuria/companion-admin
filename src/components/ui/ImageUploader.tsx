@@ -48,6 +48,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onUpload }) => {
     } else {
       updatedImages = [...newImages];
     }
+    
     setLocalImages(updatedImages);
     onUpload(updatedImages);
   };
@@ -71,6 +72,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onUpload }) => {
         }
         return img;
       });
+
       setLocalImages(updatedImages);
       onUpload(updatedImages);
     }

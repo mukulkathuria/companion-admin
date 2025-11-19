@@ -31,30 +31,40 @@ const CancellationTab = () => {
           ])
       )
       .then((res) => {
-        if (res[0].data && res[1].data) {
-          const userData = res[0].data.map((l: any) => ({
-            id: l.id,
-            name: l.User.filter((p: any) => !p.isCompanion)[0].firstname,
-            gender: l.User.filter((p: any) => !p.isCompanion)[0].gender,
-            bookingTime: formatBookingTimingsforUi(l.bookingstart),
-          }));
-          const companionData = res[1].data.map((l: any) => ({
-            id: l.id,
-            name: l.User.filter((p: any) => p.isCompanion)[0].firstname,
-            gender: l.User.filter((p: any) => p.isCompanion)[0].gender,
-            bookingTime: formatBookingTimingsforUi(l.bookingstart),
-          }));
+        console.log("companion cancel data:", res);
+
+        if (res[0]?.data && res[1]?.data) {
+          const userData = res[0].data.map((l: any) => {
+            const user = l.User?.filter((p: any) => !p.isCompanion)[0];
+            return {
+              id: l.id,
+              name: user?.firstname || "Unknown",
+              gender: user?.gender || "N/A",
+              bookingTime: formatBookingTimingsforUi(l.bookingstart),
+            };
+          });
+
+          const companionData = res[1].data.map((l: any) => {
+            const companion = l.User?.filter((p: any) => p.isCompanion)[0];
+            return {
+              id: l.id,
+              name: companion?.firstname || "Unknown",
+              gender: companion?.gender || "N/A",
+              bookingTime: formatBookingTimingsforUi(l.bookingstart),
+            };
+          });
+
           setBookingList({ userData, companionData });
         }
       });
   }, []);
 
-//   const dummyRows = dummySlotRequests.map((l) => ({
-//     id: l.id,
-//     name: l.username,
-//     gender: l.gender,
-//     bookingTime: l.bookingTime,
-//   }));
+  //   const dummyRows = dummySlotRequests.map((l) => ({
+  //     id: l.id,
+  //     name: l.username,
+  //     gender: l.gender,
+  //     bookingTime: l.bookingTime,
+  //   }));
 
   return (
     <div>
@@ -76,9 +86,15 @@ const CancellationTab = () => {
         ))}
       </div>
       {activetab === "user" ? (
-        <BookingTable columns={cancellationTableColumns} rows={bookinglist.userData} />
+        <BookingTable
+          columns={cancellationTableColumns}
+          rows={bookinglist.userData}
+        />
       ) : (
-        <BookingTable columns={cancellationTableColumns} rows={bookinglist.companionData} />
+        <BookingTable
+          columns={cancellationTableColumns}
+          rows={bookinglist.companionData}
+        />
       )}
     </div>
   );
