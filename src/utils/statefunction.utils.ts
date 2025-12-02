@@ -14,6 +14,7 @@ interface CompanionDetails {
   city: string;
   state: string;
   zipcode: string | null;
+  bookingrate: string;
   lat: string;
   lng: string;
   height: string;
@@ -85,7 +86,7 @@ export function formatCompanionRequestData(companionDetails: CompanionDetails) {
     phoneno: companionDetails.phoneno,
     description: companionDetails.description,
     skintone: companionDetails.skintone,
-    bookingrate: companionDetails.companiondetails.bookingrate,
+    bookingrate: companionDetails.bookingrate,
     height: companionDetails.height,
     bodytype: companionDetails.bodytype,
     eatinghabits: companionDetails.eatinghabits,

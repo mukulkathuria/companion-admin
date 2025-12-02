@@ -5,6 +5,7 @@ export interface basicUserDetailsDto{
     Images?: string[];
     age: number;
     isCompanion: boolean;
+    reason: string
 }
 
 export interface bookingDetailsDto {
