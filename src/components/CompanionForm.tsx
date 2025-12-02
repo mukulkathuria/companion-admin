@@ -61,7 +61,7 @@ export function CompanionForm({
 
   useEffect(() => {
     if (initialValues && initialValues.paymentmethods) {
-      console.log("initialValues: ", initialValues);
+      console.log("initialValues new value: ", initialValues);
 
       setPaymentForms(
         initialValues.paymentmethods.map((pm: any) => ({
@@ -82,7 +82,7 @@ export function CompanionForm({
         }))
       );
     }
-    console.log('preloaded form data id:', form.id);
+  //  console.log('preloaded form data id:', form.id);
     
   }, [initialValues]);
 
@@ -299,7 +299,7 @@ export function CompanionForm({
     for (let [key, value] of userData.entries()) {
       obj[key] = value;
     }
-   // console.log("update companion form submitted", obj);
+   //console.log("update companion form submitted", obj);
    // console.log('hey this is id',id);
     
     try {
@@ -700,7 +700,7 @@ export function CompanionForm({
                           className="inputfield-glg-be mt-1 block w-full mb-3 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
                         >
                           <option value="">Select Payment Method</option>
-                          <option value="Bankmethod">Bank Method</option>
+                          <option value="BANK_ACCOUNT">Bank Method</option>
                           <option value="UPI">UPI</option>
                           <option value="WALLET">Wallet</option>
                         </select>
@@ -739,7 +739,7 @@ export function CompanionForm({
                       </span>
                     )}
 
-                    {form.type === "Bankmethod" && (
+                    {form.type === "BANK_ACCOUNT" && (
                       <div className="flex gap-5 flex-wrap my-3">
                         <input
                           type="text"
@@ -788,8 +788,8 @@ export function CompanionForm({
                           className="inputfield-glg-be mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                         >
                           <option value="">Select Account Type</option>
-                          <option value="Saving">Savings</option>
-                          <option value="Current">Current</option>
+                          <option value="SAVINGS">Savings</option>
+                          <option value="CURRENT">Current</option>
                         </select>
                       </div>
                     )}

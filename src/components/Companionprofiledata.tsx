@@ -6,7 +6,7 @@ const Companionprofiledata = (initialData: any = {}) => {
   useEffect(() => {
     if (initialData.initialData) {
       setData(initialData.initialData);
-      console.log('data in component:', initialData.initialData);
+      console.log('old data for view:', initialData.initialData);
       
 
     }

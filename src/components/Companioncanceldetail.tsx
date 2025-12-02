@@ -114,13 +114,13 @@ const CompanionCancelDetails = () => {
           {String(bookingDetails.cancellationDetails?.isCompanion)}
         </div>
       </div>
-      {bookingDetails.cancelledReason ? (
+      {bookingDetails.cancellationDetails?.reason ? (
         <>
           <div>
             <h1 className="font-bold mt-4">
               Reason of cancelation by companion :{" "}
               <span className="font-normal">
-                {bookingDetails.cancelledReason}
+                {bookingDetails.cancellationDetails?.reason}
               </span>
             </h1>
           </div>
