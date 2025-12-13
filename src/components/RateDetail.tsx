@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { formatBookingTimingswithEndTime } from "@/utils/booking.utils";
 
 interface EarningItem {
+  penaltyAmount: any;
   txnId: any;
   id: string;
   Booking: {
@@ -26,27 +27,20 @@ const RateDetail: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [filterEarndata, setFilterEarndata] = useState<EarningItem[]>([]);
   const [totals, setTotals] = useState({ net: 0, tax: 0 });
+  // use consistent property name: penaltyAmount (camelCase)
   const [selectedEarnings, setSelectedEarnings] = useState<
-    { txnId: string; netAmount: number }[]
+    { txnId: string; netAmount: number; penaltyAmount: number }[]
   >([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<"PENDING" | "COMPLETED">(
     "PENDING"
-  ); // typed state
+  );
   const [activePending, setActivePending] = useState<"7DAYS" | "30DAYS">(
     "7DAYS"
   );
   const [Paymentdata, setPaymentdata] = useState<any>(null);
-
-  // Compute total selected
-  {
-    /* const totalSelected = useMemo(
-    () => selectedEarnings.reduce((sum, e) => sum + Number(e.netAmount), 0),
-    [selectedEarnings]
-  ); */
-  }
 
   useEffect(() => {
     const companionId = searchParams.get("companionId");
@@ -154,9 +148,29 @@ const RateDetail: FC = () => {
     }
   };
 
-  const ids = selectedEarnings.map((e) => e.txnId); // txnIds
+  // derived values
+  const ids = selectedEarnings.map((e) => e.txnId);
   const companionId = companiondata?.id || "";
-  const netAmount = selectedEarnings.map((e) => String(e.netAmount));
+ // const netAmountStrings = totalSelected - totalPenalty;
+  
+
+  // memoize totals for selected items
+  const totalSelected = useMemo(
+    () =>
+      selectedEarnings.reduce(
+        (sum, e) => sum + (e.netAmount || 0) - (e.penaltyAmount || 0),
+        0
+      ),
+    [selectedEarnings]
+  );
+
+  const totalPenalty = useMemo(
+    () => selectedEarnings.reduce((sum, e) => sum + (e.penaltyAmount || 0), 0),
+    [selectedEarnings]
+  );
+
+  const netAmountStrings = (totalSelected - totalPenalty).toFixed(2);
+
 
   if (!companiondata) return <div>Loading...</div>;
   const hiddenKeys = ["id", "createdAt", "updatedAt"];
@@ -219,7 +233,7 @@ const RateDetail: FC = () => {
                 <h1>Price(per hour):</h1>
                 <input
                   type="number"
-                  value={companiondata.bookingrate}
+                  value={companiondata.bookingrate ?? ""}
                   onChange={handlePriceChange}
                   className="p-2 border rounded"
                   required
@@ -344,78 +358,100 @@ const RateDetail: FC = () => {
 
             {filterEarndata.length > 0 ? (
               <>
-                {filterEarndata.length > 0 ? (
-                  <>
-                    {filterEarndata.map((item) => {
-                      const txnId = item.txnId; // use txnId
-                      const isSelected = selectedEarnings.some(
-                        (e) => e.txnId === txnId
+                {filterEarndata.map((item) => {
+                  const txnId = item.txnId;
+                  const isSelected = selectedEarnings.some(
+                    (e) => e.txnId === txnId
+                  );
+
+                  const handleToggle = () => {
+                    if (isSelected) {
+                      setSelectedEarnings((prev) =>
+                        prev.filter((e) => e.txnId !== txnId)
                       );
+                    } else {
+                      setSelectedEarnings((prev) => [
+                        ...prev,
+                        {
+                          txnId,
+                          netAmount: item.netAmount || 0,
+                          // ensure penalty key matches everywhere
+                          penaltyAmount: item.penaltyAmount || 0,
+                        },
+                      ]);
+                    }
+                  };
 
-                      const handleClick = () => {
-                        if (isSelected) {
-                          setSelectedEarnings((prev) =>
-                            prev.filter((e) => e.txnId !== txnId)
-                          );
-                        } else {
-                          setSelectedEarnings((prev) => [
-                            ...prev,
-                            { txnId, netAmount: item.netAmount },
-                          ]);
-                        }
-                      };
-
-                      return (
-                        <div
-                          key={txnId}
-                          className={`flex justify-between px-5 mt-4 py-3 rounded-lg cursor-pointer ${
-                            isSelected ? "bg-slate-300" : "bg-slate-200"
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            {activeTab === "PENDING" && (
-                              <input type="checkbox" onClick={handleClick} />
-                            )}
-                            <h1>
-                              {formatBookingTimingswithEndTime(
-                                item.Booking.bookingstart,
-                                item.Booking.bookingend ?? ""
-                              )}
-                            </h1>
-                          </div>
-                          <div className="text-right">
-                            <h1>₹{item.netAmount.toFixed(2)}</h1>
-                            <p className="text-sm text-gray-500">
-                              Tax: ₹{item.taxAmount.toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    {selectedEarnings.length > 0 && (
-                      <div className="mt-6 text-right">
-                        <h1 className="text-lg font-bold">
-                          Total of Selected: ₹
-                          {selectedEarnings
-                            .reduce((sum, e) => sum + e.netAmount, 0)
-                            .toFixed(2)}
+                  return (
+                    <div
+                      key={txnId}
+                      className={`flex justify-between px-5 mt-4 py-3 rounded-lg cursor-pointer ${
+                        isSelected ? "bg-slate-300" : "bg-slate-200"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {activeTab === "PENDING" && (
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={handleToggle}
+                          />
+                        )}
+                        <h1>
+                          {formatBookingTimingswithEndTime(
+                            item.Booking.bookingstart,
+                            item.Booking.bookingend ?? ""
+                          )}
                         </h1>
                       </div>
-                    )}
-                    {activeTab === "PENDING" && filterEarndata.length > 0 && (
-                      <button
-                        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        onClick={() => setIsModalOpen(true)}
-                      >
-                        Pay
-                      </button>
-                    )}
+                      <div className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {/* show penalty clearly */}
+                          {item.penaltyAmount > 0 && (
+                            <span className="text-sm text-red-600">
+                              -₹{item.penaltyAmount.toFixed(2)}
+                            </span>
+                          )}
+                          <h1>₹{(item.netAmount || 0).toFixed(2)}</h1>
+                        </div>
+                        <p className="text-sm text-gray-500">
+                          Tax: ₹{(item.taxAmount || 0).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {selectedEarnings.length > 0 && (
+                  <>
+                    <div className="mt-6 text-right">
+                      <h1 className="text-lg font-bold">
+                        Total Selected Amount: ₹{totalSelected.toFixed(2)}
+                      </h1>
+                    </div>
+
+                    <div className="mt-2 text-right">
+                      <h1 className="text-lg font-bold">
+                        Total Selected Penalty: ₹{totalPenalty.toFixed(2)}
+                      </h1>
+                    </div>
+
+                    <div className="mt-2 text-right">
+                      <h1 className="text-xl font-bold text-blue-600">
+                        Final Payable Amount: ₹
+                        {(totalSelected - totalPenalty).toFixed(2)}
+                      </h1>
+                    </div>
                   </>
-                ) : (
-                  <p className="text-center mt-4 text-gray-500">
-                    No earnings found
-                  </p>
+                )}
+
+                {activeTab === "PENDING" && selectedEarnings.length > 0 && (
+                  <button
+                    className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    Pay
+                  </button>
                 )}
               </>
             ) : (
@@ -432,7 +468,7 @@ const RateDetail: FC = () => {
           onClose={() => setIsModalOpen(false)}
           ids={ids}
           companionId={companionId}
-          netAmount={netAmount}
+          netAmount={[netAmountStrings]}
         />
       )}
     </>
@@ -466,7 +502,7 @@ export const Dailybooking: FC<WeeklybookingProps> = ({ data }) => {
             outerRadius={100}
             fill="#8884d8"
             dataKey="bookingHours"
-            label={({ day }) => day}
+            label={(entry: any) => entry.day}
           >
             {data.map((_, index) => (
               <Cell
