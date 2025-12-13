@@ -65,7 +65,7 @@ const Locationaccess: React.FC<LocationAccessProps> = ({ setLocation, mapkey }) 
 
       <div
         id={mapkey ? `map${mapkey}` : "map"}
-        className={isLocationSet ? 'w-[10rem] md:w-[20rem] h-[25rem] my-5' : ''}
+        className={isLocationSet ? 'w-40 md:w-[20rem] h-100 my-5' : ''}
       ></div>
     </div>
   )
