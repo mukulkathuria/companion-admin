@@ -1,10 +1,13 @@
-import path from 'path';
-import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
-// import * as fs from 'fs';
+import path from 'path'
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    tailwindcss(), // ✅ required for Tailwind v4
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -13,11 +16,11 @@ export default defineConfig({
   build: {
     target: 'esnext',
     outDir: 'dist',
-    assetsDir: 'assets', 
-    sourcemap: false, 
-    minify: 'esbuild', 
+    assetsDir: 'assets',
+    sourcemap: false,
+    minify: 'esbuild',
     assetsInlineLimit: 8000,
-    chunkSizeWarningLimit: 500, 
+    chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -30,10 +33,6 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   server: {
-    // https:{
-    //   key: fs.readFileSync('certificates/localhost-key.pem'),
-    //   cert: fs.readFileSync('certificates/localhost.pem')
-    // },
     port: 3002,
   },
-});
+})
