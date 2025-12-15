@@ -529,7 +529,7 @@ export function CreateCompanion({
     : {};
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto  ">
       <Card>
         <CardHeader>
           <CardTitle>
@@ -543,8 +543,8 @@ export function CreateCompanion({
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Personal Details Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-700">
+          <div className="space-y-4 ">
+            <h3 className="text-lg font-medium text-red-900 mt-5">
               Personal Details
             </h3>
             <div>
