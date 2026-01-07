@@ -68,6 +68,8 @@ const RateDetail: FC = () => {
               data.last7daysbookings || []
             ),
           };
+          console.log('values', data);
+
 
           setCompanionData(values);
 
@@ -93,7 +95,7 @@ const RateDetail: FC = () => {
           setTotals({ net, tax });
         }
       } catch (err) {
-        console.error("Error fetching companion data:", err);
+      
         toast.error("Failed to fetch companion data");
       }
     };
@@ -172,11 +174,25 @@ const RateDetail: FC = () => {
   const netAmountStrings = (totalSelected - totalPenalty).toFixed(2);
 
 
-  if (!companiondata) return <div>Loading...</div>;
+if (!companiondata) {
+  return <div>Loading...</div>;
+}
+
+if (companiondata.data === null) {
+  return (
+    <div className="text-center py-10 text-lg font-medium">
+      No data found
+    </div>
+  );
+}
+
+
+
   const hiddenKeys = ["id", "createdAt", "updatedAt"];
 
   return (
     <>
+
       <div>
         <h1 className="text-xl font-bold">Companion detail</h1>
         <div className="becompanion-box">

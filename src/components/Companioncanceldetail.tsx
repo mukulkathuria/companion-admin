@@ -111,7 +111,7 @@ const CompanionCancelDetails = () => {
         <span>{bookingDetails.cancellationDetails?.firstname}</span>
         <div>
           Is Cancelled By Companion:{" "}
-          {String(bookingDetails.cancellationDetails?.isCompanion)}
+          {String(bookingDetails.cancellationDetails?.reason ? "Yes" : "No")}
         </div>
       </div>
       {bookingDetails.cancellationDetails?.reason ? (
