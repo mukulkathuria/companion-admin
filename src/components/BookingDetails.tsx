@@ -257,7 +257,7 @@ export function BookingDetails() {
       </Card>
 
       {/* Cancellation Details */}
-      {bookingDetails.cancellationDetails && (
+      {  bookingDetails.status === "CANCELLATIONAPPROVED" ? (
         <Card className="mt-8">
           <CardHeader>
             <CardTitle className="text-xl font-semibold text-gray-900">
@@ -270,33 +270,31 @@ export function BookingDetails() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-gray-500">Canceled By</label>
+                <label className="text-sm text-gray-500">Canceled By Companion: </label>
                 <p className="font-medium text-gray-900">
-                  {bookingDetails.cancellationDetails.firstname}
+                  {bookingDetails.cancellationDetails.reason ? "Yes" : "No"}
                 </p>
               </div>
-              <p className="font-medium text-gray-900">
-                Companion:{" "}
-                {String(bookingDetails.cancellationDetails.isCompanion)}
-              </p>
+             {bookingDetails.cancellationDetails.reason && (
               <div>
                 <label className="text-sm text-gray-500">
                   Cancellation Time
                 </label>
-                <p className="font-medium text-gray-900">Cancelation Time</p>
+                <p className="font-medium text-gray-900">{bookingDetails.cancellationDetails.cancelledAt}</p>
               </div>
+              )}
             </div>
-            {bookingDetails.cancelledReason && (
+            {bookingDetails.cancellationDetails.reason && (
               <div>
                 <label className="text-sm text-gray-500">Reason</label>
                 <p className="font-medium text-gray-900">
-                  {bookingDetails.cancelledReason}
+                  {bookingDetails.cancellationDetails.reason}
                 </p>
               </div>
             )}
           </CardContent>
         </Card>
-      )}
+      ): null}
 
       {/* Reviews */}
       {bookingDetails?.rating && (

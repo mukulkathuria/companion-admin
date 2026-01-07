@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { formatApiResponseSecond } from "@/utils/secondconverterdata.utilis";
 import Companionprofiledata from "./Companionprofiledata";
+import { log } from "node:console";
 
 const Becompaniondetail = () => {
   const [companiondata, setcompaniondata] = useState<any>(null);
@@ -22,6 +23,8 @@ const Becompaniondetail = () => {
         )
         .then(async ({ data }) => {
           setcompaniondata(formatApiResponseSecond(data));
+          
+         
         
         });
     }
@@ -58,9 +61,10 @@ const Becompaniondetail = () => {
     return (
       <div className="text-center py-10 text-lg font-medium">Loading...</div>
     );
-  }
+  } 
 
   return (
+
     <div className="max-w-4xl mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6 text-center">
         Request Companion Detail
